@@ -6,6 +6,9 @@ releases/
 *.o
 *.so
 
+commits.txt
+third-party/*
+
 # thanks I hate it
 batmon
 !batmon/
