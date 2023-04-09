@@ -14,6 +14,8 @@ ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
 
+TARGET = main
+
 ###########################################################
 
 CC = $(CROSS_COMPILE)gcc
@@ -24,6 +26,6 @@ LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lmsettings -lrt -lz -lm
 OPTM=-O3
 
 build:
-	$(CC) -o MiniUI main.c ../common/common.c $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
+	$(CC) -o MiniUI $(TARGET).c ../common/common.c $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
 clean:
 	rm -f MiniUI
