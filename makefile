@@ -18,9 +18,9 @@ BUILD_TIME!=date "+%Y-%m-%d %H:%M:%S"
 BUILD_REPO=https://github.com/alxv2016/RetroPlay-OS.git
 BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 
-RELEASE_BASE=RetroPlayOS-V
-RELEASE_DOT!=find ./releases/. -regex ".*/$(RELEASE_BASE)[0-9]\.zip" -printf '.' | wc -m
-RELEASE_NAME=$(RELEASE_BASE)-$(RELEASE_DOT)
+TARGET=RetroPlayOS
+VERSION=1.0-alpha
+RELEASE_NAME=$(TARGET)-v$(VERSION)
 
 PATCH = git apply
 
