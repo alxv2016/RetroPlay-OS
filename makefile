@@ -15,12 +15,11 @@ endif
 BUILD_ARCH!=uname -m
 BUILD_HASH!=git rev-parse --short HEAD
 BUILD_TIME!=date "+%Y-%m-%d %H:%M:%S"
-BUILD_REPO=https://github.com/shauninman/MiniUI
+BUILD_REPO=https://github.com/alxv2016/RetroPlay-OS.git
 BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 
-RELEASE_TIME!=date +%Y%m%d
-RELEASE_BASE=RetroPlayOS-$(RELEASE_TIME)
-RELEASE_DOT!=find ./releases/. -regex ".*/$(RELEASE_BASE)-[0-9]+-base\.zip" -printf '.' | wc -m
+RELEASE_BASE=RetroPlayOS-V
+RELEASE_DOT!=find ./releases/. -regex ".*/$(RELEASE_BASE)[0-9]\.zip" -printf '.' | wc -m
 RELEASE_NAME=$(RELEASE_BASE)-$(RELEASE_DOT)
 
 PATCH = git apply
@@ -113,11 +112,11 @@ bundle:
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libstdc++.so.6 ./build/PAYLOAD/.system/lib/
 
 zip:
-	cd ./build/PAYLOAD/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME)-base.zip\n$(BUILD_HASH)" > version.txt
+	cd ./build/PAYLOAD/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip\n$(BUILD_HASH)" > version.txt
 	cp ./commits.txt ./build/PAYLOAD/.system/paks/MiniUI.pak
 	cd ./build/PAYLOAD && zip -r MiniUI.zip .system .tmp_update
 	mv ./build/PAYLOAD/MiniUI.zip ./build/PAYLOAD/miyoo354/app/
-	cd ./build/PAYLOAD && zip -r ../../releases/$(RELEASE_NAME)-base.zip Bios Roms Saves miyoo354 README.txt
+	cd ./build/PAYLOAD && zip -r ../../releases/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
 	echo "$(RELEASE_NAME)" > ./build/latest.txt
 
 rezip: payload $(BUNDLE_LIBS) zip
@@ -147,32 +146,32 @@ clean:
 # 	cd ./third-party/logotweak/logomake && make
 # 	cd ./third-party/logotweak/logowrite && make
 # 	cd ./src/clock && make
+#
+# 	cd ./third-party/vvvvvv && make -j
 
-	# cd ./third-party/vvvvvv && make -j
-
-	# fmt -w 40 -s ./extras//README.txt > ./build/EXTRAS/README.txt
-	# cp -R ./extras/. ./build/EXTRAS
+# 	fmt -w 40 -s ./extras//README.txt > ./build/EXTRAS/README.txt
+# 	cp -R ./extras/. ./build/EXTRAS
 	
 
-	# cp ./third-party/DinguxCommander/output/DinguxCommander ./build/EXTRAS/Tools/Files.pak/
-	# cp ./src/clock/clock ./build/EXTRAS/Tools/Clock.pak/
-	# cp -r ./third-party/DinguxCommander/res ./build/EXTRAS/Tools/Files.pak/
-	# cp ./third-party/screenshot/screenshot ./build/EXTRAS/Tools/Screenshots.pak/
+# 	cp ./third-party/DinguxCommander/output/DinguxCommander ./build/EXTRAS/Tools/Files.pak/
+# 	cp ./src/clock/clock ./build/EXTRAS/Tools/Clock.pak/
+# 	cp -r ./third-party/DinguxCommander/res ./build/EXTRAS/Tools/Files.pak/
+# 	cp ./third-party/screenshot/screenshot ./build/EXTRAS/Tools/Screenshots.pak/
 
-	# cp ./third-party/picoarch/output/beetle-pce-fast_libretro.so ./build/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-	# cp ./third-party/picoarch/output/pokemini_libretro.so ./build/EXTRAS/Emus/PKM.pak/
-	# cp ./third-party/picoarch/output/mednafen_supafaust_libretro.so ./build/EXTRAS/Emus/SUPA.pak/
-	# cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/MGBA.pak/
-	# cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/SGB.pak/
-	# cp ./third-party/picoarch/output/fake-08_libretro.so ./build/EXTRAS/Emus/P8.pak/
-	# cp ./third-party/picoarch/output/nxengine_libretro.so "./build/EXTRAS/Roms/Native Games (SH)/Cave Story/"
-	# cp ./third-party/vvvvvv/vvvvvv "./build/EXTRAS/Roms/Native Games (SH)/VVVVVV/"
-	# cp -R ./bits/bootlogos/pak/. ./build/EXTRAS/Tools/Single-use/bootlogo.tmp
-	# cp ./third-party/logotweak/logomake/logomake ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
-	# cp ./third-party/logotweak/logowrite/logowrite ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
-	# cd ./build/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Remove MiniUI Boot Logo.pak"
-	# cp -R ./bits/bootlogos/miniui/. ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
-	# cd ./build/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Add MiniUI Boot Logo.pak"
-	# rm -rf ./build/EXTRAS/Tools/Single-use/bootlogo.tmp
+# 	cp ./third-party/picoarch/output/beetle-pce-fast_libretro.so ./build/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
+# 	cp ./third-party/picoarch/output/pokemini_libretro.so ./build/EXTRAS/Emus/PKM.pak/
+# 	cp ./third-party/picoarch/output/mednafen_supafaust_libretro.so ./build/EXTRAS/Emus/SUPA.pak/
+# 	cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/MGBA.pak/
+# 	cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/SGB.pak/
+# 	cp ./third-party/picoarch/output/fake-08_libretro.so ./build/EXTRAS/Emus/P8.pak/
+# 	cp ./third-party/picoarch/output/nxengine_libretro.so "./build/EXTRAS/Roms/Native Games (SH)/Cave Story/"
+# 	cp ./third-party/vvvvvv/vvvvvv "./build/EXTRAS/Roms/Native Games (SH)/VVVVVV/"
+# 	cp -R ./bits/bootlogos/pak/. ./build/EXTRAS/Tools/Single-use/bootlogo.tmp
+# 	cp ./third-party/logotweak/logomake/logomake ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
+# 	cp ./third-party/logotweak/logowrite/logowrite ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
+# 	cd ./build/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Remove MiniUI Boot Logo.pak"
+# 	cp -R ./bits/bootlogos/miniui/. ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
+# 	cd ./build/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Add MiniUI Boot Logo.pak"
+# 	rm -rf ./build/EXTRAS/Tools/Single-use/bootlogo.tmp
 
-	# cd ./build/EXTRAS && zip -r ../../releases/$(RELEASE_NAME)-extras.zip Bios Emus Roms Saves Tools README.txt
+# 	cd ./build/EXTRAS && zip -r ../../releases/$(RELEASE_NAME)-extras.zip Bios Emus Roms Saves Tools README.txt
