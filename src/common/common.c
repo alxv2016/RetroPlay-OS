@@ -145,8 +145,8 @@ void getEmuName(const char* in_name, char* out_name) {
 	tmp = out_name;
 	
 	// extract just the Roms folder name if necessary
-	if (prefixMatch(Paths.romsDir, tmp)) {
-		tmp += strlen(Paths.romsDir) + 1;
+	if (prefixMatch(ROMS_PATH, tmp)) {
+		tmp += strlen(ROMS_PATH) + 1;
 		char* tmp2 = strchr(tmp, '/');
 		if (tmp2) tmp2[0] = '\0';
 	}
@@ -340,7 +340,7 @@ void GFX_quit(void) {
 // Graphics utilities functions
 SDL_Surface* GFX_loadImage(char* path) {
 	static char full_path[256];
-	sprintf(full_path, "%s/%s", Paths.resDir, path);
+	sprintf(full_path, "%s/%s", RES_PATH, path);
 	SDL_Surface* image = IMG_Load(full_path);
 	if (!image) printf("IMG_Load: %s\n", IMG_GetError());
 	return image;
@@ -462,8 +462,8 @@ void GFX_blitBattery(SDL_Surface* surface, int x, int y) {
 }
 
 // Hint copy *Deprecating
-int GFX_blitHint(SDL_Surface* surface, char* htxt, int x, int y) {
-	SDL_Surface* hint_text = TTF_RenderUTF8_Blended(font_m, htxt, white);
+void GFX_blitHint(SDL_Surface* surface, char* htxt, int x, int y) {
+	SDL_Surface* hint_text = TTF_RenderUTF8_Blended(font.small, htxt, COLOR_LIGHT_TEXT);
 	SDL_BlitSurface(hint_text, NULL, surface, &(SDL_Rect){x,y});
 	SDL_FreeSurface(hint_text);
 }

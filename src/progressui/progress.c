@@ -20,7 +20,7 @@
 
 int main (int argc, char *argv[]) {
     int fd = inotify_init();
-    int wd = inotify_add_watch( fd, UPDATE_DIR, IN_MODIFY | IN_CREATE );
+    int wd = inotify_add_watch( fd, TEMP_PATH, IN_MODIFY | IN_CREATE );
 	
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_ShowCursor(0);
@@ -71,7 +71,7 @@ int main (int argc, char *argv[]) {
 			SDL_BlitSurface(progress_bar_empty, NULL, screen, &(SDL_Rect){120,236});
 			SDL_BlitSurface(progress_bar_full, &(SDL_Rect){0,0,progress*4,8}, screen, &(SDL_Rect){120,236});
 		}
-		GFX_blitBodyCopy(screen, msg, 0,80, Screen.width,Screen.height-80);
+		GFX_blitParagraph(screen, msg, 0,80, SCREEN_WIDTH,SCREEN_HEIGHT-80);
 		SDL_Flip(screen);
 	}
 	

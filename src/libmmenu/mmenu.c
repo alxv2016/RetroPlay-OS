@@ -59,10 +59,10 @@ __attribute__((constructor)) static void init(void) {
 	slot_overlay = GFX_loadImage("slot-overlay.png");
 	slot_dots = GFX_loadImage("slot-dots.png");
 	slot_dot_selected = GFX_loadImage("slot-dot-selected.png");
-	arrow = GFX_loadImage("arrow.png");
-	arrow_highlighted = GFX_loadImage("arrow-highlighted.png");
-	no_preview = GFX_getText("No Preview", 0, 1);
-	empty_slot = GFX_getText("Empty Slot", 0, 1);
+	arrow = GFX_loadImage("chevron-white.png");
+	arrow_highlighted = GFX_loadImage("chevron-black.png");
+	no_preview = GFX_getText("No Preview");
+	empty_slot = GFX_getText("Empty Slot");
 }
 __attribute__((destructor)) static void quit(void) {
 	SDL_FreeSurface(overlay);
@@ -123,7 +123,7 @@ void ShowWarning(void) {
 	
 	SDL_Surface* okay = GFX_loadImage("okay.png");
 	SDL_BlitSurface(okay, NULL, screen, NULL);
-	GFX_blitBodyCopy(screen, "This pak does not support\nsave states, auto-power off\nor quicksave and resume.", 0,0,screen->w,406);
+	GFX_blitParagraph(screen, "This pak does not support\nsave states, auto-power off\nor quicksave and resume.", 0,0,screen->w,406);
 	SDL_Flip(screen);
 
 	SDL_Event event;
@@ -146,7 +146,7 @@ void ShowWarning(void) {
 // TODO: look at common data between SaveLoad and ShowMenu and determine which can be determined once and cached
 
 static MenuReturnStatus SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave) {
-	int status = kStatusContinue;
+	int status = STATUS_CONTINUE;
 	if (!state_support) return status;
 	
 	char *tmp;

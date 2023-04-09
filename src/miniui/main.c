@@ -628,12 +628,12 @@ static Array* getRoot(void) {
 	DIR *dh;
 	
 	Array* entries = Array_new();
-	dh = opendir(Paths.romsDir);
+	dh = opendir(ROMS_PATH);
 	if (dh!=NULL) {
 		struct dirent *dp;
 		char* tmp;
 		char full_path[256];
-		sprintf(full_path, "%s/", Paths.romsDir);
+		sprintf(full_path, "%s/", ROMS_PATH);
 		tmp = full_path + strlen(full_path);
 		Array* emus = Array_new();
 		while((dp = readdir(dh)) != NULL) {
@@ -995,7 +995,7 @@ static int autoResume(void) {
 static void openPak(char* path) {
 	// NOTE: escapeSingleQuotes() modifies the passed string 
 	// so we need to save the path before we call that
-	// if (prefixMatch(Paths.romsDir, path)) {
+	// if (prefixMatch(ROMS_PATH, path)) {
 	// 	addRecent(path);
 	// }
 	saveLast(path);
@@ -1095,7 +1095,7 @@ static void openDirectory(char* path, int auto_launch) {
 	
 	top = Directory_new(path, selected);
 	top->start = start;
-	top->end = end ? end : ((top->entries->count<Screen.main.list.row_count) ? top->entries->count : Screen.main.list.row_count);
+	top->end = end ? end : ((top->entries->count<ROW_COUNT) ? top->entries->count : ROW_COUNT);
 
 	Array_push(stack, top);
 }
@@ -1566,8 +1566,7 @@ int main (int argc, char *argv[]) {
 	
 	SDL_FillRect(screen, NULL, 0);
 	SDL_Flip(screen);
-	
-	SDL_FreeSurface(logo);
+
 	if (version) SDL_FreeSurface(version);
 
 	Menu_quit();
