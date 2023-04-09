@@ -19,7 +19,7 @@ BUILD_REPO=https://github.com/shauninman/MiniUI
 BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 
 RELEASE_TIME!=date +%Y%m%d
-RELEASE_BASE=DotUI-$(RELEASE_TIME)
+RELEASE_BASE=RetroPlayOS-$(RELEASE_TIME)
 RELEASE_DOT!=find ./releases/. -regex ".*/$(RELEASE_BASE)-[0-9]+-base\.zip" -printf '.' | wc -m
 RELEASE_NAME=$(RELEASE_BASE)-$(RELEASE_DOT)
 
