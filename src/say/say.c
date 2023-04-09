@@ -8,19 +8,14 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
-#define PINK_TRIAD 0xd4,0x98,0xab
-#define kTextBoxMaxRows 8
-#define kTextLineLength 256
-#define kLineHeight 48
+#include "../common/defines.h"
 
-#define kMiniUIFont "/mnt/SDCARD/.system/res/BPreplayBold-unhinted.otf"
-#define kStockFont "/customer/app/BPreplayBold.otf"
-
+#define STOCK_FONT "/customer/app/BPreplayBold.otf"
 static void blit(void* _dst, int dst_w, int dst_h, void* _src, int src_w, int src_h, int ox, int oy) {
 	uint8_t* dst = (uint8_t*)_dst;
 	uint8_t* src = (uint8_t*)_src;
 	
-	oy += kLineHeight - src_h;
+	oy += FONT_LINEHEIGHT - src_h;
 	
 	for (int y=0; y<src_h; y++) {
 		uint8_t* dst_row = dst + (((((dst_h - 1 - oy) - y) * dst_w) - 1 - ox) * 4);
@@ -46,12 +41,12 @@ int main(int argc , char* argv[]) {
 	}
 	
 	char* path = NULL;
-	if (access(kMiniUIFont, F_OK)==0) path = kMiniUIFont;
-	else if (access(kStockFont, F_OK)==0) path = kStockFont;
+	if (access(FONT_PATH, F_OK)==0) path = FONT_PATH;
+	else if (access(STOCK_FONT, F_OK)==0) path = STOCK_FONT;
 	if (!path) return 0;
 	
-	char str[kTextBoxMaxRows*kTextLineLength];
-	strncpy(str,argv[1],kTextBoxMaxRows*kTextLineLength);
+	char str[MAX_PATH];
+	strncpy(str,argv[1],MAX_PATH);
 	
 	int fb0_fd = open("/dev/fb0", O_RDWR);
 	struct fb_var_screeninfo vinfo;
@@ -60,26 +55,26 @@ int main(int argc , char* argv[]) {
 	char* fb0_map = (char*)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb0_fd, 0);
 
 	TTF_Init();
-	TTF_Font* font = TTF_OpenFont(path, 32);
+	TTF_Font* font = TTF_OpenFont(path, FONT_LARGE);
 	
-	int width = 640;
-	int height = 480;
-	SDL_Color pink = {PINK_TRIAD};
+	int width = SCREEN_WIDTH;
+	int height = SCREEN_HEIGHT;
+	SDL_Color font_color = {TRIAD_WHITE};
 	SDL_Surface* text;
-	char* rows[kTextBoxMaxRows];
+	char* rows[MAX_ROW];
 	int row_count = 0;
 
 	char* tmp;
 	rows[row_count++] = str;
 	while ((tmp=strchr(rows[row_count-1], '\n'))!=NULL) {
-		if (row_count+1>=kTextBoxMaxRows) break;
+		if (row_count+1>=MAX_ROW) break;
 		rows[row_count++] = tmp+1;
 	}
 	
-	int rendered_height = kLineHeight * row_count;
+	int rendered_height = FONT_LINEHEIGHT * row_count;
 	int y = (height - rendered_height) / 2;
 	
-	char line[kTextLineLength];
+	char line[MAX_PATH];
 	
 	for (int i=0; i<row_count; i++) {
 		int len;
@@ -94,12 +89,12 @@ int main(int argc , char* argv[]) {
 		}
 		
 		if (len) {
-			text = TTF_RenderUTF8_Blended(font, line, pink);
+			text = TTF_RenderUTF8_Blended(font, line, font_color);
 			int x = (width - text->w) / 2;
 			blit(fb0_map,width,height,text->pixels,text->w,text->h,x,y);
 			SDL_FreeSurface(text);
 		}
-		y += kLineHeight;
+		y += FONT_LINEHEIGHT;
 	}
 	
 	TTF_CloseFont(font);

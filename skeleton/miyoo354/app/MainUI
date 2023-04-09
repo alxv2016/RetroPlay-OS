@@ -40,7 +40,7 @@ fi
 
 # then do it
 ./blank
-./say "$VERB DotUI"
+./say "$VERB"
 unzip -o "/mnt/SDCARD/miyoo354/app/MiniUI.zip" -d "/mnt/SDCARD"
 
 # post-install
@@ -63,7 +63,7 @@ fi
 
 # we're done here
 ./blank
-./say "$NOUN complete"
+./say "$NOUN complete, enjoy!"
 
 rm -rf "$OLD_SYSTEM_PATH"
 rm -rf /mnt/SDCARD/miyoo354

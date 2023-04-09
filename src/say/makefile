@@ -9,6 +9,6 @@ CFLAGS   = -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7
 LDFLAGS	 = -lSDL -lSDL_image -lSDL_ttf
 
 all:
-	$(CC) main.c -o $(TARGET) $(CFLAGS) $(LDFLAGS)
+	$(CC) $(TARGET).c -o $(TARGET) $(CFLAGS) $(LDFLAGS)
 clean:
 	rm -f $(TARGET)

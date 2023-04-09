@@ -1,5 +1,4 @@
 // loosely based on https://github.com/gameblabla/clock_sdl_app
-
 #include <stdio.h>
 #include <time.h>
 #include <unistd.h>

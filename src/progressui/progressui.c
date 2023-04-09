@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <msettings.h>
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -8,11 +11,10 @@
 #include <sys/inotify.h>
 #include <pthread.h>
 
+#include "../common/defines.h"
 #include "../common/common.h"
 
-#define UPDATE_DIR "/tmp/"
 #define UPDATE_TXT "update_progress.txt"
-
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
@@ -24,7 +26,7 @@ int main (int argc, char *argv[]) {
 	SDL_ShowCursor(0);
 	InitSettings();
 	
-	SDL_Surface* screen = SDL_SetVideoMode(Screen.width, Screen.height, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	SDL_Surface* screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	
 	SDL_Surface* progress_bar_empty = GFX_loadImage("progress-bar-empty.png");
 	SDL_Surface* progress_bar_full = GFX_loadImage("progress-bar-full.png");
@@ -37,7 +39,7 @@ int main (int argc, char *argv[]) {
 	char msg[256];
 	void updateProgress(void) {
 		char new_msg[256];
-		getFile(UPDATE_DIR UPDATE_TXT, new_msg, 256);
+		getFile(TEMP_PATH UPDATE_TXT, new_msg, 256);
 		
 		trimTrailingNewlines(new_msg);
 		// printf("\t[%s]\n", new_msg); fflush(stdout);
@@ -73,7 +75,7 @@ int main (int argc, char *argv[]) {
 		SDL_Flip(screen);
 	}
 	
-	if (exists(UPDATE_DIR UPDATE_TXT)) updateProgress(); // don't miss the first message
+	if (exists(TEMP_PATH UPDATE_TXT)) updateProgress(); // don't miss the first message
 	
 	while (!done) {
 
@@ -92,10 +94,10 @@ int main (int argc, char *argv[]) {
 		}
 	}
 	
-    inotify_rm_watch(fd, wd);
-    close(fd);
+	inotify_rm_watch(fd, wd);
+	close(fd);
 	
-	unlink(UPDATE_DIR UPDATE_TXT);
+	unlink(TEMP_PATH UPDATE_TXT);
 	
 	SDL_FillRect(screen, NULL, 0);
 	SDL_Flip(screen);
