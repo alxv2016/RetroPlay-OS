@@ -2,22 +2,22 @@
 #define menu_h__
 
 typedef enum MenuReturnStatus {
-	kStatusContinue = 0,
-	kStatusSaveSlot = 1,
-	kStatusLoadSlot = 11,
-	kStatusOpenMenu = 23,
-	kStatusChangeDisc = 24,
-	kStatusResetGame = 25,
-	kStatusExitGame = 30,
-	kStatusPowerOff = 31,
+	STATUS_CONTINUE = 0,
+	STATUS_SAVESLOT = 1,
+	STATUS_LOADSLOT = 11,
+	STATUS_OPENMENU = 23,
+	STATUS_CHANGEDISC = 24,
+	STATUS_RESET = 25,
+	STATUS_EXIT = 30,
+	STATUS_POWER = 31,
 } MenuReturnStatus;
 
 typedef enum MenuRequestState {
-	kRequestMenu,
-	kRequestSleep,
-	kRequestPowerOff,
-	kRequestSave,
-	kRequestLoad,
+	REQUEST_MENU,
+	REQUEST_SLEEP,
+	REQUEST_POWER,
+	REQUEST_SAVE,
+	REQUEST_LOAD,
 } MenuRequestState;
 
 typedef void (*AutoSave_t)(void);
