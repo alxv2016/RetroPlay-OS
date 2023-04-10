@@ -69,22 +69,21 @@ struct MenuSettings {
 typedef struct __attribute__((__packed__)) uint24_t {
 	uint8_t a,b,c;
 } uint24_t;
-
-
-
-
 typedef void (*AutoSave_t)(void);
-typedef struct SDL_Surface SDL_Surface;
-typedef MenuReturnStatus (*ShowMenu_t)(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave);
-MenuReturnStatus ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState request_state, AutoSave_t autosave);
-
-typedef void (*ShowWarning_t)(void);
-void ShowWarning(void);
-
-typedef int (*ResumeSlot_t)(void);
+////////////////////////////////////////////////////////////
+void menu_init(void);
+void assets_init(void);
+void menu_quit(void);
+SDL_Surface* slot_thumbnail(SDL_Surface* src_img);
+void create_thumbnail(Rom game, int status, SDL_Surface* optional_snapshot);
+void show_warning(void);
+void load_game(char* rom_path, Rom game, int show_menu = 0);
+void input_events(Rom game, int selected, int status, SDL_Surface* optional_snapshot);
+int SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave);
+int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave);
+void SystemRequest(in request);
 int ResumeSlot(void);
-
-typedef int (*ChangeDisc_t)(char* disc_path);
 int ChangeDisc(char* disc_path);
+void gfx_menu(SDL_Surface* cache, int selected);
 
-#endif  // menu_h__
+#endif

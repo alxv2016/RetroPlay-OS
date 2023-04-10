@@ -79,7 +79,7 @@ void menu_quit(void) {
 /////////////////////////////////////////////////////////////
 // Utilities functions for ingame menu
 // Create thumbnails
-static SDL_Surface* slot_thumbnail(SDL_Surface* src_img) {
+SDL_Surface* slot_thumbnail(SDL_Surface* src_img) {
 	SDL_Surface* dst_img;
 	dst_img = SDL_CreateRGBSurface(0,SCREEN_WIDTH/2, SCREEN_HEIGHT/2,src_img->format->BitsPerPixel,src_img->format->Rmask,src_img->format->Gmask,src_img->format->Bmask,src_img->format->Amask);
 
@@ -113,7 +113,7 @@ static SDL_Surface* slot_thumbnail(SDL_Surface* src_img) {
 	return dst_img;
 }
 
-static void create_thumbnail(Rom game, int status, SDL_Surface* optional_snapshot) {
+void create_thumbnail(Rom game, int status, SDL_Surface* optional_snapshot) {
 	status = STATUS_SAVESLOT + game_slot;
 	SDL_Surface* preview = slot_thumbnail(optional_snapshot);
 	SDL_RWops* out = SDL_RWFromFile(game.bmp_path, "wb");
@@ -157,7 +157,7 @@ void show_warning(void) {
 
 
 // TODO: make this a reusable function, is used throughout this file
-static void load_game(char* rom_path, Rom game, int show_menu = 0) {
+void load_game(char* rom_path, Rom game, int show_menu = 0) {
 	char* tmp;
 	tmp = strrchr(rom_path,'/');
 	if (tmp==NULL) tmp = rom_path;
@@ -237,7 +237,7 @@ static void load_game(char* rom_path, Rom game, int show_menu = 0) {
 }
 
 // Menu input events
-static void input_events(Rom game, int selected, int status, SDL_Surface* optional_snapshot) {
+void input_events(Rom game, int selected, int status, SDL_Surface* optional_snapshot) {
 		int select_was_pressed = Input_isPressed(BTN_SELECT); // rs90-only
 		Input_poll();
 
@@ -334,7 +334,7 @@ static void input_events(Rom game, int selected, int status, SDL_Surface* option
 }
 
 // Save and load game
-static int SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave) {
+int SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave) {
 	int status = STATUS_CONTINUE;
 	if (!state_support) return status;
 	load_game(rom_path, game);
@@ -450,26 +450,23 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 		unsigned long now = SDL_GetTicks();
 		if (Input_anyPressed()) cancel_start = now;
 
-		#define CHARGE_DELAY 1000
-		if (dirty || now-charge_start>=CHARGE_DELAY) {
+		if (menu.dirty || now-charge_start>=CHARGE_DELAY) {
 			int is_charging = isCharging();
 			if (was_charging!=is_charging) {
 				was_charging = is_charging;
-				dirty = 1;
+				menu.dirty = 1;
 			}
 			charge_start = now;
 		}
-
 		if (!disable_poweroff && power_start && now-power_start>=1000) {
 			SystemRequest(REQUEST_POWER);
 			status = STATUS_POWER;
-			quit = 1;
+			menu.quit = 1;
 		}
 		if (Input_justPressed(BTN_POWER)) {
 			power_start = now;
 		}
 		
-		#define SLEEP_DELAY 30000
 		if (now-cancel_start>=SLEEP_DELAY && preventAutosleep()) cancel_start = now;
 		
 		if (now-cancel_start>=SLEEP_DELAY || Input_justReleased(BTN_POWER)) // || Input_justPressed(kButtonMenu)) 
@@ -477,46 +474,49 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 			SystemRequest(REQUEST_SLEEP);
 			cancel_start = SDL_GetTicks();
 			power_start = 0;
-			dirty = 1;
+			menu.dirty = 1;
 		}
 		
-		int old_setting = show_setting;
-		int old_value = setting_value;
-		show_setting = 0;
-		if (Input_isPressed(BTN_START) && Input_isPressed(BTN_SELECT)) {
-			// buh
-		}
-		else if (Input_isPressed(BTN_START) && (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS))) {
-			show_setting = 1;
-			setting_value = GetBrightness();
-			setting_min = MIN_BRIGHTNESS;
-			setting_max = MAX_BRIGHTNESS;
+		int old_setting = menu.show_setting;
+		int old_value = menu.setting_value;
+		menu.show_setting = 0;
+
+		if (Input_isPressed(BTN_START) && (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS))) {
+			menu.show_setting = 1;
+			menu.setting_value = GetBrightness();
+			menu.setting_min = MIN_BRIGHTNESS;
+			menu.setting_max = MAX_BRIGHTNESS;
 		}
 		else if (Input_isPressed(BTN_START) && old_setting == 1) {
-			show_setting = 1;
-			setting_value = GetBrightness();
-			setting_min = MIN_BRIGHTNESS;
-			setting_max = MAX_BRIGHTNESS;
+			menu.show_setting = 1;
+			menu.setting_value = GetBrightness();
+			menu.setting_min = MIN_BRIGHTNESS;
+			menu.setting_max = MAX_BRIGHTNESS;
 		}
 		else if (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS)) {
-			show_setting = 2;
-			setting_value = GetVolume();
-			setting_min = MIN_VOLUME;
-			setting_max = MAX_VOLUME;
+			menu.show_setting = 2;
+			menu.setting_value = GetVolume();
+			menu.setting_min = MIN_VOLUME;
+			menu.setting_max = MAX_VOLUME;
 		}
 
-		if (old_setting && !show_setting) setting_start = SDL_GetTicks();
+		if (old_setting && !menu.show_setting) setting_start = SDL_GetTicks();
 
-		if (old_value != setting_value) dirty = 1;
-		else if (!old_setting && show_setting) dirty = 1;
+		if (old_value != menu.setting_value) menu.dirty = 1;
+		else if (!old_setting && menu.show_setting) menu.dirty = 1;
 		else if (setting_start > 0 && SDL_GetTicks() - setting_start > 500) {
-			dirty = 1;
+			menu.dirty = 1;
 			setting_start = 0;
 		}
+		/// MENU UI display
+		if (menu.dirty) {
+			gfx_menu(cache,selected);
+		}
 
-
+		// slow down to 60fps
+		unsigned long frame_duration = SDL_GetTicks() - frame_start;
+		if (frame_duration<FRAME_DELAY) SDL_Delay(FRAME_DELAY-frame_duration);
 	}
-
 
 	// redraw original screen before returning
 	if (status!=STATUS_POWER) {
@@ -540,7 +540,7 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 	return status;
 }
 
-static void SystemRequest(in request) {
+void SystemRequest(in request) {
 	autosave();
 	putFile(AUTO_RESUME_PATH, game.rom_path + strlen(SDCARD_PATH));
 	if (request==REQUEST_SLEEP) {
@@ -553,10 +553,10 @@ static void SystemRequest(in request) {
 int ResumeSlot(void) {
 	if (!exists(RESUME_SLOT_PATH)) return -1;
 	
-	slot = getInt(RESUME_SLOT_PATH);
+	game_slot = getInt(RESUME_SLOT_PATH);
 	unlink(RESUME_SLOT_PATH);
 
-	return slot;
+	return game_slot;
 }
 
 int ChangeDisc(char* disc_path) {
@@ -565,3 +565,79 @@ int ChangeDisc(char* disc_path) {
 	return 1;
 }
 /////////////////////////////////////////////////////////////
+// Menu UI
+void gfx_menu(SDL_Surface* cache, int selected) {
+	menu.dirty = 0;
+	SDL_BlitSurface(cache, NULL, screen, NULL);
+	GFX_blitBattery(screen, 576, 12);
+	// Brightness / Volumne controls
+	if (menu.show_setting) {
+		GFX_blitSettings(screen, 0, 0, menu.show_setting==VOLUME_ICON?BRIGHTNESS_ICON:(setting_value>BRIGHTNESS_ICON?VOLUME_ICON:VOLUME_MUTE_ICON), setting_value,setting_min,setting_max);
+	}
+	
+	// Settings list
+	SDL_Surface* text;
+	for (int i=0; i<MAX_ITEMS; i++) {
+		char* item = items[i];
+		int disabled = !state_support && (i==ITEM_SAVE || i==ITEM_LOAD);
+		int color = disabled ? -1 : 1; // gray or gold
+		if (i==selected) {
+			SDL_FillRect(screen, &(SDL_Rect){12,152+(i*44)-((44)/2),280,44}, SDL_MapRGB(screen->format, TRIAD_WHITE));
+		}
+		// if (i==selected) {
+		// 	int bg_color_rgb = disabled ? gray_rgb : pink_rgb;
+		// 	SDL_FillRect(screen, &(SDL_Rect){Screen.menu.window.x,Screen.menu.list.y+(i*Screen.menu.list.line_height)-((Screen.menu.list.row_height-Screen.menu.list.line_height)/2),Screen.menu.window.width,Screen.menu.list.row_height}, bg_color_rgb);
+		// 	if (!disabled) color = 0; // white
+		// }
+		
+		GFX_blitText(screen, item, 2, PADDING, 152+(i*44));
+		if ((state_support && (i==ITEM_SAVE || i==ITEM_LOAD)) || (game.total_discs>1 && i==ITEM_CONTINUE)) {
+			// SDL_BlitSurface(i==selected?arrow_highlighted:arrow, NULL, screen, &(SDL_Rect){12+280-(arrow->w+12),152+(i*44)+14});
+		}
+	}
+
+	// disc change
+	if (game.total_discs>1 && selected==ITEM_CONTINUE) {
+		GFX_blitIngameWindow(screen, 296, 142, 332, 44+(8*2));
+		GFX_blitText(screen, disc_name, 2, 296+130, 152);
+	}
+	// slot preview
+	else if (state_support && (selected==ITEM_SAVE || selected==ITEM_LOAD)) {
+		// preview window
+		SDL_Rect preview_rect = {296+6,142+6};
+		GFX_blitIngameWindow(screen, 296, 142, 332, 270);
+		
+		if (menu.preview_exists) { // has save, has preview
+			SDL_Surface* preview = IMG_Load(game.bmp_path);
+			if (!preview) printf("IMG_Load: %s\n", IMG_GetError());
+			SDL_BlitSurface(preview, NULL, screen, &preview_rect);
+			SDL_FreeSurface(preview);
+		}
+		else {
+			int hw = SCREEN_WIDTH / 2;
+			int hh = SCREEN_HEIGHT / 2;
+			SDL_FillRect(screen, &(SDL_Rect){296+6,142+6,hw,hh}, 0);
+			if (menu.save_exists) { // has save but no preview
+				SDL_BlitSurface(gfx.no_preview, NULL, screen, &(SDL_Rect){
+					296+6+(hw-no_preview->w)/2,
+					142+6+(hh-no_preview->h)/2
+				});
+			}
+			else { // no save
+				SDL_BlitSurface(gfx.empty_slot, NULL, screen, &(SDL_Rect){
+					296+6+(hw-empty_slot->w)/2,
+					142+6+(hh-empty_slot->h)/2
+				});
+			}
+		}
+		
+		SDL_BlitSurface(gfx.slot_overlay, NULL, screen, &preview_rect);
+		SDL_BlitSurface(gfx.slot_pagination, NULL, screen, &(SDL_Rect){400,394});
+		SDL_BlitSurface(gfx.slot_active, NULL, screen, &(SDL_Rect){400+(16*slot),394});
+	}
+
+	int btn_a_width = GFX_getButtonWidth("Open", "A");
+	GFX_blitButton(screen, "A", "Okay", 557, 419);
+	GFX_blitButton(screen, "B", "Back", 557-btn_a_width,419);
+	SDL_Flip(screen);
+}
