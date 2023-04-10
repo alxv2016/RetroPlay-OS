@@ -251,7 +251,33 @@ int GFX_truncateText(TTF_Font* font, const char* in_name, char* out_name, int ma
 	
 	return text_width;
 }
-
+// Debug logging
+void LOG_note(int level, const char* fmt, ...) {
+	char buf[1024] = {0};
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	va_end(args);
+	switch(level) {
+#ifdef DEBUG
+	case LOG_DEBUG:
+		printf("[DEBUG] %s", buf);
+		break;
+#endif
+	case LOG_INFO:
+		printf("[INFO] %s", buf);
+		break;
+	case LOG_WARN:
+		fprintf(stderr, "[WARN] %s", buf);
+		break;
+	case LOG_ERROR:
+		fprintf(stderr, "[ERROR] %s", buf);
+		break;
+	default:
+		break;
+	}
+	fflush(stdout);
+}
 ///////////////////////////////////////////////////////////////
 // Video screen surface
 static SDL_Surface* screen;
