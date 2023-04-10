@@ -297,6 +297,13 @@ static struct GFX_Context {
   SDL_Surface* battery;
   SDL_Surface* battery_low_power;
   SDL_Surface* battery_low;
+	// Ingame menu assets
+	SDL_Surface* overlay;
+	SDL_Surface* slot_pagination;
+	SDL_Surface* slot_active;
+	SDL_Surface* Slot_preview;
+	SDL_Surface* no_preview;
+	SDL_Surface* empty_slot;
 } gfx;
 // Fonts
 static struct GFX_Fonts {
@@ -327,6 +334,15 @@ void GFX_init(void) {
 	gfx.battery = GFX_loadImage("battery.png");
 	gfx.battery_low_power = GFX_loadImage("battery-low-power.png");
 	gfx.battery_low = GFX_loadImage("battery-low.png");
+}
+
+void GFX_menuInit(void) {
+	// Ingame Menu assets
+	gfx.slot_overlay = GFX_loadImage("slot-overlay.png");
+	gfx.slot_pagination = GFX_loadImage("slot-dots.png");
+	gfx.slot_active = GFX_loadImage("slot-dot-selected.png");
+	gfx.no_preview = GFX_getText("No Preview");
+	gfx.empty_slot = GFX_getText("Empty Slot");
 }
 
 void GFX_clear(void) {
@@ -360,6 +376,15 @@ void GFX_quit(void) {
 
 	if (screen) SDL_FreeSurface(screen);
 	TTF_Quit();
+}
+// Ingame Menu
+void GFX_menuQuit(void) {
+	SDL_FreeSurface(gfx.overlay);
+	SDL_FreeSurface(gfx.slot_overlay);
+	SDL_FreeSurface(gfx.slot_pagination);
+	SDL_FreeSurface(gfx.slot_active);
+	SDL_FreeSurface(gfx.no_preview);
+	SDL_FreeSurface(gfx.empty_slot);
 }
 
 ///////////////////////////////////////////////////////////////

@@ -66,7 +66,9 @@ int GFX_truncateText(TTF_Font* font, const char* in_name, char* out_name, int ma
 //////////////////////////////////////
 // Graphics UI
 void GFX_init(void);
+void GFX_menuInit(void);
 void GFX_quit(void);
+void GFX_menuQuit(void);
 void GFX_clear(void);
 void GFX_ready(void);
 SDL_Surface* GFX_loadImage(char* path);
