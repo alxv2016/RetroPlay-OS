@@ -28,11 +28,15 @@ static struct GFX_Context {
 } gfx;
 
 static char* menu_items[MAX_ITEMS];
+char* disc_paths[9]; // up to 9 paths, Arc the Lad Collection is 7 discs
+static char* items[MAX_ITEMS];
 static int game_slot = 0;
 static int state_support = 1;
 static int disable_poweroff = 0;
 int show_menu = 0;
 Rom game;
+Menu menu;
+
 /////////////////////////////////////////////////////////////
 // Run these functions first and after main
 void menu_init() __attribute__((constructor));
@@ -44,6 +48,15 @@ void menu_init(void) {
 	InitSettings();
 
 	menu.simple_mode = exists(SIMPLE_MODE_PATH);
+	menu.save_exists = 0;
+	menu.preview_exists = 0;
+	menu.quit = 0;
+	menu.dirty = 1;
+	menu.show_setting = 0; // 1=brightness,2=volume
+	menu.setting_value = 0;
+	menu.setting_min = 0;
+	menu.setting_max = 0;
+	menu.simple_mode = 0;
 
 	menu_items[ITEM_CONTINUE] = "Continue";
 	menu_items[ITEM_SAVE] = "Save";
@@ -157,7 +170,7 @@ void show_warning(void) {
 
 
 // TODO: make this a reusable function, is used throughout this file
-void load_game(char* rom_path, Rom game, int show_menu = 0) {
+void load_game(char* rom_path, Rom game, int show_menu) {
 	char* tmp;
 	tmp = strrchr(rom_path,'/');
 	if (tmp==NULL) tmp = rom_path;
@@ -170,9 +183,9 @@ void load_game(char* rom_path, Rom game, int show_menu = 0) {
 
 	if (!show_menu) sprintf(game.txt_path, "%s/%s.%d.txt", game.mmenu_dir, game.rom_file, game_slot);
 
+	game.rom_disc = -1;
 	game.disc = game.rom_disc;
 	game.total_discs = 0;
-	char* disc_paths[9]; // up to 9 paths, Arc the Lad Collection is 7 discs
 
 	strcpy(game.m3u_path, rom_path);
 	tmp = strrchr(game.m3u_path, '/') + 1;
@@ -329,7 +342,6 @@ void input_events(Rom game, int selected, int status, SDL_Surface* optional_snap
 					menu.quit = 1;
 				break;
 			}
-			if (menu.quit) break;
 		}
 }
 
@@ -337,7 +349,7 @@ void input_events(Rom game, int selected, int status, SDL_Surface* optional_snap
 int SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave) {
 	int status = STATUS_CONTINUE;
 	if (!state_support) return status;
-	load_game(rom_path, game);
+	load_game(rom_path, game, show_menu);
 
 	sprintf(game.slot_path, "%s/%s.txt", game.mmenu_dir, game.rom_file);
 	if (exists(game.slot_path)) game_slot = getInt(game.slot_path);
@@ -418,7 +430,7 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 	// sleep or poweroff
 	if (requested_state!=REQUEST_MENU) {
 		if (disable_poweroff && requested_state==REQUEST_POWER) return STATUS_CONTINUE;
-		SystemRequest(requested_state);
+		SystemRequest(rom_path, requested_state, autosave);
 		if (requested_state==REQUEST_POWER) return REQUEST_POWER;
 	}
 
@@ -436,6 +448,9 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 		unsigned long frame_start = SDL_GetTicks();
 		input_events(game, selected, status, optional_snapshot);
 
+		if (Input_justPressed(BTN_A)) {
+			if (menu.quit) break;
+		}
 		if (menu.dirty && state_support && (selected==ITEM_SAVE || selected==ITEM_LOAD)) {
 			sprintf(save_path, save_path_template, game_slot);
 			sprintf(bmp_path, "%s/%s.%d.bmp", game.mmenu_dir, game.rom_file, game_slot);
@@ -459,7 +474,7 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 			charge_start = now;
 		}
 		if (!disable_poweroff && power_start && now-power_start>=1000) {
-			SystemRequest(REQUEST_POWER);
+			SystemRequest(rom_path, REQUEST_POWER, autosave);
 			status = STATUS_POWER;
 			menu.quit = 1;
 		}
@@ -471,7 +486,7 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 		
 		if (now-cancel_start>=SLEEP_DELAY || Input_justReleased(BTN_POWER)) // || Input_justPressed(kButtonMenu)) 
 		{
-			SystemRequest(REQUEST_SLEEP);
+			SystemRequest(rom_path, REQUEST_SLEEP, autosave);
 			cancel_start = SDL_GetTicks();
 			power_start = 0;
 			menu.dirty = 1;
@@ -540,9 +555,9 @@ int ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_sna
 	return status;
 }
 
-void SystemRequest(in request) {
+void SystemRequest(char* rom_path, int request, AutoSave_t autosave) {
 	autosave();
-	putFile(AUTO_RESUME_PATH, game.rom_path + strlen(SDCARD_PATH));
+	putFile(AUTO_RESUME_PATH, rom_path + strlen(SDCARD_PATH));
 	if (request==REQUEST_SLEEP) {
 		fauxSleep();
 		unlink(AUTO_RESUME_PATH);
@@ -572,7 +587,7 @@ void gfx_menu(SDL_Surface* cache, int selected) {
 	GFX_blitBattery(screen, 576, 12);
 	// Brightness / Volumne controls
 	if (menu.show_setting) {
-		GFX_blitSettings(screen, 0, 0, menu.show_setting==VOLUME_ICON?BRIGHTNESS_ICON:(setting_value>BRIGHTNESS_ICON?VOLUME_ICON:VOLUME_MUTE_ICON), setting_value,setting_min,setting_max);
+		GFX_blitSettings(screen, 0, 0, menu.show_setting==VOLUME_ICON?BRIGHTNESS_ICON:(menu.setting_value>BRIGHTNESS_ICON?VOLUME_ICON:VOLUME_MUTE_ICON), menu.setting_value,menu.setting_min,menu.setting_max);
 	}
 	
 	// Settings list
@@ -580,7 +595,7 @@ void gfx_menu(SDL_Surface* cache, int selected) {
 	for (int i=0; i<MAX_ITEMS; i++) {
 		char* item = items[i];
 		int disabled = !state_support && (i==ITEM_SAVE || i==ITEM_LOAD);
-		int color = disabled ? -1 : 1; // gray or gold
+		//int color = disabled ? -1 : 1; // gray or gold
 		if (i==selected) {
 			SDL_FillRect(screen, &(SDL_Rect){12,152+(i*44)-((44)/2),280,44}, SDL_MapRGB(screen->format, TRIAD_WHITE));
 		}
@@ -599,7 +614,7 @@ void gfx_menu(SDL_Surface* cache, int selected) {
 	// disc change
 	if (game.total_discs>1 && selected==ITEM_CONTINUE) {
 		GFX_blitIngameWindow(screen, 296, 142, 332, 44+(8*2));
-		GFX_blitText(screen, disc_name, 2, 296+130, 152);
+		GFX_blitText(screen, game.disc_name, 2, 296+130, 152);
 	}
 	// slot preview
 	else if (state_support && (selected==ITEM_SAVE || selected==ITEM_LOAD)) {
@@ -619,21 +634,21 @@ void gfx_menu(SDL_Surface* cache, int selected) {
 			SDL_FillRect(screen, &(SDL_Rect){296+6,142+6,hw,hh}, 0);
 			if (menu.save_exists) { // has save but no preview
 				SDL_BlitSurface(gfx.no_preview, NULL, screen, &(SDL_Rect){
-					296+6+(hw-no_preview->w)/2,
-					142+6+(hh-no_preview->h)/2
+					296+6+(hw-gfx.no_preview->w)/2,
+					142+6+(hh-gfx.no_preview->h)/2
 				});
 			}
 			else { // no save
 				SDL_BlitSurface(gfx.empty_slot, NULL, screen, &(SDL_Rect){
-					296+6+(hw-empty_slot->w)/2,
-					142+6+(hh-empty_slot->h)/2
+					296+6+(hw-gfx.empty_slot->w)/2,
+					142+6+(hh-gfx.empty_slot->h)/2
 				});
 			}
 		}
 		
 		SDL_BlitSurface(gfx.slot_overlay, NULL, screen, &preview_rect);
 		SDL_BlitSurface(gfx.slot_pagination, NULL, screen, &(SDL_Rect){400,394});
-		SDL_BlitSurface(gfx.slot_active, NULL, screen, &(SDL_Rect){400+(16*slot),394});
+		SDL_BlitSurface(gfx.slot_active, NULL, screen, &(SDL_Rect){400+(16*game_slot),394});
 	}
 
 	int btn_a_width = GFX_getButtonWidth("Open", "A");
