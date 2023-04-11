@@ -1,6 +1,7 @@
 build/
 nopes/
 releases/
+.vscode
 
 .DS_Store
 *.o
