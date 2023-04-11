@@ -11,17 +11,27 @@
 #include "../common/common.h"
 #include "../common/defines.h"
 
-#include "mmenu.h"
-
 // #include "mmenu.h"
+
 ///////////////////////////////////////////////////////////////
 // Video screen surface
 static SDL_Surface* screen;
 static SDL_Surface* overlay;
 ///////////////////////////////////////////////////////////////
+enum MenuReturnStatus {
+	kStatusContinue = 0,
+	kStatusSaveSlot = 1,
+	kStatusLoadSlot = 11,
+	kStatusOpenMenu = 23,
+	kStatusChangeDisc = 24,
+	kStatusResetGame = 25,
+	kStatusExitGame = 30,
+	kStatusPowerOff = 31,
+};
 
+typedef void (*ShowMenu_callback_t)(void);
 /////////////////////////////////////////////////////////////
-static void init(void) {
+static void Menu_init(void) {
 	void* librt = dlopen("librt.so.1", RTLD_LAZY | RTLD_GLOBAL); // shm
 	void* libmsettings = dlopen("libmsettings.so", RTLD_LAZY | RTLD_GLOBAL);
 	InitSettings();
@@ -31,14 +41,14 @@ static void init(void) {
 	SDL_FillRect(overlay, NULL, 0);
 }
 
-static void quit(void) {
+static void Menu_quit(void) {
 	SDL_FreeSurface(overlay);
 }
 
-void init() __attribute__((constructor));
-void quit() __attribute__((destructor));
+static void Menu_init() __attribute__((constructor));
+static void Menu_quit() __attribute__((destructor));
 
-MenuReturnStatus ShowMenu() {
+void ShowMenu() {
 	screen = SDL_GetVideoSurface();
 	GFX_init();
 	GFX_ready();
@@ -55,28 +65,28 @@ MenuReturnStatus ShowMenu() {
 	Input_reset();
 	int status = kStatusContinue;
 
-	int quit = 0;
+	int show_menu = 0;
 	int dirty = 1;
 
-	while(!quit) {
+	while(!show_menu) {
 		unsigned long frame_start = SDL_GetTicks();
 
 		Input_poll();
 		if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU)) && !dirty) {
 			status = kStatusContinue;
-			quit = 1;
+			show_menu = 1;
 		}
 		
 		if (Input_justPressed(BTN_X)) {
 			status = kStatusExitGame;
-			quit = 1;
+			show_menu = 1;
 		}
 		if (Input_justPressed(BTN_Y)) {
 			status = kStatusOpenMenu;
-			quit = 1;
+			show_menu = 1;
 		}
 
-		if (quit) break;
+		if (show_menu) break;
 
 		// Show menu UI
 		if(dirty) {
@@ -101,9 +111,8 @@ MenuReturnStatus ShowMenu() {
 	}
 
 	SDL_FreeSurface(cache);
-	// NOTE: copy->pixels was manually malloc'd so it must be manually freed too
 	SDL_FreeSurface(copy);
 	free(copy_pixels); 
 	SDL_EnableKeyRepeat(0,0);
-	return status;
+	// return status;
 }
