@@ -20,7 +20,7 @@ BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
-RELEASE_COUNT!=find ./releases/. -regex ".*/$(RELEASE_BASE)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
+RELEASE_COUNT!=find ./releases/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
 RELEASE_NAME=$(TARGET)-v$(VERSION)
 
 PATCH = git apply
@@ -125,7 +125,7 @@ rezip: payload $(BUNDLE_LIBS) zip
 clean:
 	rm -rf ./build
 	cd ./src/libmsettings && make clean
-	cd ./src/libmmenu && make clean
+# cd ./src/libmmenu && make clean
 	cd ./third-party/SDL-1.2 && make distclean
 	cd ./src/batmon && make clean
 	cd ./src/keymon && make clean

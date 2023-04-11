@@ -5,9 +5,7 @@ releases/
 .DS_Store
 *.o
 *.so
-
-/commits.txt
-third-party/*
+commits.txt
 
 # thanks I hate it
 batmon
