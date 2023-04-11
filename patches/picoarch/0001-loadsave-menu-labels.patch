@@ -1,0 +1,50 @@
+From 70635a7ebfbed19891507eb0498fbf1494f5a975 Mon Sep 17 00:00:00 2001
+From: Alxv <avong2011@gmail.com>
+Date: Tue, 11 Apr 2023 15:41:17 -0400
+Subject: [PATCH] style: updated menu labels
+
+---
+ menu.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/menu.c b/menu.c
+index e91f84a..c85d37d 100644
+--- a/menu.c
++++ b/menu.c
+@@ -1244,7 +1244,7 @@ static void draw_savestate_menu(int menu_sel, int is_loading)
+ 
+ 	menu_draw_begin(1, 1);
+ 
+-	text_out16(x, y, is_loading ? "Load state" : "Save state");
++	text_out16(x, y, is_loading ? "Choose a slot to load" : "Choose a slot to save");
+ 	y += 3 * me_mfont_h;
+ 
+ 	menu_draw_selection(x - me_mfont_w * 2, y + menu_sel * me_mfont_h, (23 + 2) * me_mfont_w + 4);
+@@ -1253,9 +1253,9 @@ static void draw_savestate_menu(int menu_sel, int is_loading)
+ 	for (i = 0; i < STATE_SLOT_COUNT; i++, y += me_mfont_h)
+ 	{
+ 		if (!(state_slot_flags & (1 << i)))
+-			strcpy(time_buf, "free");
++			strcpy(time_buf, "Empty slot");
+ 		else {
+-			strcpy(time_buf, "USED");
++			strcpy(time_buf, "Saved");
+ 			if (state_slot_times[i] != 0) {
+ 				time_t time = state_slot_times[i];
+ 				struct tm *t = localtime(&time);
+@@ -1263,9 +1263,10 @@ static void draw_savestate_menu(int menu_sel, int is_loading)
+ 			}
+ 		}
+ 
+-		text_out16(x, y, "SLOT %i (%s)", i, time_buf);
++		text_out16(x, y, "%s", i, time_buf);
+ 	}
+-	text_out16(x, y, "back");
++	y += 3 * me_mfont_h;
++	text_out16(x, y, "Cancel");
+ 
+ 	menu_draw_end();
+ }
+-- 
+2.39.2 (Apple Git-143)
+
