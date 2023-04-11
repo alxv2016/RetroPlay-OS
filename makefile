@@ -44,7 +44,7 @@ patches:
 
 lib:
 	cd ./src/libmsettings && make
-	cd ./src/libmmenu && make
+# cd ./src/libmmenu && make
 	cd ./third-party/latency_reduction && make
 sdl:
 	cd ./third-party/SDL-1.2 && ./make.sh
@@ -74,7 +74,7 @@ payload:
 	cp -R ./skeleton/. ./build/PAYLOAD
 	mv ./build/PAYLOAD/miyoo354/app/keymon.sh ./build/PAYLOAD/miyoo354/app/keymon
 	cp ./src/libmsettings/libmsettings.so ./build/PAYLOAD/.system/lib/
-	cp ./src/libmmenu/libmmenu.so ./build/PAYLOAD/.system/lib/
+# cp ./src/libmmenu/libmmenu.so ./build/PAYLOAD/.system/lib/
 	cp ./third-party/latency_reduction/as_preload.so ./build/PAYLOAD/.system/lib/
 	cp ./third-party/latency_reduction/audioserver.mod ./build/PAYLOAD/.system/bin/
 	cp ./third-party/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 ./build/PAYLOAD/.system/lib/libSDL-1.2.so.0
