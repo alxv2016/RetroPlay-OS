@@ -40,7 +40,6 @@ extras: emu
 # To fix/move into private repos
 patches:
 	cd third-party/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
-	cd third-party/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-pokemini-make.patch && touch .patched
 
 lib:
 	cd ./src/libmsettings && make
