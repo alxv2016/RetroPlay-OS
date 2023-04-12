@@ -1,11 +1,6 @@
 .PHONY: clean
 ###########################################################
 
-BUILD_ARCH!=uname -m
-BUILD_TIME!=date "+%Y-%m-%d %H:%M:%S"
-BUILD_REPO=https://github.com/alxv2016/RetroPlay-OS.git
-BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
-
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
 
@@ -21,8 +16,8 @@ RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
 
-RELEASE_DOT!=find ./release/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
-RELEASE_NAME=$(TARGET)-v$(VERSION)-$(RELEASE_DOT)
+# RELEASE_DOT!=find ./release/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
+RELEASE_NAME=$(TARGET)-v$(VERSION)
 
 PATCH = git apply
 
@@ -31,6 +26,7 @@ TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
 LIBC_LIB=/opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
 BUNDLE_LIBS=
 
+BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
 ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
@@ -39,16 +35,20 @@ endif
 all: patch lib sdl core external build readmes $(BUNDLE_LIBS) release
 
 patch:
+	echo "\n::$(TARGET) ---- Patch"
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
 
 lib:
+	echo "\n::$(TARGET) ---- Lib"
 	cd $(SRC_DIR)/libmsettings && make
 # cd $(SRC_DIR)/libmmenu && make
 	cd $(THIRD_PARTY_DIR)/latency_reduction && make
 sdl:
+	echo "\n::$(TARGET) ---- SDL"
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
 
 core:
+	echo "\n::$(TARGET) ---- Core"
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
@@ -63,7 +63,8 @@ external:
 # cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 
 build:
-	rm -rf $(BUILD_DIR)
+	echo "\n::$(TARGET) ---- Build"
+
 	mkdir -p $(RELEASE_DIR)
 	mkdir -p $(BUILD_DIR)
 	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
@@ -112,9 +113,11 @@ build:
 # cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
 readmes:
+	echo "\n::$(TARGET) ---- Readme"
 	fmt -w 40 -s $(DIST_DIR)/README.txt > $(BUILD_DIR)/dist/README.txt
 
 bundle:
+	echo "\n::$(TARGET) ---- Bundle"
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libc.so.6 $(BUILD_DIR)/dist/.system/lib/
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libcrypt.so.1 $(BUILD_DIR)/dist/.system/lib/
@@ -128,6 +131,7 @@ bundle:
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libstdc++.so.6 $(BUILD_DIR)/dist/.system/lib/
 
 release:
+	echo "\n::$(TARGET) ---- Release"
 	cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
 	cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
 	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
@@ -141,9 +145,9 @@ clean:
 	rm -rf $(CACHE)
 	rm -rf $(BUILD_DIR)
 	rm -rf $(RELEASE_DIR)
+	rm -rf $(EXTRAS_DIR)
 	cd $(SRC_DIR)/libmsettings && make clean
 # cd $(SRC_DIR)/libmmenu && make clean
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
 	cd $(SRC_DIR)/batmon && make clean
 	cd $(SRC_DIR)/keymon && make clean
 	cd $(SRC_DIR)/lumon && make clean
@@ -153,7 +157,8 @@ clean:
 	cd $(SRC_DIR)/confirm && make clean
 	cd $(SRC_DIR)/say && make clean
 	cd $(SRC_DIR)/blank && make clean
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
+# cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
 
 $(CACHE)/.docker:
