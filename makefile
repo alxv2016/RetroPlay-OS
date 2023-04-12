@@ -20,8 +20,8 @@ BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
-RELEASE_COUNT!=find ./releases/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
-RELEASE_NAME=$(TARGET)-v$(VERSION)
+RELEASE_DOT!=find ./releases/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
+RELEASE_NAME=$(TARGET)-v$(VERSION)-$(RELEASE_DOT)
 
 PATCH = git apply
 
@@ -33,7 +33,7 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
 endif
 
-all: patches lib sdl core emu payload readmes $(BUNDLE_LIBS) zip
+all: lib sdl core emu payload readmes $(BUNDLE_LIBS) zip
 
 extras: emu
 
@@ -61,7 +61,7 @@ core:
 	cd ./src/blank && make
 
 emu:
-	cd ./third-party/picoarch && make platform=miyoomini -j
+# cd ./third-party/picoarch && make platform=miyoomini -j
 	./bits/commits.sh > ./commits.txt
 
 readmes:
@@ -90,13 +90,30 @@ payload:
 	cp ./src/blank/blank ./build/PAYLOAD/.system/bin/
 	cp ./src/say/say ./build/PAYLOAD/miyoo354/app/
 	cp ./src/blank/blank ./build/PAYLOAD/miyoo354/app/
-	cp ./third-party/picoarch/output/picoarch ./build/PAYLOAD/.system/bin/
-	cp ./third-party/picoarch/output/fceumm_libretro.so ./build/PAYLOAD/.system/cores/
-	cp ./third-party/picoarch/output/gambatte_libretro.so ./build/PAYLOAD/.system/cores/
-	cp ./third-party/picoarch/output/gpsp_libretro.so ./build/PAYLOAD/.system/cores/
-	cp ./third-party/picoarch/output/pcsx_rearmed_libretro.so ./build/PAYLOAD/.system/cores/
-	cp ./third-party/picoarch/output/picodrive_libretro.so ./build/PAYLOAD/.system/cores/
-	cp ./third-party/picoarch/output/snes9x2005_plus_libretro.so ./build/PAYLOAD/.system/cores/
+
+	cp ./skeleton/cores/picoarch ./build/PAYLOAD/.system/bin/
+	cp ./skeleton/cores/fceumm_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/gambatte_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/gpsp_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/pcsx_rearmed_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/picodrive_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/snes9x2005_plus_libretro.so ./build/PAYLOAD/.system/cores/
+	cp ./skeleton/cores/beetle-pce-fast_libretro.so ./build/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
+	cp ./skeleton/cores/mednafen_supafaust_libretro.so ./build/EXTRAS/Emus/SUPA.pak/
+	cp ./skeleton/cores/mgba_libretro.so ./build/EXTRAS/Emus/MGBA.pak/
+	cp ./skeleton/cores/mgba_libretro.so ./build/EXTRAS/Emus/SGB.pak/
+
+# cp ./third-party/picoarch/output/picoarch ./build/PAYLOAD/.system/bin/
+# cp ./third-party/picoarch/output/fceumm_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/gambatte_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/gpsp_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/pcsx_rearmed_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/picodrive_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/snes9x2005_plus_libretro.so ./build/PAYLOAD/.system/cores/
+# cp ./third-party/picoarch/output/beetle-pce-fast_libretro.so ./build/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
+# cp ./third-party/picoarch/output/mednafen_supafaust_libretro.so ./build/EXTRAS/Emus/SUPA.pak/
+# cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/MGBA.pak/
+# cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/SGB.pak/
 
 
 bundle:
@@ -159,13 +176,9 @@ clean:
 # 	cp -r ./third-party/DinguxCommander/res ./build/EXTRAS/Tools/Files.pak/
 # 	cp ./third-party/screenshot/screenshot ./build/EXTRAS/Tools/Screenshots.pak/
 
-# 	cp ./third-party/picoarch/output/beetle-pce-fast_libretro.so ./build/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-# 	cp ./third-party/picoarch/output/pokemini_libretro.so ./build/EXTRAS/Emus/PKM.pak/
-# 	cp ./third-party/picoarch/output/mednafen_supafaust_libretro.so ./build/EXTRAS/Emus/SUPA.pak/
-# 	cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/MGBA.pak/
-# 	cp ./third-party/picoarch/output/mgba_libretro.so ./build/EXTRAS/Emus/SGB.pak/
 # 	cp ./third-party/picoarch/output/fake-08_libretro.so ./build/EXTRAS/Emus/P8.pak/
 # 	cp ./third-party/picoarch/output/nxengine_libretro.so "./build/EXTRAS/Roms/Native Games (SH)/Cave Story/"
+# 	cp ./third-party/picoarch/output/pokemini_libretro.so ./build/EXTRAS/Emus/PKM.pak/
 # 	cp ./third-party/vvvvvv/vvvvvv "./build/EXTRAS/Roms/Native Games (SH)/VVVVVV/"
 # 	cp -R ./bits/bootlogos/pak/. ./build/EXTRAS/Tools/Single-use/bootlogo.tmp
 # 	cp ./third-party/logotweak/logomake/logomake ./build/EXTRAS/Tools/Single-use/bootlogo.tmp/
