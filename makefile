@@ -23,6 +23,7 @@ RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
 
+PATCH = git apply
 
 TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
 
