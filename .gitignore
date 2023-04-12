@@ -4,6 +4,7 @@
 *.so
 /build/
 /release/
+/extras/
 temp/
 cache/
 /.build_cached

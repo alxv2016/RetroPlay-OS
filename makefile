@@ -1,26 +1,6 @@
 .PHONY: clean
 ###########################################################
 
-ifeq (,$(PLATFORM))
-PLATFORM=$(UNION_PLATFORM)
-endif
-
-ifeq (,$(PLATFORM))
-$(error please specify PLATFORM, eg. PLATFORM=miyoomini make)
-endif
-
-ifdef OS
-	current_dir = $(shell cd)
-	ROOT_DIR = $(subst \,/,$(current_dir))
-	makedir = mkdir
-	createfile = echo.>
-else
-	ROOT_DIR = $(shell pwd)
-	makedir = mkdir -p
-	createfile = touch
-endif
-
-###########################################################
 BUILD_ARCH!=uname -m
 BUILD_TIME!=date "+%Y-%m-%d %H:%M:%S"
 BUILD_REPO=https://github.com/alxv2016/RetroPlay-OS.git
@@ -29,21 +9,25 @@ BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
 
+###########################################################
+
 #Directories
-SRC_DIR = $(ROOT_DIR)/src
-THIRD_PARTY_DIR = $(ROOT_DIR)/third-party
-BUILD_DIR = $(ROOT_DIR)/build
-RELEASE_DIR = $(ROOT_DIR)/release
-DIST_DIR = $(ROOT_DIR)/dist
-CACHE = $(ROOT_DIR)/cache
-TEMP_DIR = $(ROOT_DIR)/cache/temp
+ROOT_DIR := $(shell pwd)
+CACHE := $(ROOT_DIR)/cache
+SRC_DIR := $(ROOT_DIR)/src
+THIRD_PARTY_DIR := $(ROOT_DIR)/third-party
+BUILD_DIR := $(ROOT_DIR)/build
+RELEASE_DIR := $(ROOT_DIR)/release
+DIST_DIR := $(ROOT_DIR)/dist
+EXTRAS_DIR := $(ROOT_DIR)/extras
 
 RELEASE_DOT!=find ./release/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
 RELEASE_NAME=$(TARGET)-v$(VERSION)-$(RELEASE_DOT)
 
 PATCH = git apply
 
-TOOLCHAIN = mholdg16/miyoomini-toolchain:latest
+TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
+
 LIBC_LIB=/opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
 BUNDLE_LIBS=
 
@@ -52,7 +36,7 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
 endif
 
-all: patch lib sdl core external build readmes $(BUNDLE_LIBS) release clean git-clean with-toolchain
+all: patch lib sdl core external build readmes $(BUNDLE_LIBS) release
 
 patch:
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
@@ -83,6 +67,7 @@ build:
 	mkdir -p $(RELEASE_DIR)
 	mkdir -p $(BUILD_DIR)
 	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
+	cp -R $(EXTRAS_DIR)/. $(BUILD_DIR)/extras
 	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
 	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
 # cp $(SRC_DIR)/libmmenu/libmmenu.so $(BUILD_DIR)/dist/.system/lib/
@@ -109,10 +94,10 @@ build:
 	cp $(DIST_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
 	cp $(DIST_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
 	cp $(DIST_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-	cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/EXTRAS/Emus/SUPA.pak/
-	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/EXTRAS/Emus/MGBA.pak/
-	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/EXTRAS/Emus/SGB.pak/
+	cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
+	cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
+	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
+	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
 # cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(BUILD_DIR)/dist/.system/bin/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
@@ -121,13 +106,13 @@ build:
 # cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(BUILD_DIR)/EXTRAS/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(BUILD_DIR)/EXTRAS/Emus/SUPA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/EXTRAS/Emus/MGBA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/EXTRAS/Emus/SGB.pak/
+# cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
+# cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
+# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
+# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
 readmes:
-	fmt -w 40 -s $(DIST_DIR)//README.txt > $(BUILD_DIR)/dist/README.txt
+	fmt -w 40 -s $(DIST_DIR)/README.txt > $(BUILD_DIR)/dist/README.txt
 
 bundle:
 	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
@@ -148,9 +133,6 @@ release:
 	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
 	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
 	echo "$(RELEASE_NAME)" > $(BUILD_DIR)/latest.txt
-
-git-clean:
-	git clean -xfd -e .vscode
 
 git-submodules:
 	git submodule update --init --recursive
@@ -176,8 +158,8 @@ clean:
 
 $(CACHE)/.docker:
 	docker pull $(TOOLCHAIN)
-	$(makedir) cache
-	$(createfile) $(CACHE)/.docker
+	mkdir -p cache
+	touch $(CACHE)/.docker
 
 toolchain: $(CACHE)/.docker
 	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash
@@ -185,7 +167,7 @@ toolchain: $(CACHE)/.docker
 with-toolchain: $(CACHE)/.docker
 	docker run --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash -c "source /root/.bashrc; make $(CMD)"
 
-# Commenting out all EXTRAS and TOOLS during development
+# Commenting out all extras and TOOLS during development
 # tools:
 # 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
 # 	cd $(THIRD_PARTY_DIR)/screenshot && make
@@ -195,25 +177,25 @@ with-toolchain: $(CACHE)/.docker
 #
 # 	cd $(THIRD_PARTY_DIR)/vvvvvv && make -j
 
-# 	fmt -w 40 -s ./extras//README.txt > $(BUILD_DIR)/EXTRAS/README.txt
-# 	cp -R ./extras/. $(BUILD_DIR)/EXTRAS
+# 	fmt -w 40 -s ./extras//README.txt > $(BUILD_DIR)/extras/README.txt
+# 	cp -R ./extras/. $(BUILD_DIR)/extras
 	
 
-# 	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/EXTRAS/Tools/Files.pak/
-# 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/EXTRAS/Tools/Clock.pak/
-# 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/EXTRAS/Tools/Files.pak/
-# 	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/EXTRAS/Tools/Screenshots.pak/
+# 	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/extras/Tools/Files.pak/
+# 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/extras/Tools/Clock.pak/
+# 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/extras/Tools/Files.pak/
+# 	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/extras/Tools/Screenshots.pak/
 
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/fake-08_libretro.so $(BUILD_DIR)/EXTRAS/Emus/P8.pak/
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/nxengine_libretro.so "$(BUILD_DIR)/EXTRAS/Roms/Native Games (SH)/Cave Story/"
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/pokemini_libretro.so $(BUILD_DIR)/EXTRAS/Emus/PKM.pak/
-# 	cp $(THIRD_PARTY_DIR)/vvvvvv/vvvvvv "$(BUILD_DIR)/EXTRAS/Roms/Native Games (SH)/VVVVVV/"
-# 	cp -R ./bits/bootlogos/pak/. $(BUILD_DIR)/EXTRAS/Tools/Single-use/bootlogo.tmp
-# 	cp $(THIRD_PARTY_DIR)/logotweak/logomake/logomake $(BUILD_DIR)/EXTRAS/Tools/Single-use/bootlogo.tmp/
-# 	cp $(THIRD_PARTY_DIR)/logotweak/logowrite/logowrite $(BUILD_DIR)/EXTRAS/Tools/Single-use/bootlogo.tmp/
-# 	cd $(BUILD_DIR)/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Remove MiniUI Boot Logo.pak"
-# 	cp -R ./bits/bootlogos/miniui/. $(BUILD_DIR)/EXTRAS/Tools/Single-use/bootlogo.tmp/
-# 	cd $(BUILD_DIR)/EXTRAS/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Add MiniUI Boot Logo.pak"
-# 	rm -rf $(BUILD_DIR)/EXTRAS/Tools/Single-use/bootlogo.tmp
+# 	cp $(THIRD_PARTY_DIR)/picoarch/output/fake-08_libretro.so $(BUILD_DIR)/extras/Emus/P8.pak/
+# 	cp $(THIRD_PARTY_DIR)/picoarch/output/nxengine_libretro.so "$(BUILD_DIR)/extras/Roms/Native Games (SH)/Cave Story/"
+# 	cp $(THIRD_PARTY_DIR)/picoarch/output/pokemini_libretro.so $(BUILD_DIR)/extras/Emus/PKM.pak/
+# 	cp $(THIRD_PARTY_DIR)/vvvvvv/vvvvvv "$(BUILD_DIR)/extras/Roms/Native Games (SH)/VVVVVV/"
+# 	cp -R ./bits/bootlogos/pak/. $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp
+# 	cp $(THIRD_PARTY_DIR)/logotweak/logomake/logomake $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
+# 	cp $(THIRD_PARTY_DIR)/logotweak/logowrite/logowrite $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
+# 	cd $(BUILD_DIR)/extras/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Remove MiniUI Boot Logo.pak"
+# 	cp -R ./bits/bootlogos/miniui/. $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
+# 	cd $(BUILD_DIR)/extras/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Add MiniUI Boot Logo.pak"
+# 	rm -rf $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp
 
-# 	cd $(BUILD_DIR)/EXTRAS && zip -r ../../releases/$(RELEASE_NAME)-extras.zip Bios Emus Roms Saves Tools README.txt
+# 	cd $(BUILD_DIR)/extras && zip -r ../../releases/$(RELEASE_NAME)-extras.zip Bios Emus Roms Saves Tools README.txt
