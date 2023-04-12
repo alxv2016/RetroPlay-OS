@@ -45,6 +45,8 @@ build:
 	$(ECHO)
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 
+clean:
+	cd $(THIRD_PARTY_DIR)/picoarch && make clean
 
 # Docker toolchain setup
 .docker: Dockerfile
