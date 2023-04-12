@@ -38,4 +38,4 @@ toolchain: .docker
 
 clean-toolchain:
 	docker rmi $(TOOLCHAIN_NAME)
-	rm -f $(CACHE_DIR).build
+	rm -f $(DOCKER_DIR)/.docker
