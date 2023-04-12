@@ -1,5 +1,5 @@
 # .PHONY: shell
-.PHONY: clean
+.PHONY: all clean
 
 ifeq (,$(PLATFORM))
 PLATFORM=$(UNION_PLATFORM)
@@ -22,11 +22,31 @@ BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
+# 
+ECHO:= echo "\n::Building Demo!"
 
 PATCH = git apply
 
 TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
 
+LIBC_LIB=/opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
+BUNDLE_LIBS=
+
+GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
+ifeq "$(GCC_VER_GTE9_0)" "1"
+  BUNDLE_LIBS=bundle
+endif
+
+all: dist
+
+dist: build
+
+build:
+	$(ECHO)
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+
+
+# Docker toolchain setup
 .docker: Dockerfile
 	chmod a+x $(DOCKER_DIR)/support/setup-toolchain.sh
 	chmod a+x $(DOCKER_DIR)/support/setup-env.sh
