@@ -64,7 +64,7 @@ external:
 
 build:
 	echo "\n::$(TARGET) ---- Build"
-
+	mkdir -p $(EXTRAS_DIR)
 	mkdir -p $(RELEASE_DIR)
 	mkdir -p $(BUILD_DIR)
 	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist

@@ -1,7 +1,6 @@
 .DS_Store
 .vscode/
 *.o
-*.so
 /build/
 /release/
 /extras/
