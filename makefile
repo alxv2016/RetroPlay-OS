@@ -1,14 +1,21 @@
+# .PHONY: shell
 .PHONY: clean
+
+ifeq (,$(PLATFORM))
+PLATFORM=$(UNION_PLATFORM)
+endif
+
 ###########################################################
 
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
+RELEASE_NAME=$(TARGET)-v$(VERSION)
 
 ###########################################################
 
 #Directories
 ROOT_DIR := $(shell pwd)
-CACHE := $(ROOT_DIR)/cache
+DOCKER_DIR := $(ROOT_DIR)/docker
 SRC_DIR := $(ROOT_DIR)/src
 THIRD_PARTY_DIR := $(ROOT_DIR)/third-party
 BUILD_DIR := $(ROOT_DIR)/build
@@ -16,191 +23,19 @@ RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
 
-# RELEASE_DOT!=find ./release/. -regex ".*/$(TARGET)-v$(VERSION)-[0-9]\.zip" -printf '.' | wc -m
-RELEASE_NAME=$(TARGET)-v$(VERSION)
 
-PATCH = git apply
+TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
 
-TOOLCHAIN := ghcr.io/onionui/miyoomini-toolchain
+.docker: Dockerfile
+	chmod a+x $(DOCKER_DIR)/support/setup-toolchain.sh
+	chmod a+x $(DOCKER_DIR)/support/setup-env.sh
+	chmod a+x $(DOCKER_DIR)/support/setup-sqlite.sh
+	docker build -t $(TOOLCHAIN_NAME) .
+	touch $(DOCKER_DIR)/.docker
 
-LIBC_LIB=/opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
-BUNDLE_LIBS=
+toolchain: .docker
+	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN_NAME) /bin/bash
 
-BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
-GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
-ifeq "$(GCC_VER_GTE9_0)" "1"
-  BUNDLE_LIBS=bundle
-endif
-
-all: patch lib sdl core external build readmes $(BUNDLE_LIBS) release
-
-patch:
-	echo "\n::$(TARGET) ---- Patch"
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
-
-lib:
-	echo "\n::$(TARGET) ---- Lib"
-	cd $(SRC_DIR)/libmsettings && make
-# cd $(SRC_DIR)/libmmenu && make
-	cd $(THIRD_PARTY_DIR)/latency_reduction && make
-sdl:
-	echo "\n::$(TARGET) ---- SDL"
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
-
-core:
-	echo "\n::$(TARGET) ---- Core"
-	cd $(SRC_DIR)/batmon && make
-	cd $(SRC_DIR)/keymon && make
-	cd $(SRC_DIR)/lumon && make
-	cd $(SRC_DIR)/progressui && make
-	cd $(SRC_DIR)/miniui && make
-	cd $(SRC_DIR)/show && make
-	cd $(SRC_DIR)/confirm && make
-	cd $(SRC_DIR)/say && make
-	cd $(SRC_DIR)/blank && make
-
-external:
-# cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
-
-build:
-	echo "\n::$(TARGET) ---- Build"
-	mkdir -p $(EXTRAS_DIR)
-	mkdir -p $(RELEASE_DIR)
-	mkdir -p $(BUILD_DIR)
-	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
-	cp -R $(EXTRAS_DIR)/. $(BUILD_DIR)/extras
-	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
-	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
-# cp $(SRC_DIR)/libmmenu/libmmenu.so $(BUILD_DIR)/dist/.system/lib/
-	cp $(THIRD_PARTY_DIR)/latency_reduction/as_preload.so $(BUILD_DIR)/dist/.system/lib/
-	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
-	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
-	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progressui/progressui $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progressui/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
-	cp $(SRC_DIR)/miniui/MiniUI $(BUILD_DIR)/dist/.system/paks/MiniUI.pak/
-	cp $(SRC_DIR)/show/show $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/miyoo354/app/
-	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/miyoo354/app/
-
-	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
-	cp $(DIST_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-	cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
-	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
-	cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
-
-# cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(BUILD_DIR)/dist/.system/bin/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
-
-readmes:
-	echo "\n::$(TARGET) ---- Readme"
-	fmt -w 40 -s $(DIST_DIR)/README.txt > $(BUILD_DIR)/dist/README.txt
-
-bundle:
-	echo "\n::$(TARGET) ---- Bundle"
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libc.so.6 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libcrypt.so.1 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libdl.so.2 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libgcc_s.so.1 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libm.so.6 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libpcprofile.so $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libpthread.so.0 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libresolv.so.2 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/librt.so.1 $(BUILD_DIR)/dist/.system/lib/
-	cp -L /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib/libstdc++.so.6 $(BUILD_DIR)/dist/.system/lib/
-
-release:
-	echo "\n::$(TARGET) ---- Release"
-	cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
-	cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
-	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
-	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
-	echo "$(RELEASE_NAME)" > $(BUILD_DIR)/latest.txt
-
-git-submodules:
-	git submodule update --init --recursive
-	
-clean:
-	rm -rf $(CACHE)
-	rm -rf $(BUILD_DIR)
-	rm -rf $(RELEASE_DIR)
-	rm -rf $(EXTRAS_DIR)
-	cd $(SRC_DIR)/libmsettings && make clean
-# cd $(SRC_DIR)/libmmenu && make clean
-	cd $(SRC_DIR)/batmon && make clean
-	cd $(SRC_DIR)/keymon && make clean
-	cd $(SRC_DIR)/lumon && make clean
-	cd $(SRC_DIR)/progressui && make clean
-	cd $(SRC_DIR)/miniui && make clean
-	cd $(SRC_DIR)/show && make clean
-	cd $(SRC_DIR)/confirm && make clean
-	cd $(SRC_DIR)/say && make clean
-	cd $(SRC_DIR)/blank && make clean
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
-# cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
-	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
-
-$(CACHE)/.docker:
-	docker pull $(TOOLCHAIN)
-	mkdir -p cache
-	touch $(CACHE)/.docker
-
-toolchain: $(CACHE)/.docker
-	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash
-
-with-toolchain: $(CACHE)/.docker
-	docker run --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN) /bin/bash -c "source /root/.bashrc; make $(CMD)"
-
-# Commenting out all extras and TOOLS during development
-# tools:
-# 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
-# 	cd $(THIRD_PARTY_DIR)/screenshot && make
-# 	cd $(THIRD_PARTY_DIR)/logotweak/logomake && make
-# 	cd $(THIRD_PARTY_DIR)/logotweak/logowrite && make
-# 	cd $(SRC_DIR)/clock && make
-#
-# 	cd $(THIRD_PARTY_DIR)/vvvvvv && make -j
-
-# 	fmt -w 40 -s ./extras//README.txt > $(BUILD_DIR)/extras/README.txt
-# 	cp -R ./extras/. $(BUILD_DIR)/extras
-	
-
-# 	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/extras/Tools/Files.pak/
-# 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/extras/Tools/Clock.pak/
-# 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/extras/Tools/Files.pak/
-# 	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/extras/Tools/Screenshots.pak/
-
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/fake-08_libretro.so $(BUILD_DIR)/extras/Emus/P8.pak/
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/nxengine_libretro.so "$(BUILD_DIR)/extras/Roms/Native Games (SH)/Cave Story/"
-# 	cp $(THIRD_PARTY_DIR)/picoarch/output/pokemini_libretro.so $(BUILD_DIR)/extras/Emus/PKM.pak/
-# 	cp $(THIRD_PARTY_DIR)/vvvvvv/vvvvvv "$(BUILD_DIR)/extras/Roms/Native Games (SH)/VVVVVV/"
-# 	cp -R ./bits/bootlogos/pak/. $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp
-# 	cp $(THIRD_PARTY_DIR)/logotweak/logomake/logomake $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
-# 	cp $(THIRD_PARTY_DIR)/logotweak/logowrite/logowrite $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
-# 	cd $(BUILD_DIR)/extras/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Remove MiniUI Boot Logo.pak"
-# 	cp -R ./bits/bootlogos/miniui/. $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp/
-# 	cd $(BUILD_DIR)/extras/Tools/Single-use/ && cp -R ./bootlogo.tmp/. "02) Add MiniUI Boot Logo.pak"
-# 	rm -rf $(BUILD_DIR)/extras/Tools/Single-use/bootlogo.tmp
-
-# 	cd $(BUILD_DIR)/extras && zip -r ../../releases/$(RELEASE_NAME)-extras.zip Bios Emus Roms Saves Tools README.txt
+clean-toolchain:
+	docker rmi $(TOOLCHAIN_NAME)
+	rm -f $(CACHE_DIR).build
