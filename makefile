@@ -1,5 +1,5 @@
 # .PHONY: shell
-.PHONY: all clean
+.PHONY: all dist patch build clean toolchain clean-toolchain .docker
 
 ifeq (,$(PLATFORM))
 PLATFORM=$(UNION_PLATFORM)
@@ -37,9 +37,14 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
 endif
 
+
 all: dist
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-pokemini-make.patch && touch .patched
 
 dist: build
+	$(ECHO)
+	cd $(SRC_DIR)/libmsettings && make
+	cd $(SRC_DIR)/libmmenu && make
 
 build:
 	$(ECHO)
