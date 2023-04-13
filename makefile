@@ -42,11 +42,10 @@ all: dist
 dist: build
 	$(ECHO)
 	cd $(SRC_DIR)/libmsettings && make
-	cd $(SRC_DIR)/libmmenu && make
 
 build:
 	$(ECHO)
-	cd $(THIRD_PARTY_DIR)/picoarch && make mgba platform=miyoomini -j
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 
 clean:
 	cd $(THIRD_PARTY_DIR)/picoarch && make clean
