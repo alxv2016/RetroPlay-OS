@@ -1,5 +1,8 @@
 .PHONY: all program libs external build bundle release dirs patch clean clean-all toolchain clean-toolchain .docker
 ###########################################################
+ifeq (,$(PLATFORM))
+PLATFORM=$(UNION_PLATFORM)
+endif
 
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
@@ -16,18 +19,23 @@ BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
+CACHE := $(ROOT_DIR)/cache
 # 
+BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
 ECHO:= @echo "\n::$(TARGET) V$(VERSION) build complete, enjoy!"
-COMPILE_CHAIN = libs external build release
 PATCH = git apply
 
-TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
-
 LIBC_LIB_DIR := /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
+BUNDLE_LIBS=
 GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
 ifeq "$(GCC_VER_GTE9_0)" "1"
-	COMPILE_CHAIN = libs external bundle release
+  BUNDLE_LIBS=bundle
 endif
+
+TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
+COMPILE_CHAIN = libs external build $(BUNDLE_LIBS) release
+
+
 ###########################################################
 # Compile our app
 all: $(COMPILE_CHAIN)
@@ -35,17 +43,17 @@ all: $(COMPILE_CHAIN)
 libs: patch
 	@echo "\n::$(TARGET) -- Compiling Libs"
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
-	cd $(THIRD_PARTY_DIR)/latency_reduction && make
-	cd $(SRC_DIR)/libmsettings && make
-	cd $(SRC_DIR)/batmon && make
-	cd $(SRC_DIR)/keymon && make
-	cd $(SRC_DIR)/lumon && make
-	cd $(SRC_DIR)/progressui && make
-	cd $(SRC_DIR)/miniui && make
-	cd $(SRC_DIR)/show && make
-	cd $(SRC_DIR)/confirm && make
-	cd $(SRC_DIR)/say && make
-	cd $(SRC_DIR)/blank && make
+# cd $(THIRD_PARTY_DIR)/latency_reduction && make
+# cd $(SRC_DIR)/libmsettings && make
+# cd $(SRC_DIR)/batmon && make
+# cd $(SRC_DIR)/keymon && make
+# cd $(SRC_DIR)/lumon && make
+# cd $(SRC_DIR)/progressui && make
+# cd $(SRC_DIR)/miniui && make
+# cd $(SRC_DIR)/show && make
+# cd $(SRC_DIR)/confirm && make
+# cd $(SRC_DIR)/say && make
+# cd $(SRC_DIR)/blank && make
 
 patch:
 	@echo "\n::$(TARGET) -- Patching Picoarch, SDL-1.2"
@@ -110,19 +118,19 @@ build: dirs
 # cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
-bundle: build
+bundle:
 	@echo "\n::$(TARGET) -- Bundling LIBC Libs"
-# cp -L $(LIBC_LIB_DIR)/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libc.so.6 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libcrypt.so.1 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libdl.so.2 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libgcc_s.so.1 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libm.so.6 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libpcprofile.so $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libpthread.so.0 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libresolv.so.2 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/librt.so.1 $(BUILD_DIR)/dist/.system/lib/
-# cp -L $(LIBC_LIB_DIR)/libc/lib/libstdc++.so.6 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libc.so.6 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libcrypt.so.1 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libdl.so.2 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libgcc_s.so.1 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libm.so.6 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libpcprofile.so $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libpthread.so.0 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libresolv.so.2 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/librt.so.1 $(BUILD_DIR)/dist/.system/lib/
+	cp -L $(LIBC_LIB_DIR)/libc/lib/libstdc++.so.6 $(BUILD_DIR)/dist/.system/lib/
 
 release:
 	@echo "\n::$(TARGET) -- Zipping up release" 
@@ -179,3 +187,12 @@ clean-toolchain:
 	@echo "\n::$(TARGET) -- Clearing toolchain cache and image"
 	docker rmi $(TOOLCHAIN_NAME)
 	rm -f $(DOCKER_DIR)/.docker
+
+
+$(CACHE)/.docker:
+	docker pull $(TOOLCHAIN_NAME)
+	mkdir -p cache
+	touch $(CACHE)/.docker
+
+toolchain2: $(CACHE)/.docker
+	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN_NAME) /bin/bash
