@@ -1,5 +1,5 @@
 # .PHONY: shell
-.PHONY: patch all dist build clean toolchain clean-toolchain .docker
+.PHONY: patch all lib build external release clean toolchain clean-toolchain .docker
 
 ifeq (,$(PLATFORM))
 PLATFORM=$(UNION_PLATFORM)
@@ -37,21 +37,38 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
 endif
 
-all: dist
+all: lib
 
-dist: build
+lib: external
 	$(ECHO)
 	cd $(SRC_DIR)/libmsettings && make
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
+	cd $(THIRD_PARTY_DIR)/latency_reduction && make
 
-build:
+external: build
 	$(ECHO)
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+
+build: release
+	$(ECHO)
+	mkdir -p $(RELEASE_DIR)
+	mkdir -p $(BUILD_DIR)
+	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
+
+release:
+	$(ECHO)
+	cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
+	cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
+	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
+	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
 
 clean:
 	cd $(THIRD_PARTY_DIR)/picoarch && make clean
 
+# Run patch manually before build
 patch:
 	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-picoarch.patch && touch .patched
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
 
 # Docker toolchain setup
 .docker: Dockerfile
