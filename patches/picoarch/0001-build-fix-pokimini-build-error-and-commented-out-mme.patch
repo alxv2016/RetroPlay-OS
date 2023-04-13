@@ -1,0 +1,37 @@
+From f5c10ab3696ac09055ee128fc444aa23ee1d1765 Mon Sep 17 00:00:00 2001
+From: Alxv <avong2011@gmail.com>
+Date: Wed, 12 Apr 2023 21:26:59 -0400
+Subject: [PATCH] build: fix pokimini build error and commented out mmenu
+
+---
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 18cccfe..5af4263 100644
+--- a/Makefile
++++ b/Makefile
+@@ -75,6 +75,8 @@ picodrive_MAKEFILE = Makefile.libretro
+ 
+ pokemini_REPO = https://github.com/libretro/PokeMini
+ pokemini_MAKEFILE = Makefile.libretro
++# Pokemini currently breaks build
++pokemini_REVISION = 684e7ea0950f4df48cd1fbf1160e6af3c262c9f0
+ 
+ quicknes_REPO = https://github.com/libretro/QuickNES_Core
+ 
+@@ -92,8 +94,9 @@ else ifeq ($(platform), miyoomini)
+ 	OBJS += source/plat_miyoomini.o
+ 	CFLAGS += -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve -fPIC -DCONTENT_DIR='"/mnt/SDCARD/Roms"'
+ 	LDFLAGS += -fPIC -lmi_sys -lmi_gfx
+-	MMENU=1
+-	# PATCH=patch
++# Commenting out MMENU to use native menu instead
++# MMENU=1
++# PATCH=patch
+ else ifeq ($(platform), unix)
+ 	OBJS += source/plat_linux.o
+ 	LDFLAGS += -fPIE
+-- 
+2.39.2 (Apple Git-143)
+
