@@ -1,4 +1,4 @@
-.PHONY: all program libs external build bundle release dirs patch clean clean-all toolchain clean-toolchain .docker
+.PHONY: all program libs external build bundle release dirs clean clean-all toolchain clean-toolchain .docker
 ###########################################################
 
 TARGET=RetroPlayOS
@@ -35,7 +35,7 @@ COMPILE_CHAIN = libs external build $(BUNDLE_LIBS) release
 
 all: $(COMPILE_CHAIN)
 
-libs: patch
+libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	@echo "\n::$(TARGET) -- Compiling Libs"
 # IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain linux dependencies 
 	cd $(SRC_DIR)/libmsettings && make
@@ -52,10 +52,13 @@ libs: patch
 	cd $(SRC_DIR)/say && make
 	cd $(SRC_DIR)/blank && make
 
-patch:
-	@echo "\n::$(TARGET) -- Patching Picoarch, SDL-1.2"
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
-	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-picoarch.patch && touch .patched
+# Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
+third-party/SDL-1.2/.patched:
+	@echo "\n::$(TARGET) -- Patching SDL-1.2"
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
+third-party/picoarch/.patched:
+	@echo "\n::$(TARGET) -- Patching Picoarch"
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
 
 external:
 # @echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
