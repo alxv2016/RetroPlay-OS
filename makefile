@@ -1,8 +1,5 @@
 .PHONY: all program libs external build bundle release dirs patch clean clean-all toolchain clean-toolchain .docker
 ###########################################################
-ifeq (,$(PLATFORM))
-PLATFORM=$(UNION_PLATFORM)
-endif
 
 TARGET=RetroPlayOS
 VERSION=1.0-alpha
@@ -19,14 +16,13 @@ BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
 DIST_DIR := $(ROOT_DIR)/dist
 EXTRAS_DIR := $(ROOT_DIR)/extras
-CACHE := $(ROOT_DIR)/cache
-# 
-BUILD_GCC:=$(shell $(CROSS_COMPILE)gcc -dumpfullversion -dumpversion)
+# CACHE := $(ROOT_DIR)/cache
+BUNDLE_LIBS =
+#
 ECHO:= @echo "\n::$(TARGET) V$(VERSION) build complete, enjoy!"
 PATCH = git apply
 
 LIBC_LIB_DIR := /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
-BUNDLE_LIBS=
 GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
 ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
@@ -35,33 +31,34 @@ endif
 TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
 COMPILE_CHAIN = libs external build $(BUNDLE_LIBS) release
 
-
 ###########################################################
-# Compile our app
+
 all: $(COMPILE_CHAIN)
 
 libs: patch
 	@echo "\n::$(TARGET) -- Compiling Libs"
+# IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain linux dependencies 
+	cd $(SRC_DIR)/libmsettings && make
+	cd $(THIRD_PARTY_DIR)/latency_reduction && make
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
-# cd $(THIRD_PARTY_DIR)/latency_reduction && make
-# cd $(SRC_DIR)/libmsettings && make
-# cd $(SRC_DIR)/batmon && make
-# cd $(SRC_DIR)/keymon && make
-# cd $(SRC_DIR)/lumon && make
-# cd $(SRC_DIR)/progressui && make
-# cd $(SRC_DIR)/miniui && make
-# cd $(SRC_DIR)/show && make
-# cd $(SRC_DIR)/confirm && make
-# cd $(SRC_DIR)/say && make
-# cd $(SRC_DIR)/blank && make
+# Core libs
+	cd $(SRC_DIR)/batmon && make
+	cd $(SRC_DIR)/keymon && make
+	cd $(SRC_DIR)/lumon && make
+	cd $(SRC_DIR)/progressui && make
+	cd $(SRC_DIR)/miniui && make
+	cd $(SRC_DIR)/show && make
+	cd $(SRC_DIR)/confirm && make
+	cd $(SRC_DIR)/say && make
+	cd $(SRC_DIR)/blank && make
 
 patch:
 	@echo "\n::$(TARGET) -- Patching Picoarch, SDL-1.2"
-# cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-picoarch.patch && touch .patched
-# cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < ../../patches/SDL-1.2/0001-vol-keys.patch && touch .patched
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-picoarch.patch && touch .patched
 
 external:
-	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
+# @echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 # cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 
 dirs: clean
@@ -71,41 +68,42 @@ dirs: clean
 
 build: dirs
 	@echo "\n::$(TARGET) -- Copying directories"
-# cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
-# cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
+	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
+	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
 # cp -R $(EXTRAS_DIR)/. $(BUILD_DIR)/extras
 
-# mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
-# cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
-# cp $(THIRD_PARTY_DIR)/latency_reduction/as_preload.so $(BUILD_DIR)/dist/.system/lib/
-# cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
-# cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
+	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
+	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
+	cp $(THIRD_PARTY_DIR)/latency_reduction/as_preload.so $(BUILD_DIR)/dist/.system/lib/
+	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
+	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
 
-# cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/progressui/progressui $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/progressui/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
-# cp $(SRC_DIR)/miniui/MiniUI $(BUILD_DIR)/dist/.system/paks/MiniUI.pak/
-# cp $(SRC_DIR)/show/show $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/.system/bin/
-# cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/miyoo354/app/
-# cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/miyoo354/app/
-
-# cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
-# cp $(DIST_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/progressui/progressui $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/progressui/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
+	cp $(SRC_DIR)/miniui/MiniUI $(BUILD_DIR)/dist/.system/paks/MiniUI.pak/
+	cp $(SRC_DIR)/show/show $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/miyoo354/app/
+	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/miyoo354/app/
+# NOTE: Saved build time with pre-build cores
+	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
+	cp $(DIST_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(DIST_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(DIST_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(DIST_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(DIST_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(DIST_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
 # cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
 # cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
 # cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
 # cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
+# NOTE: switch to this to re-build cores
 # cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(BUILD_DIR)/dist/.system/bin/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
 # cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
@@ -119,6 +117,7 @@ build: dirs
 # cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
 bundle:
+# NOTE: only bundles if GCC_VER_GTE9_0 is detected? not sure if these are dependencies for device
 	@echo "\n::$(TARGET) -- Bundling LIBC Libs"
 	cp -L $(LIBC_LIB_DIR)/ld-linux-armhf.so.3 $(BUILD_DIR)/dist/.system/lib/
 	cp -L $(LIBC_LIB_DIR)/libc/lib/libc.so.6 $(BUILD_DIR)/dist/.system/lib/
@@ -134,11 +133,13 @@ bundle:
 
 release:
 	@echo "\n::$(TARGET) -- Zipping up release" 
-# cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
-# cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
-# mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
-# cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
+	cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
+	cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
+	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
+	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
 	$(ECHO)
+
+zip-bundles: build $(BUNDLE_LIBS) zip
 
 clean:
 	@echo "\n::$(TARGET) -- Refreshing directories"
@@ -150,7 +151,6 @@ clean-all: clean
 	rm -rf $(CACHE)
 	rm -rf $(BUILD_DIR)
 	rm -rf $(RELEASE_DIR)
-	rm -rf $(EXTRAS_DIR)
 	cd $(SRC_DIR)/libmsettings && make clean
 	cd $(SRC_DIR)/batmon && make clean
 	cd $(SRC_DIR)/keymon && make clean
@@ -187,12 +187,3 @@ clean-toolchain:
 	@echo "\n::$(TARGET) -- Clearing toolchain cache and image"
 	docker rmi $(TOOLCHAIN_NAME)
 	rm -f $(DOCKER_DIR)/.docker
-
-
-$(CACHE)/.docker:
-	docker pull $(TOOLCHAIN_NAME)
-	mkdir -p cache
-	touch $(CACHE)/.docker
-
-toolchain2: $(CACHE)/.docker
-	docker run -it --rm -v "$(ROOT_DIR)":/root/workspace $(TOOLCHAIN_NAME) /bin/bash
