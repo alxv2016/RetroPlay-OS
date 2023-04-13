@@ -1,5 +1,5 @@
 # .PHONY: shell
-.PHONY: all dist patch build clean toolchain clean-toolchain .docker
+.PHONY: patch all dist build clean toolchain clean-toolchain .docker
 
 ifeq (,$(PLATFORM))
 PLATFORM=$(UNION_PLATFORM)
@@ -37,9 +37,7 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
   BUNDLE_LIBS=bundle
 endif
 
-
 all: dist
-	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-pokemini-make.patch && touch .patched
 
 dist: build
 	$(ECHO)
@@ -48,10 +46,13 @@ dist: build
 
 build:
 	$(ECHO)
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+	cd $(THIRD_PARTY_DIR)/picoarch && make mgba platform=miyoomini -j
 
 clean:
 	cd $(THIRD_PARTY_DIR)/picoarch && make clean
+
+patch:
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < ../../patches/picoarch/0001-picoarch.patch && touch .patched
 
 # Docker toolchain setup
 .docker: Dockerfile

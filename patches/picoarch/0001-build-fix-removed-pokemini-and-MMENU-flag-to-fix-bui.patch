@@ -1,0 +1,48 @@
+From 6d40abf311341f543f52b6caec6d77532399fe66 Mon Sep 17 00:00:00 2001
+From: Alxv <avong2011@gmail.com>
+Date: Wed, 12 Apr 2023 22:00:28 -0400
+Subject: [PATCH] build: fix removed pokemini and MMENU flag to fix build
+ errors
+
+---
+ Makefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 18cccfe..80fe63d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -25,7 +25,7 @@ PATCH = git apply
+ 
+ # Unpolished or slow cores that build
+ # EXTRA_CORES += mame2003_plus
+-CORES = gambatte gpsp fceumm snes9x2005_plus pcsx_rearmed picodrive pokemini mgba smsplus-gx beetle-pce-fast genesis-plus-gx snes9x2005 nxengine mednafen_supafaust
++CORES = gambatte gpsp fceumm snes9x2005_plus pcsx_rearmed picodrive mgba smsplus-gx beetle-pce-fast genesis-plus-gx snes9x2005 nxengine mednafen_supafaust
+ CORES+= beetle-vb fake-08
+ 
+ # *_BUILD_PATH seems to assume the makefile is present in the root of the repo
+@@ -73,8 +73,8 @@ pcsx_rearmed_REVISION = 131a1b41835bc0eba3e35998dce376163a0a1b14
+ picodrive_REPO = https://github.com/irixxxx/picodrive
+ picodrive_MAKEFILE = Makefile.libretro
+ 
+-pokemini_REPO = https://github.com/libretro/PokeMini
+-pokemini_MAKEFILE = Makefile.libretro
++# pokemini_REPO = https://github.com/libretro/PokeMini
++# pokemini_MAKEFILE = Makefile.libretro
+ 
+ quicknes_REPO = https://github.com/libretro/QuickNES_Core
+ 
+@@ -92,8 +92,8 @@ else ifeq ($(platform), miyoomini)
+ 	OBJS += source/plat_miyoomini.o
+ 	CFLAGS += -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve -fPIC -DCONTENT_DIR='"/mnt/SDCARD/Roms"'
+ 	LDFLAGS += -fPIC -lmi_sys -lmi_gfx
+-	MMENU=1
+-	# PATCH=patch
++# MMENU=1
++# PATCH=patch
+ else ifeq ($(platform), unix)
+ 	OBJS += source/plat_linux.o
+ 	LDFLAGS += -fPIE
+-- 
+2.39.2 (Apple Git-143)
+
