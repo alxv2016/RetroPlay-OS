@@ -130,10 +130,5 @@
 #define RESUME_SLOT_PATH "/tmp/mmenu_slot.txt"
 #define AUTO_RESUME_PATH "/mnt/SDCARD/.userdata/.miniui/auto_resume.txt"
 #define AUTO_RESUME_SLOT "9"
-#define SIMPLE_MODE_PATH "/mnt/SDCARD/.userdata/enable-simple-mode"
-
-#define SCALE1(a) ((a)*SCREEN_SCALE)
-#define SCALE2(a, b) ((a)*SCREEN_SCALE), ((b)*SCREEN_SCALE)
-#define SCALE4(a, b, c, d) ((a)*SCREEN_SCALE), ((b)*SCREEN_SCALE), ((c)*SCREEN_SCALE), ((d)*SCREEN_SCALE)
 
 #endif

@@ -587,9 +587,11 @@ void GFX_blitBattery(SDL_Surface *surface, int x, int y)
 	}
 	else
 	{
-		int pwr_amount = 24 * charge / 100;
+		int pwr_width = 24;
+		int pwr_height = 12;
+		int pwr_amount = pwr_width * charge / 100;
 		// 2 is 2px right-offset from the center of the battery image
-		int cx = (bat_icon->w / 2) - (bat_power->w / 2) - 2;
+		int cx = (bat_icon->w / 2) - (bat_power->w / 2) - 1;
 		int cy = (bat_icon->h / 2) - (bat_power->h / 2);
 		int margin_left = bat_label->w + 8;
 		int bat_label_cy = (bat_icon->h / 2) - (bat_label->h / 2);
@@ -598,7 +600,7 @@ void GFX_blitBattery(SDL_Surface *surface, int x, int y)
 		rect.x = 0;
 		rect.y = 0;
 		rect.w = pwr_amount;
-		rect.h = 12;
+		rect.h = pwr_height;
 
 		SDL_BlitSurface(bat_icon, NULL, surface, &(SDL_Rect){x, y});
 		SDL_BlitSurface(bat_power, &rect, surface, &(SDL_Rect){x + cx, y + cy});
@@ -714,23 +716,24 @@ void GFX_blitMainMenu(SDL_Surface *surface, char *name, char *path, char *unique
 	int margin_left = 32;
 
 	SDL_Surface *text;
-	text = TTF_RenderUTF8_Blended(font.medium, display_name, COLOR_LIGHT_TEXT);
+	text = TTF_RenderUTF8_Blended(font.small, display_name, COLOR_LIGHT_TEXT);
 	int row_width = text->w + margin_left * 2;
-	int text_width = GFX_truncateText(font.medium, display_name, display_name, 400, margin_left) + margin_left;
+	int text_width = GFX_truncateText(font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
 	int max_width = MIN(row_width, text_width);
 	int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
+	int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
 	if (row == selected_row)
 	{
 		// Selected rows
-		text = TTF_RenderUTF8_Blended(font.medium, display_name, COLOR_DARK_TEXT);
-		SDL_FillRect(surface, &(SDL_Rect){0, 24 + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, SDL_MapRGB(surface->format, TRIAD_WHITE));
-		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, 24 + (row * ROW_HEIGHT) + row_cy});
+		text = TTF_RenderUTF8_Blended(font.small, display_name, COLOR_DARK_TEXT);
+		SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, SDL_MapRGB(surface->format, TRIAD_WHITE));
+		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
 		SDL_FreeSurface(text);
 	}
 	else
 	{
-		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, 24 + (row * ROW_HEIGHT) + row_cy});
+		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
 		SDL_FreeSurface(text);
 	}
 }
