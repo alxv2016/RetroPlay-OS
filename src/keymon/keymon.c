@@ -16,6 +16,8 @@
 #include <sys/ioctl.h>
 #include <pthread.h>
 
+#include "../common/rumble.h"
+
 //	Button Defines
 #define	BUTTON_MENU		KEY_ESC
 #define	BUTTON_POWER	KEY_POWER
@@ -132,6 +134,7 @@ static void* runAXP(void *arg) {
 }
 
 int main (int argc, char *argv[]) {
+	rumble(0);
 	checkAXP();
 	pthread_create(&adc_pt, NULL, &runAXP, NULL);
 	
@@ -152,9 +155,11 @@ int main (int argc, char *argv[]) {
 		switch (ev.code) {
 		case BUTTON_MENU:
 			if ( val != REPEAT ) menu_pressed = val;
+			if ( val == PRESSED) menu_super_short_pulse();
 			break;
 		case BUTTON_POWER:
 			if ( val != REPEAT ) power_pressed = val;
+			if ( val == PRESSED ) super_short_pulse();
 			break;
 		case BUTTON_START:
 			if ( val != REPEAT ) {
@@ -170,6 +175,7 @@ int main (int argc, char *argv[]) {
 				repeat_vol = 0;
 			}
 			if ( val == PRESSED ) {
+				super_short_pulse();
 				if (menu_pressed > 0) {
 					val = GetBrightness();
 					if (val<BRIMAX) SetBrightness(++val);
@@ -189,6 +195,7 @@ int main (int argc, char *argv[]) {
 				repeat_vol = 0;
 			}
 			if ( val == PRESSED ) {
+				super_short_pulse();
 				if (menu_pressed > 0) {
 					val = GetBrightness();
 					if (val>0) SetBrightness(--val);
@@ -205,6 +212,7 @@ int main (int argc, char *argv[]) {
 		
 		if (menu_pressed && power_pressed) {
 			menu_pressed = power_pressed = 0;
+			short_pulse();
 			system("shutdown");
 			while (1) pause();
 		}
