@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <time.h>
 
@@ -61,7 +62,8 @@ int msleep(long msec)
     struct timespec ts;
     int res;
 
-    if (msec < 0) {
+    if (msec < 0)
+    {
         errno = EINVAL;
         return -1;
     }
@@ -69,7 +71,8 @@ int msleep(long msec)
     ts.tv_sec = msec / 1000;
     ts.tv_nsec = (msec % 1000) * 1000000;
 
-    do {
+    do
+    {
         res = nanosleep(&ts, &ts);
     } while (res && errno == EINTR && msleep_interrupt == 0);
 
@@ -89,4 +92,4 @@ int file_write(const char *path, const char *str, uint32_t len)
     return 0;
 }
 
-#endif 
+#endif

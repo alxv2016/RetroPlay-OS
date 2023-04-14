@@ -18,8 +18,8 @@
 #define CODE_L2 SDLK_TAB
 #define CODE_R1 SDLK_t
 #define CODE_R2 SDLK_BACKSPACE
-#define	CODE_PLUS SDLK_LSUPER
-#define	CODE_MINUS SDLK_RSUPER
+#define CODE_PLUS SDLK_LSUPER
+#define CODE_MINUS SDLK_RSUPER
 
 // Volume and Brightness
 #define MIN_VOLUME 0
@@ -28,29 +28,56 @@
 #define MAX_BRIGHTNESS 10
 
 // Raw Hex Colors
-#define TRIAD_WHITE 0xff,0xff,0xff
-#define TRIAD_BLACK 0x00,0x00,0x00
-#define TRIAD_LIGHT_GRAY 0x7f,0x7f,0x7f
-#define TRIAD_GRAY 0x99,0x99,0x99
-#define TRIAD_DARK_GRAY 0x26,0x26,0x26
-#define TRIAD_LIGHT_TEXT 0xcc,0xcc,0xcc
-#define TRIAD_DARK_TEXT 0x00,0x00,0x00
+#define TRIAD_WHITE 0xff, 0xff, 0xff
+#define TRIAD_BLACK 0x00, 0x00, 0x00
+#define TRIAD_LIGHT_GRAY 0x7f, 0x7f, 0x7f
+#define TRIAD_GRAY 0x99, 0x99, 0x99
+#define TRIAD_DARK_GRAY 0x26, 0x26, 0x26
+#define TRIAD_LIGHT_TEXT 0xcc, 0xcc, 0xcc
+#define TRIAD_DARK_TEXT 0x00, 0x00, 0x00
 // Colors
-#define COLOR_WHITE (SDL_Color){TRIAD_WHITE}
-#define COLOR_GRAY (SDL_Color){TRIAD_GRAY}
-#define COLOR_BLACK (SDL_Color){TRIAD_BLACK}
-#define COLOR_LIGHT_TEXT (SDL_Color){TRIAD_LIGHT_TEXT}
-#define COLOR_DARK_TEXT (SDL_Color){TRIAD_DARK_TEXT}
-#define COLOR_GRAY_TEXT (SDL_Color){TRIAD_GRAY}
-#define COLOR_BUTTON_TEXT(SDL_Color){TRIAD_GRAY}
+#define COLOR_WHITE \
+  (SDL_Color)       \
+  {                 \
+    TRIAD_WHITE     \
+  }
+#define COLOR_GRAY \
+  (SDL_Color)      \
+  {                \
+    TRIAD_GRAY     \
+  }
+#define COLOR_BLACK \
+  (SDL_Color)       \
+  {                 \
+    TRIAD_BLACK     \
+  }
+#define COLOR_LIGHT_TEXT \
+  (SDL_Color)            \
+  {                      \
+    TRIAD_LIGHT_TEXT     \
+  }
+#define COLOR_DARK_TEXT \
+  (SDL_Color)           \
+  {                     \
+    TRIAD_DARK_TEXT     \
+  }
+#define COLOR_GRAY_TEXT \
+  (SDL_Color)           \
+  {                     \
+    TRIAD_GRAY          \
+  }
+#define COLOR_BUTTON_TEXT(SDL_Color) \
+  {                                  \
+    TRIAD_GRAY                       \
+  }
 
 // Screen size
 #define BASE_WIDTH 320
 #define BASE_HEIGHT 240
 
-#define SCREEN_WIDTH 	640
+#define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-#define SCREEN_SCALE 	2 // SCREEN_HEIGHT / BASE_HEIGHT
+#define SCREEN_SCALE 2 // SCREEN_HEIGHT / BASE_HEIGHT
 
 // UI Dimensions
 #define ICON_SIZE 44
@@ -106,7 +133,7 @@
 #define SIMPLE_MODE_PATH "/mnt/SDCARD/.userdata/enable-simple-mode"
 
 #define SCALE1(a) ((a)*SCREEN_SCALE)
-#define SCALE2(a,b) ((a)*SCREEN_SCALE),((b)*SCREEN_SCALE)
-#define SCALE4(a,b,c,d) ((a)*SCREEN_SCALE),((b)*SCREEN_SCALE),((c)*SCREEN_SCALE),((d)*SCREEN_SCALE)
+#define SCALE2(a, b) ((a)*SCREEN_SCALE), ((b)*SCREEN_SCALE)
+#define SCALE4(a, b, c, d) ((a)*SCREEN_SCALE), ((b)*SCREEN_SCALE), ((c)*SCREEN_SCALE), ((d)*SCREEN_SCALE)
 
 #endif
