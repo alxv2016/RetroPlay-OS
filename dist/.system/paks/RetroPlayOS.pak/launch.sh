@@ -2,6 +2,9 @@
 # RetroPlayOS.pak
 
 # /mnt/SDCARD/.system/bin/blank
+# NOTE: will launch "say" which will display message during boot, TODO show an image?
+# /mnt/SDCARD/.system/bin/say "Booting up!"
+/mnt/SDCARD/.system/bin/sys-img "charging.png"
 
 # init backlight
 echo 0 > /sys/class/pwm/pwmchip0/export

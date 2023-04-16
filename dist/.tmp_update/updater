@@ -11,4 +11,5 @@ while [ -f "$LAUNCH_PATH" ] ; do
 	"$LAUNCH_PATH"
 done
 
-reboot # under no circumstances should stock be allowed to touch this card
+# under no circumstances should stock be allowed to touch this card
+reboot

@@ -17,12 +17,12 @@ src/**/RetroPlayOS
 !RetroPlayOS/
 src/**/progressui
 !progressui/
-src/**/show
-!show/
+src/**/sys-img
+!sys-img/
 src/**/confirm
 !confirm/
-src/**/say
-!say/
+src/**/sys-msg
+!sys-msg/
 src/**/blank
 !blank/
 src/**/clock

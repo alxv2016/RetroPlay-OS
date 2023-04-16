@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
+
   if (argc < 2) {
     puts("Usage: show image.png");
     return 0;
@@ -49,6 +50,7 @@ int main(int argc, char *argv[]) {
       src -= 3;
     }
   }
+
   SDL_FreeSurface(img);
   munmap(fb0_map, map_size);
   close(fb0_fd);
