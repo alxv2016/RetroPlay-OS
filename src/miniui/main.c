@@ -10,9 +10,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "../common/common.h"
 #include "../common/defines.h"
-#include "../common/arry.h"
+#include "../common/keycontext.h"
+#include "../common/api.h"
+#include "../common/common.h"
+#include "../common/powerops.h"
+#include "../common/controls.h"
 
 ///////////////////////////////////////
 

@@ -9,7 +9,7 @@
 #include <SDL/SDL_ttf.h>
 
 #include "utils.h"
-#include "arry.h"
+#include "api.h"
 #include "defines.h"
 
 Directory *top;

@@ -1,5 +1,5 @@
-#ifndef _ARRY_H
-#define _ARRY_H
+#ifndef _API_H
+#define _API_H
 
 #include "utils.h"
 

@@ -1,51 +1,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-enum
-{
-	LOG_DEBUG = 0,
-	LOG_INFO,
-	LOG_WARN,
-	LOG_ERROR,
-};
-
-#define LOG_debug(fmt, ...) LOG_note(LOG_DEBUG, fmt, ##__VA_ARGS__)
-#define LOG_info(fmt, ...) LOG_note(LOG_INFO, fmt, ##__VA_ARGS__)
-#define LOG_warn(fmt, ...) LOG_note(LOG_WARN, fmt, ##__VA_ARGS__)
-#define LOG_error(fmt, ...) LOG_note(LOG_ERROR, fmt, ##__VA_ARGS__)
-void LOG_note(int level, const char *fmt, ...);
-
-typedef enum GamePadIndex
-{
-	BTN_UP = 0,
-	BTN_DOWN,
-	BTN_LEFT,
-	BTN_RIGHT,
-	BTN_A,
-	BTN_B,
-	BTN_X,
-	BTN_Y,
-	BTN_START,
-	BTN_SELECT,
-	BTN_L1,
-	BTN_R1,
-	BTN_L2,
-	BTN_R2,
-	BTN_MENU,
-	BTN_POWER,
-	BTN_PLUS,
-	BTN_MINUS,
-	BTN_COUNT,
-} GamePadIndex;
-
-void Input_reset(void);
-void Input_poll(void);
-int Input_anyPressed(void);
-int Input_justPressed(GamePadIndex btn);
-int Input_justRepeated(GamePadIndex btn);
-int Input_isPressed(GamePadIndex btn);
-int Input_justReleased(GamePadIndex btn);
-
 ///////////////////////////////////////////
 int GFX_truncateText(TTF_Font *font, const char *in_name, char *out_name, int max_width, int padding);
 
@@ -74,15 +29,5 @@ void GFX_blitSettings(SDL_Surface *surface, int x, int y, int icon, int value, i
 
 SDL_Surface *GFX_getText(char *text);
 /////////////////////////////////////////
-// POWER Management
-void waitForWake(void);
-void fauxSleep(void);
-void powerOff(void);
-void enterSleep(void);
-void exitSleep(void);
-void disablePoweroff(void);
-
-int isCharging(void);
-int preventAutosleep(void);
 
 #endif
