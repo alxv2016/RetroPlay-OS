@@ -13,13 +13,14 @@
 #include "../common/defines.h"
 #include "../common/keycontext.h"
 #include "../common/api.h"
-#include "../common/common.h"
+#include "../common/interface.h"
 #include "../common/powerops.h"
 #include "../common/controls.h"
 
 ///////////////////////////////////////
 
 ///////////////////////////////////////
+GFX g_gfx;
 
 int main(int argc, char *argv[]) {
   if (autoResume())
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]) {
   SDL_EnableKeyRepeat(300, 100);
 
   InitSettings();
-  SDL_Surface *screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
+  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
                                          SDL_HWSURFACE | SDL_DOUBLEBUF);
   GFX_init();
   GFX_ready();
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
   int dirty = 1;
   int was_charging = isCharging();
   unsigned long charge_start = SDL_GetTicks();
-  int btn_a_width = GFX_getButtonWidth("Open", "A");
+  int btn_a_width = getButtonWidth("Open", "A");
   int show_version = 0;
   int show_setting = 0; // 1=brightness,2=volume
   int setting_value = 0;
@@ -266,10 +267,10 @@ int main(int argc, char *argv[]) {
     }
 
     if (dirty) {
-      SDL_FillRect(screen, NULL, 0);
+      SDL_FillRect(g_gfx.screen, NULL, 0);
 
       if (show_setting) {
-        GFX_blitSettings(screen, 0, 0,
+        volumnBrightness(g_gfx.screen, 0, 0,
                          show_setting == VOLUME_ICON
                              ? BRIGHTNESS_ICON
                              : (setting_value > BRIGHTNESS_ICON
@@ -277,7 +278,7 @@ int main(int argc, char *argv[]) {
                                     : VOLUME_MUTE_ICON),
                          setting_value, setting_min, setting_max);
       } else {
-        GFX_blitBattery(screen, 576, 12);
+        batteryStatus(g_gfx.screen, 576, 12);
       }
 
       if (show_version) {
@@ -324,27 +325,27 @@ int main(int argc, char *argv[]) {
         SDL_FillRect(overlay, NULL, 0);
         // SDL_BlitSurface(screen, NULL, screen, &(SDL_Rect){(SCREEN_WIDTH -
         // version->w) / 2, (SCREEN_HEIGHT - version->h) / 2});
-        GFX_blitButton(screen, "B", "Back", 557, 419);
+        button(g_gfx.screen, "B", "Back", 557, 419);
       } else {
         if (total > 0) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            GFX_blitMainMenu(screen, entry->name, entry->path, entry->unique, j,
+            listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
                              selected_row);
           }
         } else {
           // TODO: show console list, move this to roms folders
-          GFX_blitParagraph(screen, "Empty folder", 0, 0, SCREEN_WIDTH,
+          paragraph(g_gfx.screen, "Empty folder", 0, 0, SCREEN_WIDTH,
                             SCREEN_HEIGHT);
         }
       }
 
       if (can_resume && !show_version) {
         if (strlen("X") > 1)
-          GFX_blitButton(screen, "X", "Resume", 20, 419);
+          button(g_gfx.screen, "X", "Resume", 20, 419);
         else
-          GFX_blitButton(screen, "X", "Resume", 557 - btn_a_width, 419);
+          button(g_gfx.screen, "X", "Resume", 557 - btn_a_width, 419);
       }
 
       // if (show_version)
@@ -361,11 +362,11 @@ int main(int argc, char *argv[]) {
       // }
       if (!show_version) {
         if (total == 0 && stack->count > 1) {
-          GFX_blitButton(screen, "B", "Back", 557 - btn_a_width, 419);
+          button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
         } else {
-          GFX_blitButton(screen, "A", "Open", 557, 419);
+          button(g_gfx.screen, "A", "Open", 557, 419);
           if (stack->count > 1) {
-            GFX_blitButton(screen, "B", "Back", 557 - btn_a_width, 419);
+            button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
           }
         }
       }
@@ -380,7 +381,7 @@ int main(int argc, char *argv[]) {
     // }
 
     if (dirty) {
-      SDL_Flip(screen);
+      SDL_Flip(g_gfx.screen);
       dirty = 0;
     }
     // slow down to 60fps
@@ -390,8 +391,8 @@ int main(int argc, char *argv[]) {
       SDL_Delay(FRAME_DURATION - frame_duration);
   }
 
-  SDL_FillRect(screen, NULL, 0);
-  SDL_Flip(screen);
+  SDL_FillRect(g_gfx.screen, NULL, 0);
+  SDL_Flip(g_gfx.screen);
 
   Menu_quit();
   GFX_quit();

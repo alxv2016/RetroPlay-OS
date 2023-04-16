@@ -1,5 +1,4 @@
-.PHONY: build
-.PHONY: clean
+.PHONY: build clean
 	
 ###########################################################
 
@@ -24,6 +23,6 @@ LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lmsettings -lpthread -lrt -lz -lm
 OPTM=-O3
 
 build:
-	$(CC) -o progressui progress.c ../common/controls.c ../common/common.c ../common/powerops.c ../common/utils.c $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
+	$(CC) -o progressui progress.c ../common/controls.c ../common/interface.c ../common/powerops.c ../common/utils.c $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
 clean:
 	rm -f progressui

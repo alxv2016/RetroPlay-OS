@@ -13,12 +13,14 @@
 
 #include "../common/defines.h"
 #include "../common/utils.h"
-#include "../common/common.h"
+#include "../common/interface.h"
 #include "../common/controls.h"
 
 #define UPDATE_TXT "update_progress.txt"
 #define EVENT_SIZE (sizeof(struct inotify_event))
 #define BUF_LEN (1024 * (EVENT_SIZE + 16))
+
+GFX gfx;
 
 int main(int argc, char *argv[])
 {
@@ -29,10 +31,10 @@ int main(int argc, char *argv[])
 	SDL_ShowCursor(0);
 	InitSettings();
 
-	SDL_Surface *screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
 
-	SDL_Surface *progress_bar_empty = GFX_loadImage("progress-bar-empty.png");
-	SDL_Surface *progress_bar_full = GFX_loadImage("progress-bar-full.png");
+	SDL_Surface *progress_bar_empty = loadImage("progress-bar-empty.png");
+	SDL_Surface *progress_bar_full = loadImage("progress-bar-full.png");
 
 	GFX_init();
 	GFX_ready();
@@ -76,14 +78,14 @@ int main(int argc, char *argv[])
 
 		// printf("%f: %s\n", progress/100.0, msg); fflush(stdout);
 
-		SDL_FillRect(screen, NULL, 0);
+		SDL_FillRect(gfx.screen, NULL, 0);
 		if (progress > -1)
 		{
-			SDL_BlitSurface(progress_bar_empty, NULL, screen, &(SDL_Rect){120, 236});
-			SDL_BlitSurface(progress_bar_full, &(SDL_Rect){0, 0, progress * 4, 8}, screen, &(SDL_Rect){120, 236});
+			SDL_BlitSurface(progress_bar_empty, NULL, gfx.screen, &(SDL_Rect){120, 236});
+			SDL_BlitSurface(progress_bar_full, &(SDL_Rect){0, 0, progress * 4, 8}, gfx.screen, &(SDL_Rect){120, 236});
 		}
-		GFX_blitParagraph(screen, msg, 0, 80, SCREEN_WIDTH, SCREEN_HEIGHT - 80);
-		SDL_Flip(screen);
+		paragraph(gfx.screen, msg, 0, 80, SCREEN_WIDTH, SCREEN_HEIGHT - 80);
+		SDL_Flip(gfx.screen);
 	}
 
 	if (exists(TEMP_PATH UPDATE_TXT))
@@ -116,8 +118,8 @@ int main(int argc, char *argv[])
 
 	unlink(TEMP_PATH UPDATE_TXT);
 
-	SDL_FillRect(screen, NULL, 0);
-	SDL_Flip(screen);
+	SDL_FillRect(gfx.screen, NULL, 0);
+	SDL_Flip(gfx.screen);
 
 	SDL_FreeSurface(progress_bar_empty);
 	SDL_FreeSurface(progress_bar_full);

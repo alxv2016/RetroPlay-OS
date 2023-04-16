@@ -1,0 +1,74 @@
+#ifndef _INTERFACE_H
+#define _INTERFACE_H
+
+/* USER INTERFACE COMPONENTS */
+#define BUTTON_SIZE 44
+// Battery
+#define BATTERY_INFO "/tmp/battery"
+/// MENU
+#define ROW_COUNT 6
+#define ROW_HEIGHT 64
+#define MAX_SIZE 16
+#define ROW_PADDING 20
+
+// Icons
+#define BRIGHTNESS_ICON 0
+#define VOLUME_ICON 1
+#define VOLUME_MUTE_ICON 2
+
+typedef struct GFX_Context {
+  SDL_Surface *screen;
+  SDL_Surface *button;
+  SDL_Surface *slot_overlay;
+  SDL_Surface *bg_white;
+  SDL_Surface *corner_radius;
+  SDL_Surface *settings_bar_full;
+  SDL_Surface *settings_bar_empty;
+  SDL_Surface *brightness;
+  SDL_Surface *volume;
+  SDL_Surface *mute;
+  SDL_Surface *battery_charge;
+  SDL_Surface *battery_power;
+  SDL_Surface *battery;
+  SDL_Surface *battery_low_power;
+  SDL_Surface *battery_low;
+  // Ingame menu assets
+  SDL_Surface *overlay;
+  SDL_Surface *slot_pagination;
+  SDL_Surface *slot_active;
+  SDL_Surface *Slot_preview;
+  SDL_Surface *no_preview;
+  SDL_Surface *empty_slot;
+} GFX;
+// Fonts
+typedef struct GFX_Fonts {
+  TTF_Font *large;
+  TTF_Font *medium;
+  TTF_Font *small;
+  TTF_Font *tiny;
+} Font;
+
+extern GFX g_gfx;
+extern Font g_font;
+
+void GFX_init(void);
+void GFX_clear(void);
+void GFX_ready(void);
+void GFX_quit(void);
+
+void window(SDL_Surface *surface, int x, int y, int width, int height);
+void listMenu(SDL_Surface *surface, char *path, char *name, char *unique,int row, int selected);
+void batteryStatus(SDL_Surface *surface, int x, int y);
+void button(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
+void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
+void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
+void hintLabel(SDL_Surface *surface, char *htxt, int x, int y);
+void paragraph(SDL_Surface *surface, char *str, int x, int y, int width,int height);
+void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark);
+int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,int maxWidth, int row, int selected, int reset, int force);
+int getButtonWidth(char *blabel, char *bkey);
+int truncateText(TTF_Font *font, const char *in_name, char *out_name,int max_width, int padding);
+SDL_Surface *loadImage(char *path);
+SDL_Surface *renderText(char *text);
+
+#endif

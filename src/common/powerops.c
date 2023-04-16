@@ -10,14 +10,14 @@
 #include "utils.h"
 #include "defines.h"
 #include "controls.h"
-#include "common.h"
+#include "interface.h"
 #include "keycontext.h"
 #include "powerops.h"
 
 /* POWER */
 int can_poweroff = 1;
 char governor[128];
-SDL_Surface *screen;
+GFX g_gfx;
 
 int isCharging(void) {
   // Code adapted from OnionOS
@@ -109,9 +109,9 @@ void powerOff(void) {
   if (can_poweroff) {
     char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off"
                                          : "Powering off";
-    SDL_FillRect(screen, NULL, 0);
-    GFX_blitParagraph(screen, msg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    SDL_Flip(screen);
+    SDL_FillRect(g_gfx.screen, NULL, 0);
+    paragraph(g_gfx.screen, msg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    SDL_Flip(g_gfx.screen);
     sleep(1);
     system("shutdown");
     while (1)
