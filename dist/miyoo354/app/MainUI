@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# {
+
 DIR=/mnt/SDCARD/miyoo354/app
 cd "$DIR"
 
