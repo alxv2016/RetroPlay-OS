@@ -47,22 +47,6 @@ int Input_isPressed(GamePadIndex btn);
 int Input_justReleased(GamePadIndex btn);
 
 ///////////////////////////////////////////
-// Utilities
-int prefixMatch(char *pre, char *str);
-int suffixMatch(char *suf, char *str);
-int exactMatch(char *str1, char *str2);
-int hide(char *file_name);
-int exists(char *path);
-int getInt(char *path);
-
-void getDisplayName(const char *in_name, char *out_name);
-void getEmuName(const char *in_name, char *out_name);
-void normalizeNewline(char *line);
-void trimTrailingNewlines(char *line);
-void touch(char *path);
-void putFile(char *path, char *contents);
-void getFile(char *path, char *buffer, size_t buffer_size);
-void putInt(char *path, int value);
 int GFX_truncateText(TTF_Font *font, const char *in_name, char *out_name, int max_width, int padding);
 
 //////////////////////////////////////

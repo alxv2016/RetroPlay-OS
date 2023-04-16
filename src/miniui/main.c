@@ -16,74 +16,12 @@
 
 ///////////////////////////////////////
 
-#define dump(msg)                                                              \
-  puts((msg));                                                                 \
-  fflush(stdout);
-
-///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-///////////////////////////////////////
-
-
-///////////////////////////////////////
-
-// static Directory *top;
-// // DirectoryArray
-// static Array *stack;
-// // RecentArray
-// static Array *recents;
-
-// static int quit = 0;
-// static int can_resume = 0;
-// // set to 1 on BTN_R1esume but only if can_resume==1
-// static int should_resume = 0; 
-// static char slot_path[256];
-
-// static int restore_depth = -1;
-// static int restore_relative = -1;
-// static int restore_selected = 0;
-// static int restore_start = 0;
-// static int restore_end = 0;
-
-// int quit = 0;
-// int can_resume = 0;
-// // set to 1 on BTN_R1esume but only if can_resume==1
-// int should_resume = 0; 
-// char slot_path[256];
-
-// int restore_depth = -1;
-// int restore_relative = -1;
-// int restore_selected = 0;
-// int restore_start = 0;
-// int restore_end = 0;
-
-
-///////////////////////////////////////
-
-
-
-
-///////////////////////////////////////
-
-///////////////////////////////////////
-
-
-///////////////////////////////////////
-
-
-///////////////////////////////////////
-
-
 ///////////////////////////////////////
 
 int main(int argc, char *argv[]) {
   if (autoResume())
     return 0; // nothing to do
-
-  dump("MiniUI");
+    
   putenv("SDL_HIDE_BATTERY=1");
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();

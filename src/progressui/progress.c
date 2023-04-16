@@ -12,6 +12,7 @@
 #include <pthread.h>
 
 #include "../common/defines.h"
+#include "../common/utils.h"
 #include "../common/common.h"
 
 #define UPDATE_TXT "update_progress.txt"

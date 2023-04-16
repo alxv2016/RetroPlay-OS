@@ -1,25 +1,10 @@
 #ifndef _ARRY_H
 #define _ARRY_H
 
-#define INT_ARRAY_MAX 27
+#include "utils.h"
+
 // a multiple of all menu rows
 #define MAX_RECENTS 24 
-
-typedef struct Array {
-  int count;
-  int capacity;
-  void **items;
-} Array;
-
-typedef struct IntArray {
-  int count;
-  int items[INT_ARRAY_MAX];
-} IntArray;
-
-typedef struct Hash {
-  Array *keys;
-  Array *values;
-} Hash; // not really a hash
 
 enum EntryType {
   ENTRY_DIR,
@@ -73,39 +58,20 @@ extern int restore_start;
 extern int restore_end;
 
 /*****/
-int getIndexChar(char *str); //static
+void getDisplayName(const char *in_name, char *out_name);
+void getEmuName(const char *in_name, char *out_name);
 void getUniqueName(Entry *entry, char *out_name); //static
 int hasEmu(char *emu_name); // static
 void getEmuPath(char *emu_name, char *pak_path); // static
 int hasAlt(char *emu_name); // static
-int hasCue(char *dir_path, char *cue_path);
-int hasM3u(char *rom_path, char *m3u_path);
+int hasCue(char *dir_path, char *cue_path); // static
+int hasM3u(char *rom_path, char *m3u_path); // static
 int hasCollections(void); // static
 int hasRoms(char *dir_name); // static
 int hasRecents(Array *recents); // static
-int isConsoleDir(char *path);
-char *escapeSingleQuotes(char *str);
+int isConsoleDir(char *path); // static
 int getFirstDisc(char *m3u_path, char *disc_path);
-void queueNext(char *cmd);
-
-/* ARRAYS */
-Array *Array_new(void);
-void Array_push(Array *self, void *item);
-void Array_unshift(Array *self, void *item); // static
-void *Array_pop(Array *self);
-void Array_reverse(Array *self); // static
-void Array_free(Array *self); // static
-int StringArray_indexOf(Array *self, char *str); // static
-void StringArray_free(Array *self);
-IntArray *IntArray_new(void); // static
-void IntArray_push(IntArray *self, int i); // static
-void IntArray_free(IntArray *self); // static
-
-/* HASHS */
-Hash *Hash_new(void); // static
-void Hash_free(Hash *self); // static
-void Hash_set(Hash *self, char *key, char *value); // static
-char *Hash_get(Hash *self, char *key); // static
+void queueNext(char *cmd); // static
 
 /* ENTRY */
 Entry *Entry_new(char *path, int type); // static
@@ -126,13 +92,13 @@ Array *getDiscs(char *path); // static
 void Directory_index(Directory *self); // static
 Directory *Directory_new(char *path, int selected, Array *recents);
 void Directory_free(Directory *self); // static
-void DirectoryArray_pop(Array *self);
-void DirectoryArray_free(Array *self);
+void DirectoryArray_pop(Array *self); // static
+void DirectoryArray_free(Array *self); // static
 
 Recent *Recent_new(char *path); // static
 void Recent_free(Recent *self); // static
 int RecentArray_indexOf(Array *self, char *str); // static
-void RecentArray_free(Array *self);
+void RecentArray_free(Array *self); // static
 void saveRecents(Array *recents); // static
 void addRecent(char *path, Array *recents);
 
@@ -142,16 +108,16 @@ int Entry_hasAlt(Entry *self); // static
 int Entry_useAlt(Entry *self); // static
 int Entry_toggleAlt(Entry *self); // static
 
-void readyResumePath(char *rom_path, int type);
+void readyResumePath(char *rom_path, int type); // static
 void readyResume(Entry *entry);
 int autoResume(void);
-void openPak(char *path);
-void openRom(char *path, char *last);
-void openDirectory(char *path, int auto_launch);
+void openPak(char *path); // static
+void openRom(char *path, char *last); // static
+void openDirectory(char *path, int auto_launch); // static
 void closeDirectory(void);
 void Entry_open(Entry *self);
-void saveLast(char *path);
-void loadLast(void);
+void saveLast(char *path); // static
+void loadLast(void); // static
 
 void Menu_init(void);
 void Menu_quit(void);

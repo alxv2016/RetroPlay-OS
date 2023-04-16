@@ -8,8 +8,8 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
+#include "utils.h"
 #include "arry.h"
-#include "common.h"
 #include "defines.h"
 
 Directory *top;
@@ -30,50 +30,63 @@ int restore_start = 0;
 int restore_end = 0;
 
 /*****/
-static int replaceString(char *line, const char *search, const char *replace) {
-  char *sp; // start of pattern
-  if ((sp = strstr(line, search)) == NULL) {
-    return 0;
+void getDisplayName(const char *in_name, char *out_name) {
+  char *tmp;
+  strcpy(out_name, in_name);
+
+  // extract just the filename if necessary
+  tmp = strrchr(in_name, '/');
+  if (tmp)
+    strcpy(out_name, tmp + 1);
+
+  // remove extension
+  tmp = strrchr(out_name, '.');
+  if (tmp && strlen(tmp) <= 4)
+    tmp[0] = '\0'; // 3 letter extension plus dot
+
+  // remove trailing parens (round and square)
+  char safe_name[256];
+  strcpy(safe_name, out_name);
+  while ((tmp = strrchr(out_name, '(')) != NULL ||
+         (tmp = strrchr(out_name, '[')) != NULL) {
+    if (tmp == out_name)
+      break;
+    tmp[0] = '\0';
+    tmp = out_name;
   }
-  int count = 1;
-  int sLen = strlen(search);
-  int rLen = strlen(replace);
-  if (sLen > rLen) {
-    // move from right to left
-    char *src = sp + sLen;
-    char *dst = sp + rLen;
-    while ((*dst = *src) != '\0') {
-      dst++;
-      src++;
-    }
-  } else if (sLen < rLen) {
-    // move from left to right
-    int tLen = strlen(sp) - sLen;
-    char *stop = sp + rLen;
-    char *src = sp + sLen + tLen;
-    char *dst = sp + rLen + tLen;
-    while (dst >= stop) {
-      *dst = *src;
-      dst--;
-      src--;
-    }
-  }
-  memcpy(sp, replace, rLen);
-  count += replaceString(sp + rLen, search, replace);
-  return count;
+
+  // make sure we haven't nuked the entire name
+  if (out_name[0] == '\0')
+    strcpy(out_name, safe_name);
+
+  // remove trailing whitespace
+  tmp = out_name + strlen(out_name) - 1;
+  while (tmp > out_name && isspace((unsigned char)*tmp))
+    tmp--;
+  tmp[1] = '\0';
 }
 
-char *escapeSingleQuotes(char *str) {
-  replaceString(str, "'", "'\\''");
-  return str;
-}
+void getEmuName(const char *in_name, char *out_name) {
+  char *tmp;
+  strcpy(out_name, in_name);
+  tmp = out_name;
 
-int getIndexChar(char *str) {
-  char i = 0;
-  char c = tolower(str[0]);
-  if (c >= 'a' && c <= 'z')
-    i = (c - 'a') + 1;
-  return i;
+  // extract just the Roms folder name if necessary
+  if (prefixMatch(ROMS_PATH, tmp)) {
+    tmp += strlen(ROMS_PATH) + 1;
+    char *tmp2 = strchr(tmp, '/');
+    if (tmp2)
+      tmp2[0] = '\0';
+  }
+
+  // finally extract pak name from parenths if present
+  tmp = strrchr(tmp, '(');
+  if (tmp) {
+    tmp += 1;
+    strcpy(out_name, tmp);
+    tmp = strchr(out_name, ')');
+    tmp[0] = '\0';
+  }
 }
 
 void getUniqueName(Entry *entry, char *out_name) {
@@ -315,108 +328,7 @@ void queueNext(char *cmd) {
   quit = 1;
 }
 
-/*****/
-
-Array *Array_new(void) {
-  Array *self = malloc(sizeof(Array));
-  self->count = 0;
-  self->capacity = 8;
-  self->items = malloc(sizeof(void *) * self->capacity);
-  return self;
-}
-
-void Array_push(Array *self, void *item) {
-  if (self->count >= self->capacity) {
-    self->capacity *= 2;
-    self->items = realloc(self->items, sizeof(void *) * self->capacity);
-  }
-  self->items[self->count++] = item;
-}
-
-void Array_unshift(Array *self, void *item) {
-  if (self->count == 0)
-    return Array_push(self, item);
-  Array_push(self, NULL); // ensures we have enough capacity
-  for (int i = self->count - 2; i >= 0; i--) {
-    self->items[i + 1] = self->items[i];
-  }
-  self->items[0] = item;
-}
-
-void *Array_pop(Array *self) {
-  if (self->count == 0)
-    return NULL;
-  return self->items[--self->count];
-}
-
-void Array_reverse(Array *self) {
-  int end = self->count - 1;
-  int mid = self->count / 2;
-  for (int i = 0; i < mid; i++) {
-    void *item = self->items[i];
-    self->items[i] = self->items[end - i];
-    self->items[end - i] = item;
-  }
-}
-
-void Array_free(Array *self) {
-  free(self->items);
-  free(self);
-}
-
-int StringArray_indexOf(Array *self, char *str) {
-  for (int i = 0; i < self->count; i++) {
-    if (exactMatch(self->items[i], str))
-      return i;
-  }
-  return -1;
-}
-
-void StringArray_free(Array *self) {
-  for (int i = 0; i < self->count; i++) {
-    free(self->items[i]);
-  }
-  Array_free(self);
-}
-
-IntArray *IntArray_new(void) {
-  IntArray *self = malloc(sizeof(IntArray));
-  self->count = 0;
-  memset(self->items, 0, sizeof(int) * INT_ARRAY_MAX);
-  return self;
-}
-
-void IntArray_push(IntArray *self, int i) { self->items[self->count++] = i; }
-
-void IntArray_free(IntArray *self) { free(self); }
-
-/*****/
-
-Hash *Hash_new(void) {
-  Hash *self = malloc(sizeof(Hash));
-  self->keys = Array_new();
-  self->values = Array_new();
-  return self;
-}
-
-void Hash_free(Hash *self) {
-  StringArray_free(self->keys);
-  StringArray_free(self->values);
-  free(self);
-}
-
-void Hash_set(Hash *self, char *key, char *value) {
-  Array_push(self->keys, strdup(key));
-  Array_push(self->values, strdup(value));
-}
-
-char *Hash_get(Hash *self, char *key) {
-  int i = StringArray_indexOf(self->keys, key);
-  if (i == -1)
-    return NULL;
-  return self->values->items[i];
-}
-
+///
 /*******/
 
 Entry *Entry_new(char *path, int type) {
