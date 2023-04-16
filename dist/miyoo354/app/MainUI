@@ -41,7 +41,7 @@ fi
 # then do it
 ./blank
 ./say "$VERB"
-unzip -o "/mnt/SDCARD/miyoo354/app/MiniUI.zip" -d "/mnt/SDCARD"
+unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
 
 # post-install
 POST_INSTALL=/mnt/SDCARD/.system/post-install.sh

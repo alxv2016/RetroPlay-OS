@@ -1,5 +1,5 @@
 #!/bin/sh
-# MiniUI.pak
+# RetroPlayOS.pak
 
 /mnt/SDCARD/.system/bin/blank
 
@@ -27,7 +27,7 @@ export USERDATA_PATH=/mnt/SDCARD/.userdata
 export LOGS_PATH=/mnt/SDCARD/.userdata/logs
 export CORES_PATH=/mnt/SDCARD/.system/cores
 export RES_PATH=/mnt/SDCARD/.system/res
-export DATETIME_PATH=$USERDATA_PATH/.miniui/datetime.txt # used by bin/shutdown
+export DATETIME_PATH=$USERDATA_PATH/.retroplayos/datetime.txt # used by bin/shutdown
 
 # killall tee # NOTE: killing tee is somehow responsible for audioserver crashes
 rm -f "$SDCARD_PATH/update.log"
@@ -52,7 +52,7 @@ keymon &
 
 mkdir -p "$LOGS_PATH"
 mkdir -p "$USERDATA_PATH/.mmenu"
-mkdir -p "$USERDATA_PATH/.miniui"
+mkdir -p "$USERDATA_PATH/.retroplayos"
 
 # init datetime
 if [ -f "$DATETIME_PATH" ]; then
@@ -70,21 +70,21 @@ fi
 
 cd $(dirname "$0")
 
-EXEC_PATH=/tmp/miniui_exec
+EXEC_PATH=/tmp/retroplayos_exec
 touch "$EXEC_PATH"  && sync
 
 MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
 export MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
 
 # Battery level debug info
-ls /customer/app > "$USERDATA_PATH/.miniui/app_contents.txt"
-/customer/app/axp_test > "$USERDATA_PATH/.miniui/axp_result.txt"
+ls /customer/app > "$USERDATA_PATH/.retroplayos/app_contents.txt"
+/customer/app/axp_test > "$USERDATA_PATH/.retroplayos/axp_result.txt"
 
 CPU_PATH=/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 while [ -f "$EXEC_PATH" ]; do
 	echo ondemand > "$CPU_PATH"
 
-	./MiniUI &> "$LOGS_PATH/MiniUI.txt"
+	./RetroPlayOS &> "$LOGS_PATH/RetroPlayOS.txt"
 	
 	echo `date +'%F %T'` > "$DATETIME_PATH"
 	echo performance > "$CPU_PATH"

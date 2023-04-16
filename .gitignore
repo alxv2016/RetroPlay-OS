@@ -13,8 +13,8 @@ src/**/keymon
 !keymon/
 src/**/lumon
 !lumon/
-src/**/MiniUI
-!MiniUI/
+src/**/RetroPlayOS
+!RetroPlayOS/
 src/**/progressui
 !progressui/
 src/**/show

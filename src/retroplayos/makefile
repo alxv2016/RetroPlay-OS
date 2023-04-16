@@ -28,6 +28,6 @@ OPTM=-O3
 OBJS = ../common/interface.c ../common/controls.c ../common/powerops.c ../common/utils.c ../common/api.c
 
 build:
-	$(CC) -o MiniUI $(TARGET).c $(OBJS) $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
+	$(CC) -o RetroPlayOS $(TARGET).c $(OBJS) $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
 clean:
-	rm -f MiniUI
+	rm -f RetroPlayOS

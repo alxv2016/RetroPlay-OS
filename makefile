@@ -46,7 +46,7 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
 	cd $(SRC_DIR)/progressui && make
-	cd $(SRC_DIR)/miniui && make
+	cd $(SRC_DIR)/retroplayos && make
 	cd $(SRC_DIR)/show && make
 	cd $(SRC_DIR)/confirm && make
 	cd $(SRC_DIR)/say && make
@@ -86,7 +86,7 @@ build: dirs
 	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/progressui/progressui $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/progressui/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
-	cp $(SRC_DIR)/miniui/MiniUI $(BUILD_DIR)/dist/.system/paks/MiniUI.pak/
+	cp $(SRC_DIR)/retroplayos/RetroPlayOS $(BUILD_DIR)/dist/.system/paks/RetroPlayOS.pak/
 	cp $(SRC_DIR)/show/show $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/.system/bin/
@@ -136,9 +136,9 @@ bundle:
 
 release:
 	@echo "\n::$(TARGET) -- Zipping up release" 
-	cd $(BUILD_DIR)/dist/.system/paks/MiniUI.pak && echo "$(RELEASE_NAME).zip" > version.txt
-	cd $(BUILD_DIR)/dist && zip -r MiniUI.zip .system .tmp_update
-	mv $(BUILD_DIR)/dist/MiniUI.zip $(BUILD_DIR)/dist/miyoo354/app/
+	cd $(BUILD_DIR)/dist/.system/paks/RetroPlayOS.pak && echo "$(RELEASE_NAME).zip" > version.txt
+	cd $(BUILD_DIR)/dist && zip -r RetroPlayOS.zip .system .tmp_update
+	mv $(BUILD_DIR)/dist/RetroPlayOS.zip $(BUILD_DIR)/dist/miyoo354/app/
 	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
 	$(ECHO)
 
@@ -159,7 +159,7 @@ clean-all: clean
 	cd $(SRC_DIR)/keymon && make clean
 	cd $(SRC_DIR)/lumon && make clean
 	cd $(SRC_DIR)/progressui && make clean
-	cd $(SRC_DIR)/miniui && make clean
+	cd $(SRC_DIR)/retroplayos && make clean
 	cd $(SRC_DIR)/show && make clean
 	cd $(SRC_DIR)/confirm && make clean
 	cd $(SRC_DIR)/say && make clean
