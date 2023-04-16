@@ -39,7 +39,7 @@ else
 fi
 
 # then do it
-./blank
+# ./blank
 ./say "$VERB"
 unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
 
@@ -62,7 +62,7 @@ if [ -f "$POST_UPDATE" ]; then
 fi
 
 # we're done here
-./blank
+# ./blank
 ./say "$NOUN complete, enjoy!"
 
 rm -rf "$OLD_SYSTEM_PATH"

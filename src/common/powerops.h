@@ -7,6 +7,11 @@
 
 #define SHORT_PULSE_MS 100
 #define SUPER_SHORT_PULSE_MS 50
+#define CHARGE_DELAY 1000
+// SLEEP DELAY TODO put into settings allow users to set time
+// 10 Minutes
+#define SLEEP_DELAY 600000
+
 #define GOVERNOR_PATH "/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor"
 
 extern int can_poweroff;

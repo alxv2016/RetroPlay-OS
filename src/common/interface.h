@@ -18,6 +18,7 @@
 
 typedef struct GFX_Context {
   SDL_Surface *screen;
+  SDL_Surface *overlay;
   SDL_Surface *button;
   SDL_Surface *slot_overlay;
   SDL_Surface *bg_white;
@@ -32,13 +33,6 @@ typedef struct GFX_Context {
   SDL_Surface *battery;
   SDL_Surface *battery_low_power;
   SDL_Surface *battery_low;
-  // Ingame menu assets
-  SDL_Surface *overlay;
-  SDL_Surface *slot_pagination;
-  SDL_Surface *slot_active;
-  SDL_Surface *Slot_preview;
-  SDL_Surface *no_preview;
-  SDL_Surface *empty_slot;
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {
@@ -51,10 +45,13 @@ typedef struct GFX_Fonts {
 extern GFX g_gfx;
 extern Font g_font;
 
+#define FRAME_DURATION 17
+
 void GFX_init(void);
 void GFX_clear(void);
 void GFX_ready(void);
 void GFX_quit(void);
+void GFX_sync(unsigned long frameStart );
 
 void window(SDL_Surface *surface, int x, int y, int width, int height);
 void listMenu(SDL_Surface *surface, char *path, char *name, char *unique,int row, int selected);

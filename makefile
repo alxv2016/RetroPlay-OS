@@ -50,7 +50,7 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	cd $(SRC_DIR)/show && make
 	cd $(SRC_DIR)/confirm && make
 	cd $(SRC_DIR)/say && make
-	cd $(SRC_DIR)/blank && make
+# cd $(SRC_DIR)/blank && make
 
 # Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
 third-party/SDL-1.2/.patched:
@@ -90,9 +90,9 @@ build: dirs
 	cp $(SRC_DIR)/show/show $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/.system/bin/
+# cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/say/say $(BUILD_DIR)/dist/miyoo354/app/
-	cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/miyoo354/app/
+# cp $(SRC_DIR)/blank/blank $(BUILD_DIR)/dist/miyoo354/app/
 # NOTE: Saved build time with pre-build cores
 	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
 	cp $(DIST_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
@@ -163,7 +163,7 @@ clean-all: clean
 	cd $(SRC_DIR)/show && make clean
 	cd $(SRC_DIR)/confirm && make clean
 	cd $(SRC_DIR)/say && make clean
-	cd $(SRC_DIR)/blank && make clean
+# cd $(SRC_DIR)/blank && make clean
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean

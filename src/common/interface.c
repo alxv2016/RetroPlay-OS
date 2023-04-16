@@ -49,6 +49,13 @@ void GFX_ready(void) {
   g_gfx.screen = SDL_GetVideoSurface(); // :cold_sweat:
 }
 
+void GFX_sync(unsigned long frameStart ) {
+  unsigned long frameDuration = SDL_GetTicks() - frameStart;
+  if (frameDuration < FRAME_DURATION) {
+      SDL_Delay(FRAME_DURATION - frameDuration);
+  }
+}
+
 void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.button);
   SDL_FreeSurface(g_gfx.bg_white);

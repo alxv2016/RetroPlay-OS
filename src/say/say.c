@@ -62,7 +62,9 @@ int main(int argc, char *argv[]) {
       vinfo.xres * vinfo.yres * (vinfo.bits_per_pixel / 8); // 640x480x4
   char *fb0_map =
       (char *)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb0_fd, 0);
-
+  // clear screen
+  memset(fb0_map, 0, map_size);
+  // INIT TEXT MESSAGE
   TTF_Init();
   TTF_Font *font = TTF_OpenFont(path, FONT_LARGE);
 
@@ -109,6 +111,7 @@ int main(int argc, char *argv[]) {
 
   TTF_CloseFont(font);
   TTF_Quit();
+  // END OF MESSAGE
   munmap(fb0_map, map_size);
   close(fb0_fd);
 

@@ -18,8 +18,6 @@
 #include "../common/controls.h"
 
 ///////////////////////////////////////
-
-///////////////////////////////////////
 GFX g_gfx;
 
 int main(int argc, char *argv[]) {
@@ -38,11 +36,10 @@ int main(int argc, char *argv[]) {
                                          SDL_HWSURFACE | SDL_DOUBLEBUF);
   GFX_init();
   GFX_ready();
-  SDL_Surface *overlay;
 
-  overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 16,
+  g_gfx.overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 16,
                                  0, 0, 0, 0);
-  SDL_SetAlpha(overlay, SDL_SRCALPHA, 0x90);
+  SDL_SetAlpha(g_gfx.overlay, SDL_SRCALPHA, 0x90);
 
   Menu_init();
   Input_reset();
@@ -59,8 +56,9 @@ int main(int argc, char *argv[]) {
   unsigned long setting_start = 0;
   unsigned long cancel_start = SDL_GetTicks();
   unsigned long power_start = 0;
+
   while (!quit) {
-    unsigned long frame_start = SDL_GetTicks();
+    unsigned long frameStart = SDL_GetTicks();
 
     Input_poll();
 
@@ -195,7 +193,6 @@ int main(int argc, char *argv[]) {
     if (Input_anyPressed())
       cancel_start = now;
 
-#define CHARGE_DELAY 1000
     if (dirty || now - charge_start >= CHARGE_DELAY) {
       int is_charging = isCharging();
       if (was_charging != is_charging) {
@@ -213,8 +210,6 @@ int main(int argc, char *argv[]) {
       power_start = now;
     }
 
-    // SLEEP DELAY TODO put into settings allow users to set time
-#define SLEEP_DELAY 600000 // 10 Minutes
     if (now - cancel_start >= SLEEP_DELAY && preventAutosleep())
       cancel_start = now;
 
@@ -232,6 +227,7 @@ int main(int argc, char *argv[]) {
     int old_setting = show_setting;
     int old_value = setting_value;
     show_setting = 0;
+
     if (Input_isPressed(BTN_START) && Input_isPressed(BTN_SELECT)) {
       // ???? What's the purpose of this combo button press
     } else if (Input_isPressed(BTN_MENU) &&
@@ -322,7 +318,6 @@ int main(int argc, char *argv[]) {
         // 	SDL_FreeSurface(date_txt);
         // }
         // TODO: show console list, move this to roms folders
-        SDL_FillRect(overlay, NULL, 0);
         // SDL_BlitSurface(screen, NULL, screen, &(SDL_Rect){(SCREEN_WIDTH -
         // version->w) / 2, (SCREEN_HEIGHT - version->h) / 2});
         button(g_gfx.screen, "B", "Back", 557, 419);
@@ -385,10 +380,7 @@ int main(int argc, char *argv[]) {
       dirty = 0;
     }
     // slow down to 60fps
-    unsigned long frame_duration = SDL_GetTicks() - frame_start;
-#define FRAME_DURATION 17
-    if (frame_duration < FRAME_DURATION)
-      SDL_Delay(FRAME_DURATION - frame_duration);
+    GFX_sync(frameStart);
   }
 
   SDL_FillRect(g_gfx.screen, NULL, 0);

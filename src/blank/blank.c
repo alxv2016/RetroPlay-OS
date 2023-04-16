@@ -8,6 +8,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+/// NOTE: Blank clears screen during initial update or install?
 int main(int argc, char *argv[]) {
   // clear screen
   int fb0_fd = open("/dev/fb0", O_RDWR);

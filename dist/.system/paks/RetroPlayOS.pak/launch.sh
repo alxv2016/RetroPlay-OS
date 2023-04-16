@@ -1,7 +1,7 @@
 #!/bin/sh
 # RetroPlayOS.pak
 
-/mnt/SDCARD/.system/bin/blank
+# /mnt/SDCARD/.system/bin/blank
 
 # init backlight
 echo 0 > /sys/class/pwm/pwmchip0/export
