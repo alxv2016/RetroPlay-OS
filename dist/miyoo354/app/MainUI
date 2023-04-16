@@ -40,7 +40,7 @@ else
 fi
 
 # then do it
-/mnt/SDCARD/.system/bin/sys-img "$VERB"
+./sys-img "$VERB"
 unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
 
 # post-install
@@ -62,8 +62,8 @@ if [ -f "$POST_UPDATE" ]; then
 fi
 
 # we're done here
-/mnt/SDCARD/.system/bin/sys-msg "$NOUN complete, enjoy!"
-/mnt/SDCARD/.system/bin/sys-img "charging.png"
+./sys-msg "$NOUN complete, enjoy!"
+# ./sys-img "charging.png"
 
 rm -rf "$OLD_SYSTEM_PATH"
 rm -rf /mnt/SDCARD/miyoo354

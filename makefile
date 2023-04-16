@@ -89,6 +89,8 @@ build: dirs
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/miyoo354/app/
+	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/miyoo354/app/
 
 # NOTE: Saved build time with pre-build cores
 	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
