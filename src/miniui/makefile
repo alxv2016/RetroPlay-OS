@@ -25,7 +25,9 @@ CFLAGS = -I$(INCLUDEDIR) -I. -I../common -DPLATFORM_$(shell echo $(PLATFORM) | t
 LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lmsettings -lrt -lz -lm
 OPTM=-O3
 
+OBJS = ../common/common.c ../common/arry.c
+
 build:
-	$(CC) -o MiniUI $(TARGET).c ../common/common.c $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
+	$(CC) -o MiniUI $(TARGET).c $(OBJS) $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic
 clean:
 	rm -f MiniUI
