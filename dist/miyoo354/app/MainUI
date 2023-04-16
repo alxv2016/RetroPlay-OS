@@ -40,7 +40,7 @@ else
 fi
 
 # then do it
-./sys-img "$VERB"
+./sys-msg "$VERB"
 unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
 
 # post-install
