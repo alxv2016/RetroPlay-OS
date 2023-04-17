@@ -21,10 +21,6 @@ echo 800 > $pwmdir/pwm0/period
 echo 80 > $pwmdir/pwm0/duty_cycle
 echo 1 > $pwmdir/pwm0/enable
 
-# Show welcome boot image
-/mnt/SDCARD/.system/bin/sys-img "boot.png"
-sleep 2
-
 export SDCARD_PATH=/mnt/SDCARD
 export BIOS_PATH=/mnt/SDCARD/Bios
 export ROMS_PATH=/mnt/SDCARD/Roms
@@ -54,7 +50,12 @@ lumon &
 CHARGING=`/customer/app/axp_test | awk -F'[,: {}]+' '{print $7}'`
 if [ "$CHARGING" == "3" ]; then
 	batmon
+else
+	# Show welcome boot image unless device is charging
+	/mnt/SDCARD/.system/bin/sys-img "boot.png"
+	sleep 2
 fi
+
 
 keymon &
 

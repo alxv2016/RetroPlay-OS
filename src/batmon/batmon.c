@@ -105,11 +105,10 @@ int main(void) {
 
   input_fd = open("/dev/input/event0", O_RDONLY);
   pthread_create(&input_pt, NULL, &inputThread, NULL);
-
   pthread_create(&charging_pt, NULL, &chargingThread, NULL);
 
   while (!launch && is_charging) {
-    if (screen_on && SDL_GetTicks() - screen_start >= 3000)
+    if (screen_on && SDL_GetTicks() - screen_start >= 10000)
       screenOff();
   }
 

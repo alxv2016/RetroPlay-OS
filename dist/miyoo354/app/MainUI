@@ -11,7 +11,8 @@ export LD_LIBRARY_PATH=/lib:/config/lib:/customer/lib
 contains() { [ -z "${2##*$1*}" ]; }
 MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
 MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
-SUPPORTED_VERSION="202205010000" # date after latest known version
+# date after latest known version
+SUPPORTED_VERSION="202205010000"
 
 if [ $MIYOO_VERSION -lt $SUPPORTED_VERSION ]; then
 	OLD_CMD=`/etc/fw_printenv bootcmd`
@@ -44,7 +45,7 @@ fi
 unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
 
 # post-install
-POST_INSTALL=/mnt/SDCARD/.system/post-install.sh
+POST_INSTALL=/mnt/SDCARD/.system/bin/post-install.sh
 if [ -f "$POST_INSTALL" ]; then
 	if [ -n "$JUST_INSTALLED" ]; then
 		"$POST_INSTALL"
@@ -53,7 +54,7 @@ if [ -f "$POST_INSTALL" ]; then
 fi
 
 # post-update
-POST_UPDATE=/mnt/SDCARD/.system/post-update.sh
+POST_UPDATE=/mnt/SDCARD/.system/bin/post-update.sh
 if [ -f "$POST_UPDATE" ]; then
 	if [ -n "$JUST_UPDATED" ]; then
 		"$POST_UPDATE"
@@ -63,13 +64,13 @@ fi
 
 # we're done here
 ./sys-msg "$NOUN complete, enjoy!"
-# ./sys-img "charging.png"
+#NOTE: sleep pausing the screen for X seconds to give users time to read the system message
+sleep 2
 
 rm -rf "$OLD_SYSTEM_PATH"
 rm -rf /mnt/SDCARD/miyoo354
 
 # } > /mnt/SDCARD/miyoo.txt 2>&1
 
-sleep 3
 # let's do this
 /mnt/SDCARD/.tmp_update/updater
