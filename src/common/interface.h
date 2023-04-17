@@ -20,8 +20,6 @@ typedef struct GFX_Context {
   SDL_Surface *screen;
   SDL_Surface *overlay;
   SDL_Surface *button;
-  SDL_Surface *slot_overlay;
-  SDL_Surface *bg_white;
   SDL_Surface *corner_radius;
   SDL_Surface *settings_bar_full;
   SDL_Surface *settings_bar_empty;

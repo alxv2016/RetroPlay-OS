@@ -26,10 +26,9 @@ void GFX_init(void) {
   g_font.tiny = TTF_OpenFont(FONT_PATH, FONT_TINY);
 
   g_gfx.button = loadImage("btn.png");
-  g_gfx.bg_white = loadImage("bg-white.png");
   g_gfx.corner_radius = loadImage("radius-black.png");
-  g_gfx.settings_bar_full = loadImage("settings-bar-full.png");
-  g_gfx.settings_bar_empty = loadImage("settings-bar-empty.png");
+  g_gfx.settings_bar_full = loadImage("progress-full.png");
+  g_gfx.settings_bar_empty = loadImage("progress-empty.png");
   g_gfx.brightness = loadImage("brightness.png");
   g_gfx.volume = loadImage("volume.png");
   g_gfx.mute = loadImage("mute.png");

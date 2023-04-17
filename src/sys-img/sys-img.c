@@ -10,6 +10,10 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+/* System images, this module is used by launch.sh script to show and display
+an image during boot. It can be launched via shell script by passing a
+string of the image name */
+
 int main(int argc, char *argv[]) {
 
   if (argc < 2) {

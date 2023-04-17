@@ -14,6 +14,11 @@
 
 #define STOCK_FONT "/customer/app/BPreplayBold.otf"
 
+/* System message, this module is used by the MainUI.sh and launch.sh
+scripts to show messages during installation, updates and other messages.
+A string is pass through the shell script and gets picked up here.
+sys-img and confirm have similar logic */
+
 static void blit(void *_dst, int dst_w, int dst_h, void *_src, int src_w,
                  int src_h, int ox, int oy) {
   uint8_t *dst = (uint8_t *)_dst;

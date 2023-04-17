@@ -3,6 +3,7 @@
 
 # /mnt/SDCARD/.system/bin/blank
 # NOTE: will launch "say" which will display message during boot, TODO show an image?
+# NOTE: sleep XX indicates the duration timeout before proceeding to next set of actions.
 # /mnt/SDCARD/.system/bin/say "Booting up!"
 # /mnt/SDCARD/.system/bin/sys-img "charging.png"
 
@@ -15,6 +16,9 @@ echo 1 > /sys/class/pwm/pwmchip0/pwm0/enable
 # init lcd
 cat /proc/ls
 sleep 0.5
+
+/mnt/SDCARD/.system/bin/sys-img "boot.png"
+sleep 6
 
 # init charger detection
 if [ ! -f /sys/devices/gpiochip0/gpio/gpio59/direction ]; then
