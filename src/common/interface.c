@@ -57,7 +57,6 @@ void GFX_sync(unsigned long frameStart ) {
 
 void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.button);
-  SDL_FreeSurface(g_gfx.bg_white);
   SDL_FreeSurface(g_gfx.corner_radius);
   SDL_FreeSurface(g_gfx.settings_bar_full);
   SDL_FreeSurface(g_gfx.settings_bar_empty);

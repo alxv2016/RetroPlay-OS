@@ -1,30 +1,29 @@
 #!/bin/sh
 # RetroPlayOS.pak
 
-# /mnt/SDCARD/.system/bin/blank
 # NOTE: will launch "say" which will display message during boot, TODO show an image?
 # NOTE: sleep XX indicates the duration timeout before proceeding to next set of actions.
-# /mnt/SDCARD/.system/bin/say "Booting up!"
-# /mnt/SDCARD/.system/bin/sys-img "charging.png"
-
-# init backlight
-echo 0 > /sys/class/pwm/pwmchip0/export
-echo 800 > /sys/class/pwm/pwmchip0/pwm0/period
-echo 6 > /sys/class/pwm/pwmchip0/pwm0/duty_cycle
-echo 1 > /sys/class/pwm/pwmchip0/pwm0/enable
 
 # init lcd
 cat /proc/ls
-sleep 0.5
-
-/mnt/SDCARD/.system/bin/sys-img "boot.png"
-sleep 6
+sleep 0.25
 
 # init charger detection
 if [ ! -f /sys/devices/gpiochip0/gpio/gpio59/direction ]; then
 	echo 59 > /sys/class/gpio/export
 	echo in > /sys/devices/gpiochip0/gpio/gpio59/direction
 fi
+
+# init backlight
+pwmdir=/sys/class/pwm/pwmchip0
+echo 0 > $pwmdir/export
+echo 800 > $pwmdir/pwm0/period
+echo 80 > $pwmdir/pwm0/duty_cycle
+echo 1 > $pwmdir/pwm0/enable
+
+# Show welcome boot image
+/mnt/SDCARD/.system/bin/sys-img "boot.png"
+sleep 2
 
 export SDCARD_PATH=/mnt/SDCARD
 export BIOS_PATH=/mnt/SDCARD/Bios
@@ -34,7 +33,8 @@ export USERDATA_PATH=/mnt/SDCARD/.userdata
 export LOGS_PATH=/mnt/SDCARD/.userdata/logs
 export CORES_PATH=/mnt/SDCARD/.system/cores
 export RES_PATH=/mnt/SDCARD/.system/res
-export DATETIME_PATH=$USERDATA_PATH/.retroplayos/datetime.txt # used by bin/shutdown
+# used by bin/shutdown
+export DATETIME_PATH=$USERDATA_PATH/.retroplayos/datetime.txt
 
 # killall tee # NOTE: killing tee is somehow responsible for audioserver crashes
 rm -f "$SDCARD_PATH/update.log"
@@ -48,7 +48,8 @@ if [ -f /customer/lib/libpadsp.so ]; then
     export LD_PRELOAD=libpadsp.so
 fi
 
-lumon & # adjust lcd luma and saturation
+# adjust lcd luma and saturation
+lumon &
 
 CHARGING=`/customer/app/axp_test | awk -F'[,: {}]+' '{print $7}'`
 if [ "$CHARGING" == "3" ]; then
@@ -112,4 +113,5 @@ while [ -f "$EXEC_PATH" ]; do
 	fi
 done
 
-shutdown # just in case
+# just in case
+shutdown

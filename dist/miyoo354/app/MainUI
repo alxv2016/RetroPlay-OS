@@ -70,6 +70,6 @@ rm -rf /mnt/SDCARD/miyoo354
 
 # } > /mnt/SDCARD/miyoo.txt 2>&1
 
-sleep 5
+sleep 3
 # let's do this
 /mnt/SDCARD/.tmp_update/updater
