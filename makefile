@@ -39,8 +39,6 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	@echo "\n::$(TARGET) -- Compiling Libs"
 # IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain linux dependencies 
 	cd $(SRC_DIR)/libmsettings && make
-	cd $(THIRD_PARTY_DIR)/latency_reduction && make
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
 # Core libs
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
@@ -74,10 +72,6 @@ build: dirs
 
 	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
 	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
-	cp $(THIRD_PARTY_DIR)/latency_reduction/as_preload.so $(BUILD_DIR)/dist/.system/lib/
-	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
-	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
-
 	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
@@ -157,9 +151,20 @@ clean-all: clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
 
 
+build-libs:
+# NOTE: run commands to re-build dependency libs
+	@echo "\n::$(TARGET) -- Compiling SDL-1.2 lib"
+	cd $(SRC_DIR)/libmsettings && make
+	cd $(THIRD_PARTY_DIR)/latency_reduction && make
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && ./make.sh
+	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
+	cp $(THIRD_PARTY_DIR)/latency_reduction/as_preload.so $(BUILD_DIR)/dist/.system/lib/
+	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
+	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
+
 build-cores:
 # NOTE: run commands to re-build cores
-# @echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
+	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(ROOT_DIR)/cores/
 	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(ROOT_DIR)/cores/
