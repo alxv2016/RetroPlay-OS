@@ -75,8 +75,6 @@ dirs: clean
 build: dirs
 	@echo "\n::$(TARGET) -- Copying directories"
 	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
-	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
-# cp -R $(EXTRAS_DIR)/. $(BUILD_DIR)/extras
 
 	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
 	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
@@ -102,13 +100,17 @@ build: dirs
 	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Tools/Screenshots.pak/
 
 # NOTE: Saved build time with pre-build cores
-	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
-	cp $(DIST_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(DIST_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
+	cp $(ROOT_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/fbalpha_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/cores/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
 # cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
 # cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
 # cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
