@@ -1,3 +1,5 @@
+.PHONY: all clean
+
 ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
@@ -11,6 +13,6 @@ LDFLAGS	 = -lSDL -lSDL_image -lSDL_ttf
 OBJS = ../common/utils.c ../common/interface.c
 
 all:
-	$(CC) $(TARGET).c -o $(TARGET) $(OBJS) $(CFLAGS) $(LDFLAGS)
+	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(CFLAGS) $(LDFLAGS)
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET).o

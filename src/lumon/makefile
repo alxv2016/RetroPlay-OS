@@ -1,3 +1,5 @@
+.PHONY: all clean
+
 ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
@@ -10,5 +12,6 @@ LDFLAGS	 = -Os -lmi_sys -lmi_disp
 
 all:
 	$(CC) $(TARGET).c -o $(TARGET) $(CFLAGS) $(LDFLAGS)
+	
 clean:
 	rm -f $(TARGET)

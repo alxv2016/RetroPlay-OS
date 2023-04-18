@@ -1,3 +1,5 @@
+.PHONY: all clean
+
 ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
@@ -9,6 +11,6 @@ CFLAGS = -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve
 LDFLAGS = -lSDL -lSDL_image -lpthread
 
 all:
-	$(CC) -o $(TARGET) $(TARGET).c $(CFLAGS) $(LDFLAGS)
+	$(CC) $(TARGET).c -o $(TARGET) $(CFLAGS) $(LDFLAGS)
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET).o

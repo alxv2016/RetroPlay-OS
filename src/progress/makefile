@@ -1,14 +1,10 @@
 .PHONY: all clean
 	
-###########################################################
-
 ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
 
 TARGET = progress
-
-###########################################################
 
 CC = $(CROSS_COMPILE)gcc
 SYS_ROOT := $(shell $(CC) --print-sysroot)
