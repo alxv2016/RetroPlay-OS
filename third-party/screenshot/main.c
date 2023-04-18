@@ -88,7 +88,7 @@ char* getrecent(char *filename) {
 			fclose(fp);
 		}
 	} else if ((fp = fopen("/tmp/next", "r"))) {
-		// for RetroPlayOS
+		// for retroplayos
 		char ename[256];
 		char fname[256];
 		char *strptr;

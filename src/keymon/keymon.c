@@ -50,25 +50,6 @@ void quit(int exitcode) {
   exit(exitcode);
 }
 
-static int isCharging(void) {
-  // Code adapted from OnionOS
-  char *cmd = "cd /customer/app/ ; ./axp_test";
-  int batJsonSize = 100;
-  char buf[batJsonSize];
-  int charge_number;
-  int result;
-
-  FILE *fp;
-  fp = popen(cmd, "r");
-  if (fgets(buf, batJsonSize, fp) != NULL) {
-    sscanf(buf, "{\"battery\":%*d, \"voltage\":%*d, \"charging\":%d}",
-           &charge_number);
-    result = (charge_number == 3);
-  }
-  pclose(fp);
-  return result;
-}
-
 void checkAXP(void) {
   // Code adapted from OnionOS
   char *cmd = "cd /customer/app/ ; ./axp_test";

@@ -1,17 +1,19 @@
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
 #include <ctype.h>
 #include <dirent.h>
 #include <fcntl.h>
-#include <msettings.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
+#include <msettings.h>
+
 #include "../common/defines.h"
 #include "../common/keycontext.h"
+
 #include "../common/api.h"
 #include "../common/interface.h"
 #include "../common/powerops.h"

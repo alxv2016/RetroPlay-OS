@@ -22,7 +22,6 @@ extern SDL_Surface *screen;
 void disablePoweroff(void);
 void waitForWake(void);
 void fauxSleep(void);
-int isCharging(void);
 void enterSleep(void);
 void exitSleep(void);
 int preventAutosleep(void);

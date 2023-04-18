@@ -6,7 +6,7 @@ if [ -d "/mnt/SDCARD/miyoo354" ] ; then
 fi
 
 # or launch (and keep launched)
-LAUNCH_PATH="/mnt/SDCARD/.system/paks/RetroPlayOS.pak/launch.sh"
+LAUNCH_PATH="/mnt/SDCARD/.system/paks/retroplayos.pak/launch.sh"
 while [ -f "$LAUNCH_PATH" ] ; do
 	"$LAUNCH_PATH"
 done

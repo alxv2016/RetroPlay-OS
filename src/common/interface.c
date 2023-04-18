@@ -8,7 +8,6 @@
 #include <SDL/SDL_ttf.h>
 
 #include "defines.h"
-#include "powerops.h"
 #include "utils.h"
 
 #include "interface.h"

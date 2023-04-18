@@ -1,11 +1,16 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #include <time.h>
 #include <unistd.h>
 
 #include "../common/defines.h"
+
+#include "../common/utils.h"
+#include "../common/interface.h"
 
 /* CLOCK COMPONENT */
 #define MAX_YEAR 2100

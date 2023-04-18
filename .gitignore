@@ -13,10 +13,10 @@ src/**/keymon
 !keymon/
 src/**/lumon
 !lumon/
-src/**/RetroPlayOS
-!RetroPlayOS/
-src/**/progressui
-!progressui/
+src/**/retroplayos
+!retroplayos/
+src/**/progress
+!progress/
 src/**/sys-img
 !sys-img/
 src/**/confirm

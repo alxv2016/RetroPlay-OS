@@ -55,4 +55,7 @@ void Hash_free(Hash *self); // static
 void Hash_set(Hash *self, char *key, char *value); // static
 char *Hash_get(Hash *self, char *key); // static
 
+/* POWER */
+int isCharging(void);
+
 #endif

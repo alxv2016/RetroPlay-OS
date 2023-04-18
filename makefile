@@ -45,7 +45,7 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
-	cd $(SRC_DIR)/progressui && make
+	cd $(SRC_DIR)/progress && make
 	cd $(SRC_DIR)/retroplayos && make
 	cd $(SRC_DIR)/sys-img && make
 	cd $(SRC_DIR)/sys-msg && make
@@ -87,9 +87,9 @@ build: dirs
 	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progressui/progressui $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progressui/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
-	cp $(SRC_DIR)/retroplayos/RetroPlayOS $(BUILD_DIR)/dist/.system/paks/RetroPlayOS.pak/
+	cp $(SRC_DIR)/progress/progress $(BUILD_DIR)/dist/.system/bin/
+	cp $(SRC_DIR)/progress/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
+	cp $(SRC_DIR)/retroplayos/retroplayos $(BUILD_DIR)/dist/.system/paks/retroplayos.pak/
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
@@ -144,9 +144,9 @@ bundle:
 
 release:
 	@echo "\n::$(TARGET) -- Zipping up release" 
-	cd $(BUILD_DIR)/dist/.system/paks/RetroPlayOS.pak && echo "$(RELEASE_NAME).zip" > version.txt
-	cd $(BUILD_DIR)/dist && zip -r RetroPlayOS.zip .system .tmp_update
-	mv $(BUILD_DIR)/dist/RetroPlayOS.zip $(BUILD_DIR)/dist/miyoo354/app/
+	cd $(BUILD_DIR)/dist/.system/paks/retroplayos.pak && echo "$(RELEASE_NAME).zip" > version.txt
+	cd $(BUILD_DIR)/dist && zip -r $(TARGET).zip .system .tmp_update
+	mv $(BUILD_DIR)/dist/$(TARGET).zip $(BUILD_DIR)/dist/miyoo354/app/
 	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves Tools miyoo354 README.txt
 	$(ECHO)
 
@@ -166,7 +166,7 @@ clean-all: clean
 	cd $(SRC_DIR)/batmon && make clean
 	cd $(SRC_DIR)/keymon && make clean
 	cd $(SRC_DIR)/lumon && make clean
-	cd $(SRC_DIR)/progressui && make clean
+	cd $(SRC_DIR)/progress && make clean
 	cd $(SRC_DIR)/retroplayos && make clean
 	cd $(SRC_DIR)/sys-img && make clean
 	cd $(SRC_DIR)/sys-msg && make clean

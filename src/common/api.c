@@ -8,9 +8,10 @@
 #include <SDL/SDL_image.h>
 #include <SDL/SDL_ttf.h>
 
-#include "utils.h"
-#include "api.h"
 #include "defines.h"
+#include "utils.h"
+
+#include "api.h"
 
 Directory *top;
 // DirectoryArray

@@ -1,20 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <msettings.h>
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
-
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/inotify.h>
+
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_ttf.h>
+#include <msettings.h>
 #include <pthread.h>
 
 #include "../common/defines.h"
 #include "../common/utils.h"
+
 #include "../common/interface.h"
-#include "../common/controls.h"
 
 #define UPDATE_TXT "update_progress.txt"
 #define EVENT_SIZE (sizeof(struct inotify_event))

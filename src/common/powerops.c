@@ -7,36 +7,19 @@
 #include <SDL/SDL_ttf.h>
 #include <msettings.h>
 
-#include "utils.h"
 #include "defines.h"
-#include "controls.h"
-#include "interface.h"
 #include "keycontext.h"
+#include "utils.h"
+
+#include "interface.h"
+#include "controls.h"
+
 #include "powerops.h"
 
 /* POWER */
 int can_poweroff = 1;
 char governor[128];
 GFX g_gfx;
-
-int isCharging(void) {
-  // Code adapted from OnionOS
-  char *cmd = "cd /customer/app/ ; ./axp_test";
-  int batJsonSize = 100;
-  char buf[batJsonSize];
-  int charge_number;
-  int result;
-
-  FILE *fp;
-  fp = popen(cmd, "r");
-  if (fgets(buf, batJsonSize, fp) != NULL) {
-    sscanf(buf, "{\"battery\":%*d, \"voltage\":%*d, \"charging\":%d}",
-           &charge_number);
-    result = (charge_number == 3);
-  }
-  pclose(fp);
-  return result;
-}
 
 void disablePoweroff(void) { can_poweroff = 0; }
 

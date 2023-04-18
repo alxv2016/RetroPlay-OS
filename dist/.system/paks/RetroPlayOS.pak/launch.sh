@@ -1,5 +1,5 @@
 #!/bin/sh
-# RetroPlayOS.pak
+# retroplayos.pak
 
 # NOTE: will launch "say" which will display message during boot, TODO show an image?
 # NOTE: sleep XX indicates the duration timeout before proceeding to next set of actions.
@@ -93,7 +93,7 @@ CPU_PATH=/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 while [ -f "$EXEC_PATH" ]; do
 	echo ondemand > "$CPU_PATH"
 
-	./RetroPlayOS &> "$LOGS_PATH/RetroPlayOS.txt"
+	./retroplayos &> "$LOGS_PATH/retroplayos.txt"
 	
 	echo `date +'%F %T'` > "$DATETIME_PATH"
 	echo performance > "$CPU_PATH"
