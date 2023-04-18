@@ -35,11 +35,10 @@ COMPILE_CHAIN = libs build $(BUNDLE_LIBS) release
 
 all: $(COMPILE_CHAIN)
 
-libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
+libs:
 	@echo "\n::$(TARGET) -- Compiling Libs"
-# IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain linux dependencies 
+# IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain dependencies 
 	cd $(SRC_DIR)/libmsettings && make
-# Core libs
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
@@ -52,14 +51,6 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	cd $(SRC_DIR)/clock && make
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
 	cd $(THIRD_PARTY_DIR)/screenshot && make
-
-# Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
-third-party/SDL-1.2/.patched:
-	@echo "\n::$(TARGET) -- Patching SDL-1.2"
-	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
-third-party/picoarch/.patched:
-	@echo "\n::$(TARGET) -- Patching Picoarch"
-	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
 
 dirs: clean
 	@echo "\n::$(TARGET) -- Making Directories"
@@ -151,7 +142,15 @@ clean-all: clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
 
 
-build-libs:
+# Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
+third-party/SDL-1.2/.patched:
+	@echo "\n::$(TARGET) -- Patching SDL-1.2"
+	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
+third-party/picoarch/.patched:
+	@echo "\n::$(TARGET) -- Patching Picoarch"
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
+
+build-libs: third-party/SDL-1.2/.patched
 # NOTE: run commands to re-build dependency libs
 	@echo "\n::$(TARGET) -- Compiling SDL-1.2 lib"
 	cd $(SRC_DIR)/libmsettings && make
@@ -162,7 +161,7 @@ build-libs:
 	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
 	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
 
-build-cores:
+build-cores: third-party/picoarch/.patched
 # NOTE: run commands to re-build cores
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
