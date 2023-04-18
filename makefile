@@ -1,4 +1,4 @@
-.PHONY: all program libs external build bundle release dirs clean clean-all toolchain clean-toolchain .docker
+.PHONY: all program libs build bundle release dirs clean clean-all toolchain clean-toolchain .docker
 ###########################################################
 
 TARGET=RetroPlayOS
@@ -29,7 +29,7 @@ ifeq "$(GCC_VER_GTE9_0)" "1"
 endif
 
 TOOLCHAIN_NAME=ghcr.io/onionui/miyoomini-toolchain
-COMPILE_CHAIN = libs external build $(BUNDLE_LIBS) release
+COMPILE_CHAIN = libs build $(BUNDLE_LIBS) release
 
 ###########################################################
 
@@ -62,10 +62,6 @@ third-party/SDL-1.2/.patched:
 third-party/picoarch/.patched:
 	@echo "\n::$(TARGET) -- Patching Picoarch"
 	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
-
-external:
-# @echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
-# cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 
 dirs: clean
 	@echo "\n::$(TARGET) -- Making Directories"
@@ -111,23 +107,6 @@ build: dirs
 	cp $(ROOT_DIR)/cores/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
 	cp $(ROOT_DIR)/cores/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
 	cp $(ROOT_DIR)/cores/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(DIST_DIR)/cores/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-# cp $(DIST_DIR)/cores/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
-# cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
-# cp $(DIST_DIR)/cores/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
-
-# NOTE: switch to this to re-build cores
-# cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(BUILD_DIR)/dist/.system/bin/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(BUILD_DIR)/extras/Emus/PCE.pak/mednafen_pce_fast_libretro.so
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(BUILD_DIR)/extras/Emus/SUPA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/MGBA.pak/
-# cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(BUILD_DIR)/extras/Emus/SGB.pak/
 
 bundle:
 # NOTE: only bundles if GCC_VER_GTE9_0 is detected? not sure if these are dependencies for device
@@ -176,6 +155,23 @@ clean-all: clean
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
+
+
+build-cores:
+# NOTE: run commands to re-build cores
+# @echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(ROOT_DIR)/cores/
 
 # Init git submodules
 git-submodules:
