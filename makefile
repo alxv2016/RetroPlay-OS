@@ -50,6 +50,10 @@ libs: third-party/SDL-1.2/.patched third-party/picoarch/.patched
 	cd $(SRC_DIR)/sys-img && make
 	cd $(SRC_DIR)/sys-msg && make
 	cd $(SRC_DIR)/confirm && make
+# Tools
+	cd $(SRC_DIR)/clock && make
+	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
+	cd $(THIRD_PARTY_DIR)/screenshot && make
 
 # Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
 third-party/SDL-1.2/.patched:
@@ -91,6 +95,11 @@ build: dirs
 	cp $(SRC_DIR)/confirm/confirm $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/miyoo354/app/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/miyoo354/app/
+
+	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Tools/Files.pak/
+	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Tools/Clock.pak/
+	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Tools/Files.pak/
+	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Tools/Screenshots.pak/
 
 # NOTE: Saved build time with pre-build cores
 	cp $(DIST_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
@@ -138,7 +147,7 @@ release:
 	cd $(BUILD_DIR)/dist/.system/paks/RetroPlayOS.pak && echo "$(RELEASE_NAME).zip" > version.txt
 	cd $(BUILD_DIR)/dist && zip -r RetroPlayOS.zip .system .tmp_update
 	mv $(BUILD_DIR)/dist/RetroPlayOS.zip $(BUILD_DIR)/dist/miyoo354/app/
-	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves miyoo354 README.txt
+	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves Tools miyoo354 README.txt
 	$(ECHO)
 
 zip-bundles: build $(BUNDLE_LIBS) zip

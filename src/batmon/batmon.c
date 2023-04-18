@@ -78,12 +78,11 @@ int main(void) {
       vinfo.xres * vinfo.yres * (vinfo.bits_per_pixel / 8); // 640x480x4
   char *fb0_map =
       (char *)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb0_fd, 0);
-
-  memset(fb0_map, 0, map_size); // clear screen
+  // clear screen
+  memset(fb0_map, 0, map_size);
 
   char charging_path[128];
   sprintf(charging_path, "%s/charging.png", getenv("RES_PATH"));
-	
   SDL_Surface *img = IMG_Load(charging_path); // 24-bit opaque png
 
   uint8_t *dst = (uint8_t *)fb0_map;     // rgba

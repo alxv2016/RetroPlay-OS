@@ -31,6 +31,7 @@ typedef struct GFX_Context {
   SDL_Surface *battery;
   SDL_Surface *battery_low_power;
   SDL_Surface *battery_low;
+  SDL_Surface *digits;
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {
