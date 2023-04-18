@@ -350,7 +350,8 @@ int main(int argc, char *argv[]) {
              "date -s '%d-%d-%d %d:%d:%d';hwclock --utc -w", year_selected,
              month_selected, date_selected, hour_selected, minute_selected,
              seconds_selected);
-    execlp("/bin/sh", "/bin/sh", "-c", final_long_string, (char *)NULL);
+    // execlp("/bin/sh", "/bin/sh", "-c", final_long_string, (char *)NULL);
+    system(final_long_string);
   }
 
   return 0;
