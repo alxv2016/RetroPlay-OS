@@ -1,7 +1,6 @@
 #!/bin/sh
 
 EMU_EXE=fbalpha2012_cps2
-CORES_PATH=$(dirname "$0")
 
 ###############################
 
