@@ -9,10 +9,10 @@ TARGET = keymon
 CC = $(CROSS_COMPILE)gcc
 FLAGS	= -Os -lmsettings -lpthread -lrt -ldl -Wl,--gc-sections -s
 
-OBJS = ../common/rumble.c
+OBJS =
 
 all:
-	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(FLAGS)
+	$(CC) $(TARGET).c -o $(TARGET) $(FLAGS)
 
 clean:
 	rm -rf $(TARGET).o

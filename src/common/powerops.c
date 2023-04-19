@@ -13,6 +13,7 @@
 
 #include "interface.h"
 #include "controls.h"
+#include "rumble.h"
 
 #include "powerops.h"
 
@@ -50,6 +51,7 @@ void waitForWake(void) {
 }
 
 void fauxSleep(void) {
+  menuSuperShortPulse();
   GFX_clear();
   Input_reset();
 
@@ -61,6 +63,7 @@ void fauxSleep(void) {
 }
 
 void enterSleep(void) {
+  menuSuperShortPulse();
   SetMute(1);
   putInt("/sys/class/gpio/export", 4);
   putFile("/sys/class/gpio/gpio4/direction", "out");
@@ -75,6 +78,7 @@ void enterSleep(void) {
 }
 
 void exitSleep(void) {
+  menuSuperShortPulse();
   putInt("/sys/class/gpio/gpio4/value", 1);
   putInt("/sys/class/gpio/unexport", 4);
   putInt("/sys/class/pwm/pwmchip0/export", 0);
@@ -90,6 +94,7 @@ int preventAutosleep(void) { return isCharging(); }
 
 void powerOff(void) {
   if (can_poweroff) {
+    menuSuperShortPulse();
     char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off"
                                          : "Powering off";
     SDL_FillRect(g_gfx.screen, NULL, 0);

@@ -17,7 +17,6 @@
 #include <sys/types.h>
 
 #include "../common/keycontext.h"
-#include "../common/rumble.h"
 
 #include "keymon.h"
 
@@ -83,7 +82,6 @@ static void *runAXP(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
-  rumble(OFF);
   checkAXP();
   pthread_create(&adc_pt, NULL, &runAXP, NULL);
   // Set Initial Volume / Brightness
@@ -106,13 +104,11 @@ int main(int argc, char *argv[]) {
       if (val != REPEAT)
         menu_pressed = val;
       if (val == PRESSED)
-        menuSuperShortPulse();
       break;
     case BUTTON_POWER:
       if (val != REPEAT)
         power_pressed = val;
       if (val == PRESSED)
-        superShortPulse();
       break;
     case BUTTON_START:
       if (val != REPEAT) {
@@ -128,7 +124,6 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        superShortPulse();
         if (menu_pressed > 0) {
           val = GetBrightness();
           if (val < MAX_BRIGHTNESS)
@@ -151,7 +146,6 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        superShortPulse();
         if (menu_pressed > 0) {
           val = GetBrightness();
           if (val > 0)
@@ -171,7 +165,6 @@ int main(int argc, char *argv[]) {
 
     if (menu_pressed && power_pressed) {
       menu_pressed = power_pressed = 0;
-      shortPulse();
       system("shutdown");
       while (1)
         pause();

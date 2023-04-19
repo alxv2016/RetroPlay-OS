@@ -19,43 +19,36 @@
 #define COLOR_BUTTON_TEXT (SDL_Color){TRIAD_GRAY}
 
 // Screen size
-#define BASE_WIDTH 320
-#define BASE_HEIGHT 240
-
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
-#define SCREEN_SCALE 2 // SCREEN_HEIGHT / BASE_HEIGHT
 
 // UI Dimensions
 #define ICON_SIZE 44
-#define PILL_SIZE 44
-#define BUTTON_SIZE 44
-#define BATTERY_ICON_SIZE 44
-#define BUTTON_MARGIN 8
-#define BUTTON_PADDING 12
-#define SETTINGS_SIZE 4
-#define SETTINGS_WIDTH 80
-#define ROW_COUNT 6
-#define ROW_HEIGHT 64
-#define MAX_ROW 16
-#define PADDING 20
+#define BUTTON_SIZE 32
 #define RADIUS 16
 
 // Screen spacing
+#define PADDING 20
 #define PADDING_TOP 12
 #define PADDING_LR 20
+
+/// MENU
+#define ROW_COUNT 5
+#define ROW_HEIGHT 64
+#define MAX_SIZE 16
+#define MAX_ROW 16
 
 // Font size
 #define FONT_LARGE 32
 #define FONT_MEDIUM 28
 #define FONT_SMALL 24
-#define FONT_TINY 18
+#define FONT_TINY 22
 #define FONT_LINEHEIGHT 32
 
 // Paths
 #define MAX_PATH 512
 #define TEMP_PATH "/tmp/"
-#define TEMP_BATTERY "/tmp/battery"
+#define BATTERY_INFO "/tmp/battery"
 
 #define SDCARD_PATH "/mnt/SDCARD"
 #define RES_PATH "/mnt/SDCARD/.system/res"

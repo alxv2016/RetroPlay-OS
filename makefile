@@ -14,7 +14,7 @@ SRC_DIR := $(ROOT_DIR)/src
 THIRD_PARTY_DIR := $(ROOT_DIR)/third-party
 BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
-DIST_DIR := $(ROOT_DIR)/dist
+STATIC_DIR := $(ROOT_DIR)/static
 EXTRAS_DIR := $(ROOT_DIR)/extras
 # CACHE := $(ROOT_DIR)/cache
 BUNDLE_LIBS =
@@ -59,7 +59,7 @@ dirs: clean
 
 build: dirs
 	@echo "\n::$(TARGET) -- Copying directories"
-	cp -R $(DIST_DIR)/. $(BUILD_DIR)/dist
+	cp -R $(STATIC_DIR)/. $(BUILD_DIR)/dist
 
 	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
 	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/

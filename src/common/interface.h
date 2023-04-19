@@ -1,20 +1,7 @@
 #ifndef _INTERFACE_H
 #define _INTERFACE_H
 
-/* USER INTERFACE COMPONENTS */
-#define BUTTON_SIZE 44
-// Battery
-#define BATTERY_INFO "/tmp/battery"
-/// MENU
-#define ROW_COUNT 6
-#define ROW_HEIGHT 64
-#define MAX_SIZE 16
-#define ROW_PADDING 20
-
-// Icons
-#define BRIGHTNESS_ICON 0
-#define VOLUME_ICON 1
-#define VOLUME_MUTE_ICON 2
+#define FRAME_DURATION 17
 
 typedef struct GFX_Context {
   SDL_Surface *screen;
@@ -43,8 +30,6 @@ typedef struct GFX_Fonts {
 
 extern GFX g_gfx;
 extern Font g_font;
-
-#define FRAME_DURATION 17
 
 void GFX_init(void);
 void GFX_clear(void);

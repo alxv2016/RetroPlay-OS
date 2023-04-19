@@ -118,10 +118,9 @@ void listMenu(SDL_Surface *surface, char *name, char *path, char *unique,
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
   int row_width = text->w + margin_left * 2;
-  int text_width = truncateText(g_font.small, display_name, display_name,
-                                SCREEN_WIDTH / 2, margin_left) +
-                   margin_left;
-  int max_width = MIN(row_width, text_width);
+  // int text_width = truncateText(g_font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
+  // int max_width = MIN(row_width, text_width);
+  int max_width = MIN(row_width, 580);
   int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
@@ -192,7 +191,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
 
 // Return computed button width
 int getButtonWidth(char *blabel, char *bkey) {
-  int margin = 8;
+  int margin = 6;
   int btnWidth = 0;
   int computedWidth;
 
@@ -214,11 +213,11 @@ int getButtonWidth(char *blabel, char *bkey) {
 void button(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_Surface *btn = g_gfx.button;
   SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(g_font.medium, bkey, COLOR_DARK_TEXT);
+      TTF_RenderUTF8_Blended(g_font.tiny, bkey, COLOR_DARK_TEXT);
   SDL_Surface *btnLabel =
-      TTF_RenderUTF8_Blended(g_font.small, blabel, COLOR_LIGHT_TEXT);
+      TTF_RenderUTF8_Blended(g_font.tiny, blabel, COLOR_LIGHT_TEXT);
 
-  int margin = 8;
+  int margin = 6;
   int btnCX = (btn->w / 2) - (btnKey->w / 2);
   // Bump 2px up to visually center letter in btn
   int btnCY = (btn->h / 2) - (btnKey->h / 2) - 1;
@@ -273,9 +272,9 @@ int volumnBrightnessWidth(void) {
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_Surface *btn = g_gfx.button;
   SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(g_font.medium, bkey, COLOR_DARK_TEXT);
+      TTF_RenderUTF8_Blended(g_font.tiny, bkey, COLOR_DARK_TEXT);
   SDL_Surface *btnLabel =
-      TTF_RenderUTF8_Blended(g_font.small, blabel, COLOR_LIGHT_TEXT);
+      TTF_RenderUTF8_Blended(g_font.tiny, blabel, COLOR_LIGHT_TEXT);
 
   // Pill's left radius
   SDL_Rect rectL;
@@ -296,7 +295,7 @@ void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   rectR.w = BUTTON_SIZE / 2;
   rectR.h = BUTTON_SIZE;
 
-  int margin = 8;
+  int margin = 6;
   int btnCX = ((btn->w / 2) + (btnKey->w / 2)) - (btnKey->w / 2);
   // Bump 2px up to visually center letter in btn
   int btnCY = (btn->h / 2) - (btnKey->h / 2) - 2;
