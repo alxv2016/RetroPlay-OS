@@ -62,7 +62,7 @@
 #define PAKS_PATH "/mnt/SDCARD/.system/paks"
 #define USERDATA_PATH "/mnt/SDCARD/.userdata"
 #define ROMS_PATH "/mnt/SDCARD/Roms"
-#define RECENT_PATH "/mnt/SDCARD/.userdata/.retroplayos/recent.txt"
+#define RECENT_PATH "/mnt/SDCARD/.userdata/.retroplay/recent.txt"
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"
 #define COLLECTIONS_PATH "/mnt/SDCARD/Collections"
 #define FONT_PATH "/mnt/SDCARD/.system/res/OpenSans-SemiBold.ttf"
@@ -70,7 +70,7 @@
 #define LAST_PATH "/tmp/last.txt" // transient
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"
 #define RESUME_SLOT_PATH "/tmp/mmenu_slot.txt"
-#define AUTO_RESUME_PATH "/mnt/SDCARD/.userdata/.retroplayos/auto_resume.txt"
+#define AUTO_RESUME_PATH "/mnt/SDCARD/.userdata/.retroplay/auto_resume.txt"
 #define AUTO_RESUME_SLOT "9"
 
 // Icons

@@ -13,8 +13,8 @@ src/**/keymon
 !keymon/
 src/**/lumon
 !lumon/
-src/**/retroplayos
-!retroplayos/
+src/**/retroplay
+!retroplay/
 src/**/progress
 !progress/
 src/**/sys-img

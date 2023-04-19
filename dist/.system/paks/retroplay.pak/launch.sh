@@ -1,5 +1,5 @@
 #!/bin/sh
-# retroplayos.pak
+# retroplay.pak
 
 # NOTE: will launch "say" which will display message during boot, TODO show an image?
 # NOTE: sleep XX indicates the duration timeout before proceeding to next set of actions.
@@ -30,7 +30,7 @@ export LOGS_PATH=/mnt/SDCARD/.userdata/logs
 export CORES_PATH=/mnt/SDCARD/.system/cores
 export RES_PATH=/mnt/SDCARD/.system/res
 # used by bin/shutdown
-export DATETIME_PATH=$USERDATA_PATH/.retroplayos/datetime.txt
+export DATETIME_PATH=$USERDATA_PATH/.retroplay/datetime.txt
 
 # killall tee # NOTE: killing tee is somehow responsible for audioserver crashes
 rm -f "$SDCARD_PATH/update.log"
@@ -61,7 +61,7 @@ keymon &
 
 mkdir -p "$LOGS_PATH"
 mkdir -p "$USERDATA_PATH/.mmenu"
-mkdir -p "$USERDATA_PATH/.retroplayos"
+mkdir -p "$USERDATA_PATH/.retroplay"
 
 # init datetime
 if [ -f "$DATETIME_PATH" ]; then
@@ -79,21 +79,21 @@ fi
 
 cd $(dirname "$0")
 
-EXEC_PATH=/tmp/retroplayos_exec
+EXEC_PATH=/tmp/retroplay_exec
 touch "$EXEC_PATH"  && sync
 
 MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
 export MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
 
 # Battery level debug info
-ls /customer/app > "$USERDATA_PATH/.retroplayos/app_contents.txt"
-/customer/app/axp_test > "$USERDATA_PATH/.retroplayos/axp_result.txt"
+ls /customer/app > "$USERDATA_PATH/.retroplay/app_contents.txt"
+/customer/app/axp_test > "$USERDATA_PATH/.retroplay/axp_result.txt"
 
 CPU_PATH=/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 while [ -f "$EXEC_PATH" ]; do
 	echo ondemand > "$CPU_PATH"
 
-	./retroplayos &> "$LOGS_PATH/retroplayos.txt"
+	./retroplay &> "$LOGS_PATH/retroplay.txt"
 	
 	echo `date +'%F %T'` > "$DATETIME_PATH"
 	echo performance > "$CPU_PATH"

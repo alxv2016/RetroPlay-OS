@@ -6,7 +6,7 @@ ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
 
-TARGET = retroplayos
+TARGET = retroplay
 
 ###########################################################
 

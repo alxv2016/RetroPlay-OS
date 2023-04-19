@@ -88,7 +88,7 @@ char* getrecent(char *filename) {
 			fclose(fp);
 		}
 	} else if ((fp = fopen("/tmp/next", "r"))) {
-		// for retroplayos
+		// for RetroPlay OS
 		char ename[256];
 		char fname[256];
 		char *strptr;
@@ -108,7 +108,7 @@ char* getrecent(char *filename) {
 	}
 
 	if (!(*fnptr)) {
-		if (searchpid("RetroPlayOS")) strcat(filename, "RetroPlayOS");
+		if (searchpid("retroplay")) strcat(filename, "retroplay");
 		else strcat(filename, "MainUI");
 	}
 

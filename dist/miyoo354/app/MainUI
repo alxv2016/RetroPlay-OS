@@ -42,7 +42,7 @@ fi
 
 # then do it
 ./sys-msg "$VERB"
-unzip -o "/mnt/SDCARD/miyoo354/app/RetroPlayOS.zip" -d "/mnt/SDCARD"
+unzip -o "/mnt/SDCARD/miyoo354/app/retroplay.zip" -d "/mnt/SDCARD"
 
 # post-install
 POST_INSTALL=/mnt/SDCARD/.system/bin/post-install.sh
