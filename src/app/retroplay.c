@@ -25,7 +25,8 @@ GFX g_gfx;
 
 int main(int argc, char *argv[]) {
   rumble(OFF);
-  if (autoResume()) return 0; // nothing to do
+  if (autoResume())
+    return 0; // nothing to do
   menuSuperShortPulse();
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
@@ -34,7 +35,8 @@ int main(int argc, char *argv[]) {
   SDL_EnableKeyRepeat(300, 100);
 
   InitSettings();
-  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
+                                  SDL_HWSURFACE | SDL_DOUBLEBUF);
 
   GFX_init();
   GFX_ready();
@@ -96,8 +98,7 @@ int main(int argc, char *argv[]) {
             top->end += 1;
           }
         }
-
-        if (Input_justRepeated(BTN_LEFT)) { 
+        if (Input_justRepeated(BTN_LEFT)) {
           // Scan games alphabetically
           Entry *entry = top->entries->items[selected];
           int i = entry->alpha - 1;
@@ -131,7 +132,7 @@ int main(int argc, char *argv[]) {
         top->selected = selected;
         dirty = 1;
       }
-
+      /*   */
       if (dirty && total > 0)
         readyResume(top->entries->items[top->selected]);
 
@@ -233,39 +234,32 @@ int main(int argc, char *argv[]) {
 
     if (dirty) {
       SDL_FillRect(g_gfx.screen, NULL, 0);
-      int selected_row = top->selected - top->start;
-      for (int i = top->start, j = 0; i < top->end; i++, j++) {
-        Entry *entry = top->entries->items[i];
-        listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j, selected_row);
+      if (total > 0) {
+        int selected_row = top->selected - top->start;
+        for (int i = top->start, j = 0; i < top->end; i++, j++) {
+          Entry *entry = top->entries->items[i];
+          listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
+          selected_row);
+        }
+
+      } else {
+        paragraph(g_gfx.screen, "No games detected,\n load some games.", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
       }
-
-      // if (total > 0) {
-      //   int selected_row = top->selected - top->start;
-      //   for (int i = top->start, j = 0; i < top->end; i++, j++) {
-      //     Entry *entry = top->entries->items[i];
-      //     listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j, selected_row);
-      //   }
-
-      // } else {
-      //   // TODO: show console list, move this to roms folders
-      //   paragraph(g_gfx.screen, "Empty folder", 0, 0, SCREEN_WIDTH,
-      //             SCREEN_HEIGHT);
-      // }
 
       if (can_resume && !show_version) {
         if (strlen("X") > 1)
-          button(g_gfx.screen, "X", "Resume", 20, 419);
+          button(g_gfx.screen, "X", "Resume", 0, 20, 419);
         else
-          button(g_gfx.screen, "X", "Resume", 557 - btn_a_width, 419);
+          button(g_gfx.screen, "X", "Resume", 0, 557, 419);
       }
 
       if (total == 0 && stack->count > 1) {
-        button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
+        button(g_gfx.screen, "B", "Back", 0, 557, 419);
+      } else if (total > 0 && stack->count > 1) {
+        button(g_gfx.screen, "A", "Play", 0, 557, 419);
+        button(g_gfx.screen, "B", "Back", 1, 557 - btn_a_width, 419);
       } else {
-        button(g_gfx.screen, "A", "Open", 557, 419);
-        if (stack->count > 1) {
-          button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
-        }
+        button(g_gfx.screen, "A", "Select", 0, 557, 419);
       }
 
       if (show_version) {

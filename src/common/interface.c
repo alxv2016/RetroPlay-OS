@@ -25,6 +25,7 @@ void GFX_init(void) {
   g_font.tiny = TTF_OpenFont(FONT_PATH, FONT_TINY);
 
   g_gfx.button = loadImage("btn.png");
+  g_gfx.button_outline = loadImage("btn-outline.png");
   g_gfx.corner_radius = loadImage("radius-black.png");
   g_gfx.settings_bar_full = loadImage("progress-full.png");
   g_gfx.settings_bar_empty = loadImage("progress-empty.png");
@@ -210,10 +211,10 @@ int getButtonWidth(char *blabel, char *bkey) {
 }
 
 // Button
-void button(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
-  SDL_Surface *btn = g_gfx.button;
+void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int x, int y) {
+  SDL_Surface *btn = outline? g_gfx.button_outline : g_gfx.button;
   SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(g_font.tiny, bkey, COLOR_DARK_TEXT);
+      TTF_RenderUTF8_Blended(g_font.tiny, bkey, outline?COLOR_LIGHT_TEXT:COLOR_DARK_TEXT);
   SDL_Surface *btnLabel =
       TTF_RenderUTF8_Blended(g_font.tiny, blabel, COLOR_LIGHT_TEXT);
 

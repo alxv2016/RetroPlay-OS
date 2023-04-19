@@ -384,7 +384,6 @@ void EntryArray_free(Array *self) {
 // Goes before Directory functions
 Array *getRoot(Array *recents) {
   Array *root = Array_new();
-
   if (hasRecents(recents))
     Array_push(root, Entry_new(FAUX_RECENT_PATH, ENTRY_DIR));
 
@@ -403,6 +402,10 @@ Array *getRoot(Array *recents) {
       if (hide(dp->d_name))
         continue;
       if (hasRoms(dp->d_name)) {
+        strcpy(tmp, dp->d_name);
+        Array_push(emus, Entry_new(full_path, ENTRY_DIR));
+      } else {
+        // Show Emulators
         strcpy(tmp, dp->d_name);
         Array_push(emus, Entry_new(full_path, ENTRY_DIR));
       }
@@ -707,10 +710,12 @@ void addRecent(char *path, Array *recents) {
 }
 
 /****/
+
 Array *getEntries(char *path) {
   Array *entries = Array_new();
 
-  if (isConsoleDir(path)) { // top-level console folder, might collate
+  if (isConsoleDir(path)) { 
+    // top-level console folder, might collate
     char collated_path[256];
     strcpy(collated_path, path);
     char *tmp = strrchr(collated_path, '(');
