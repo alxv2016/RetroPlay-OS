@@ -15,9 +15,9 @@
 #include "../common/keycontext.h"
 
 #include "../common/api.h"
+#include "../common/controls.h"
 #include "../common/interface.h"
 #include "../common/powerops.h"
-#include "../common/controls.h"
 
 ///////////////////////////////////////
 GFX g_gfx;
@@ -25,7 +25,7 @@ GFX g_gfx;
 int main(int argc, char *argv[]) {
   if (autoResume())
     return 0; // nothing to do
-    
+
   putenv("SDL_HIDE_BATTERY=1");
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
@@ -35,13 +35,13 @@ int main(int argc, char *argv[]) {
 
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
-                                         SDL_HWSURFACE | SDL_DOUBLEBUF);
+                                  SDL_HWSURFACE | SDL_DOUBLEBUF);
+  g_gfx.overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH,
+                                       SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+  SDL_SetAlpha(g_gfx.overlay, SDL_SRCALPHA, 0x90);
+
   GFX_init();
   GFX_ready();
-
-  g_gfx.overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 16,
-                                 0, 0, 0, 0);
-  SDL_SetAlpha(g_gfx.overlay, SDL_SRCALPHA, 0x90);
 
   Menu_init();
   Input_reset();
@@ -73,6 +73,7 @@ int main(int argc, char *argv[]) {
         dirty = 1;
       }
     } else {
+
       if (Input_justPressed(BTN_Y) ||
           Input_justReleased(BTN_MENU) && !show_setting) {
         show_version = 1;
@@ -267,75 +268,20 @@ int main(int argc, char *argv[]) {
     if (dirty) {
       SDL_FillRect(g_gfx.screen, NULL, 0);
 
-      if (show_setting) {
-        volumnBrightness(g_gfx.screen, 0, 0,
-                         show_setting == VOLUME_ICON
-                             ? BRIGHTNESS_ICON
-                             : (setting_value > BRIGHTNESS_ICON
-                                    ? VOLUME_ICON
-                                    : VOLUME_MUTE_ICON),
-                         setting_value, setting_min, setting_max);
-      } else {
-        batteryStatus(g_gfx.screen, 576, 12);
-      }
+      batteryStatus(g_gfx.screen, 576, 12);
 
-      if (show_version) {
-        // if (!version)
-        // {
-        // 	char release[256];
-        // 	getFile("./version.txt", release, 256);
-
-        // 	char *tmp, *commit;
-        // 	commit = strrchr(release, '\n');
-        // 	commit[0] = '\0';
-        // 	commit = strrchr(release, '\n') + 1;
-        // 	tmp = strchr(release, '\n');
-        // 	tmp[0] = '\0';
-
-        // 	SDL_Surface *release_txt = GFX_getText("Release");
-        // 	SDL_Surface *version_txt = GFX_getText(release);
-        // 	SDL_Surface *commit_txt = GFX_getText("Commit");
-        // 	SDL_Surface *hash_txt = GFX_getText(commit);
-
-        // 	SDL_Surface *firmware_txt = GFX_getText("Firmware");
-        // 	SDL_Surface *date_txt = GFX_getText(getenv("MIYOO_VERSION"));
-
-        // 	int x = firmware_txt->w + 12;
-        // 	int w = x + version_txt->w;
-        // 	int h = 96 * 2;
-        // 	version = SDL_CreateRGBSurface(0, w, h, 16, 0, 0, 0, 0);
-
-        // 	SDL_BlitSurface(release_txt, NULL, version, &(SDL_Rect){0, 0});
-        // 	SDL_BlitSurface(version_txt, NULL, version, &(SDL_Rect){x, 0});
-        // 	SDL_BlitSurface(commit_txt, NULL, version, &(SDL_Rect){0, 48});
-        // 	SDL_BlitSurface(hash_txt, NULL, version, &(SDL_Rect){x, 48});
-        // 	SDL_BlitSurface(firmware_txt, NULL, version, &(SDL_Rect){0,
-        // 144}); 	SDL_BlitSurface(date_txt, NULL, version, &(SDL_Rect){x, 144});
-
-        // 	SDL_FreeSurface(release_txt);
-        // 	SDL_FreeSurface(version_txt);
-        // 	SDL_FreeSurface(commit_txt);
-        // 	SDL_FreeSurface(hash_txt);
-        // 	SDL_FreeSurface(firmware_txt);
-        // 	SDL_FreeSurface(date_txt);
-        // }
-        // TODO: show console list, move this to roms folders
-        // SDL_BlitSurface(screen, NULL, screen, &(SDL_Rect){(SCREEN_WIDTH -
-        // version->w) / 2, (SCREEN_HEIGHT - version->h) / 2});
-        button(g_gfx.screen, "B", "Back", 557, 419);
-      } else {
-        if (total > 0) {
-          int selected_row = top->selected - top->start;
-          for (int i = top->start, j = 0; i < top->end; i++, j++) {
-            Entry *entry = top->entries->items[i];
-            listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
-                             selected_row);
-          }
-        } else {
-          // TODO: show console list, move this to roms folders
-          paragraph(g_gfx.screen, "Empty folder", 0, 0, SCREEN_WIDTH,
-                            SCREEN_HEIGHT);
+      if (total > 0) {
+        int selected_row = top->selected - top->start;
+        for (int i = top->start, j = 0; i < top->end; i++, j++) {
+          Entry *entry = top->entries->items[i];
+          listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
+                   selected_row);
         }
+
+      } else {
+        // TODO: show console list, move this to roms folders
+        paragraph(g_gfx.screen, "Empty folder", 0, 0, SCREEN_WIDTH,
+                  SCREEN_HEIGHT);
       }
 
       if (can_resume && !show_version) {
@@ -345,27 +291,31 @@ int main(int argc, char *argv[]) {
           button(g_gfx.screen, "X", "Resume", 557 - btn_a_width, 419);
       }
 
-      // if (show_version)
-      // {
-      // 	// GFX_blitButton(screen, "B", "Back", 557 - btn_a_width, 419);
-      // }
-      // else if (total == 0)
-      // {
-      // 	if (stack->count > 1)
-      // 	{
-      // 		GFX_blitButton(screen, "B", "Back", 557 - btn_a_width,
-      // 419);
-      // 	}
-      // }
-      if (!show_version) {
-        if (total == 0 && stack->count > 1) {
+      if (total == 0 && stack->count > 1) {
+        button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
+      } else {
+        button(g_gfx.screen, "A", "Open", 557, 419);
+        if (stack->count > 1) {
           button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
-        } else {
-          button(g_gfx.screen, "A", "Open", 557, 419);
-          if (stack->count > 1) {
-            button(g_gfx.screen, "B", "Back", 557 - btn_a_width, 419);
-          }
         }
+      }
+
+      if (show_version) {
+        SDL_BlitSurface(g_gfx.overlay, NULL, g_gfx.screen, NULL);
+      }
+
+      if (show_setting) {
+        SDL_BlitSurface(g_gfx.overlay, NULL, g_gfx.screen, NULL);
+        int w = volumnBrightnessWidth();
+        int cx = (SCREEN_WIDTH / 2) - (w / 2);
+        int cy = (SCREEN_HEIGHT / 2) - (ICON_SIZE / 2);
+        volumnBrightness(g_gfx.screen, cx, cy,
+                         show_setting == VOLUME_ICON
+                             ? BRIGHTNESS_ICON
+                             : (setting_value > BRIGHTNESS_ICON
+                                    ? VOLUME_ICON
+                                    : VOLUME_MUTE_ICON),
+                         setting_value, setting_min, setting_max);
       }
     }
 
@@ -385,6 +335,7 @@ int main(int argc, char *argv[]) {
     GFX_sync(frameStart);
   }
 
+  SDL_FreeSurface(g_gfx.overlay);
   SDL_FillRect(g_gfx.screen, NULL, 0);
   SDL_Flip(g_gfx.screen);
 

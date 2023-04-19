@@ -1,10 +1,6 @@
 #ifndef _POWEROPS_H
 #define _POWEROPS_H
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_image.h>
-#include <SDL/SDL_ttf.h>
-
 #define SHORT_PULSE_MS 100
 #define SUPER_SHORT_PULSE_MS 50
 #define CHARGE_DELAY 1000

@@ -47,10 +47,10 @@ void GFX_ready(void) {
   g_gfx.screen = SDL_GetVideoSurface(); // :cold_sweat:
 }
 
-void GFX_sync(unsigned long frameStart ) {
+void GFX_sync(unsigned long frameStart) {
   unsigned long frameDuration = SDL_GetTicks() - frameStart;
   if (frameDuration < FRAME_DURATION) {
-      SDL_Delay(FRAME_DURATION - frameDuration);
+    SDL_Delay(FRAME_DURATION - frameDuration);
   }
 }
 
@@ -108,34 +108,40 @@ void window(SDL_Surface *surface, int x, int y, int width, int height) {
 }
 
 // Menu list component
-void listMenu(SDL_Surface *surface, char *name, char *path, char *unique, int row, int selected_row)
-{
+void listMenu(SDL_Surface *surface, char *name, char *path, char *unique,
+              int row, int selected_row) {
 #define MIN(a, b) (a) < (b) ? (a) : (b)
-	char *display_name = unique ? unique : name;
-	trimSortingMeta(&display_name);
-	int margin_left = 32;
+  char *display_name = unique ? unique : name;
+  trimSortingMeta(&display_name);
+  int margin_left = 32;
 
-	SDL_Surface *text;
-	text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
-	int row_width = text->w + margin_left * 2;
-	int text_width = truncateText(g_font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
-	int max_width = MIN(row_width, text_width);
-	int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
-	int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
+  SDL_Surface *text;
+  text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
+  int row_width = text->w + margin_left * 2;
+  int text_width = truncateText(g_font.small, display_name, display_name,
+                                SCREEN_WIDTH / 2, margin_left) +
+                   margin_left;
+  int max_width = MIN(row_width, text_width);
+  int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
+  int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
-	if (row == selected_row)
-	{
-		// Selected rows
-		text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_DARK_TEXT);
-		SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, SDL_MapRGB(surface->format, TRIAD_WHITE));
-		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
-		SDL_FreeSurface(text);
-	}
-	else
-	{
-		SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
-		SDL_FreeSurface(text);
-	}
+  if (row == selected_row) {
+    // Selected rows
+    text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_DARK_TEXT);
+    SDL_FillRect(
+        surface,
+        &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT},
+        SDL_MapRGB(surface->format, TRIAD_WHITE));
+    SDL_BlitSurface(
+        text, &(SDL_Rect){0, 0, max_width, text->h}, surface,
+        &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+    SDL_FreeSurface(text);
+  } else {
+    SDL_BlitSurface(
+        text, &(SDL_Rect){0, 0, max_width, text->h}, surface,
+        &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+    SDL_FreeSurface(text);
+  }
 }
 
 // Battery
@@ -247,13 +253,20 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value,
   int h = sProgressBar->h;
   int marginLeft = ICON_SIZE + 8;
 
-  window(surface, x, y, SCREEN_WIDTH / 2, ICON_SIZE * 2);
-
+  // window(g_gfx.overlay, x, y, SCREEN_WIDTH / 2, ICON_SIZE * 2);
   SDL_BlitSurface(sIcon, NULL, surface, &(SDL_Rect){x, y});
   SDL_BlitSurface(sProgressEmpty, NULL, surface,
                   &(SDL_Rect){x + marginLeft, y + cy});
   SDL_BlitSurface(sProgressBar, &(SDL_Rect){0, 0, w, h}, surface,
                   &(SDL_Rect){x + marginLeft, y + cy, w, h});
+}
+
+int volumnBrightnessWidth(void) {
+  SDL_Surface *sProgressBar = g_gfx.settings_bar_full;
+  int w = sProgressBar->w;
+  int marginLeft = ICON_SIZE + 8;
+  int totalWidth = w + marginLeft;
+  return totalWidth;
 }
 
 // Pill button

@@ -58,6 +58,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y);
 void button(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
+int volumnBrightnessWidth(void);
 void hintLabel(SDL_Surface *surface, char *htxt, int x, int y);
 void paragraph(SDL_Surface *surface, char *str, int x, int y, int width,int height);
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark);
