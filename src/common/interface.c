@@ -253,7 +253,6 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value,
   int h = sProgressBar->h;
   int marginLeft = ICON_SIZE + 8;
 
-  // window(g_gfx.overlay, x, y, SCREEN_WIDTH / 2, ICON_SIZE * 2);
   SDL_BlitSurface(sIcon, NULL, surface, &(SDL_Rect){x, y});
   SDL_BlitSurface(sProgressEmpty, NULL, surface,
                   &(SDL_Rect){x + marginLeft, y + cy});
