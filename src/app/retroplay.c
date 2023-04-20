@@ -251,6 +251,9 @@ int main(int argc, char *argv[]) {
       } else if (total > 0 && stack->count > 1) {
         button(g_gfx.screen, "A", "Play", 0, 557, 419);
         button(g_gfx.screen, "B", "Back", 1, 557 - btn_a_width, 419);
+      } else if (showSettings) {
+        button(g_gfx.screen, "A", "Select", 0, 557, 419);
+        button(g_gfx.screen, "B", "Cancel", 1, 557 - btn_a_width, 419);
       } else {
         button(g_gfx.screen, "A", "Select", 0, 557, 419);
       }

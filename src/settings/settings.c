@@ -10,6 +10,7 @@
 #include "../common/interface.h"
 #include "../common/utils.h"
 #include "../common/controls.h"
+#include "../common/powerops.h"
 
 #include "settings.h"
 
@@ -90,17 +91,28 @@ void initSettings(SDL_Surface *surface) {
     if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU)) && !dirty) {
         quit = 1;
       } else if (Input_justPressed(BTN_A)) {
+        switch(selected) {
+          case SETTINGS_SLEEP:
+          fauxSleep();
+          quit = 1;
+          break;
+          case SETTINGS_POWER:
+          powerOff();
+          quit = 1;
+          break;
+        }
         //TODO: add status switch case to track options
     }
 
-
     // Dirty
     if(dirty) {
+      int btn_a_width = getButtonWidth("Select", "A");
       for (int i = 0; i < MENU_ITEMS; i++) {
         settingsMenu(surface, selected, i);
 	      // SDL_FillRect(surface, NULL, background);
       }
-
+      button(surface, "A", "Select", 0, 557, 419);
+      button(surface, "B", "Cancel", 1, 557 - btn_a_width, 419);
       SDL_Flip(surface);
       dirty = 0;
     }
@@ -110,7 +122,7 @@ void initSettings(SDL_Surface *surface) {
 		if (frameDuration<FRAME_DURATION) SDL_Delay(FRAME_DURATION-frameDuration);
   }
 
-  SDL_FillRect(g_gfx.screen, NULL, 0);
-  SDL_Flip(g_gfx.screen);
+  SDL_FillRect(surface, NULL, 0);
+  SDL_Flip(surface);
   SDL_Quit();
 }

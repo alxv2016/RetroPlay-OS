@@ -206,7 +206,7 @@ int getButtonWidth(char *blabel, char *bkey) {
   btnWidth += margin;
 
   TTF_SizeUTF8(g_font.small, blabel, &computedWidth, NULL);
-  btnWidth += computedWidth + margin;
+  btnWidth += (computedWidth + margin);
   return btnWidth;
 }
 
