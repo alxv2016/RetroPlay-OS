@@ -191,23 +191,13 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
 }
 
 // Return computed button width
-int getButtonWidth(char *blabel, char *bkey) {
+int getButtonWidth(char *blabel) {
   int margin = 6;
-  int btnWidth = 0;
-  int computedWidth;
-
-  if (strlen(bkey) == 1) {
-    btnWidth += BUTTON_SIZE;
-  } else {
-    btnWidth += BUTTON_SIZE;
-    TTF_SizeUTF8(g_font.medium, bkey, &computedWidth, NULL);
-    btnWidth += computedWidth;
-  }
-  btnWidth += margin;
-
+  int btnWidth = BUTTON_SIZE + margin;
+  int computedWidth = NULL;
   TTF_SizeUTF8(g_font.small, blabel, &computedWidth, NULL);
-  btnWidth += (computedWidth + margin);
-  return btnWidth;
+  // btnWidth += computedWidth;
+  return computedWidth;
 }
 
 // Button

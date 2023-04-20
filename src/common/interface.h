@@ -49,7 +49,7 @@ void hintLabel(SDL_Surface *surface, char *htxt, int x, int y);
 void paragraph(SDL_Surface *surface, char *str, int x, int y, int width,int height);
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark);
 int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,int maxWidth, int row, int selected, int reset, int force);
-int getButtonWidth(char *blabel, char *bkey);
+int getButtonWidth(char *blabel);
 int truncateText(TTF_Font *font, const char *in_name, char *out_name,int max_width, int padding);
 SDL_Surface *loadImage(char *path);
 SDL_Surface *renderText(char *text);

@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   int dirty = 1;
   int was_charging = isCharging();
   unsigned long charge_start = SDL_GetTicks();
-  int btn_a_width = getButtonWidth("Open", "A");
+  int btn_a_width = getButtonWidth("Select");
   int showSettings = 0;
   int setting_value = 0;
   int setting_min = 0;
@@ -222,8 +222,8 @@ int main(int argc, char *argv[]) {
     }
 
     if (dirty) {
+      int testW = getButtonWidth("Selecting super long");
       SDL_FillRect(g_gfx.screen, NULL, 0);
-
       if (showSettings) {
         initSettings(g_gfx.screen);
       } else {
@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
         button(g_gfx.screen, "A", "Select", 0, 557, 419);
         button(g_gfx.screen, "B", "Cancel", 1, 557 - btn_a_width, 419);
       } else {
-        button(g_gfx.screen, "A", "Select", 0, 557, 419);
+        button(g_gfx.screen, "A", "Selecting super long", 0, SCREEN_WIDTH - testW, 419);
       }
 
       batteryStatus(g_gfx.screen, 576, 12);
