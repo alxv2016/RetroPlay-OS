@@ -41,7 +41,7 @@ void GFX_sync(unsigned long frameStart );
 void window(SDL_Surface *surface, int x, int y, int width, int height);
 void listMenu(SDL_Surface *surface, char *path, char *name, char *unique,int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);
-void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int x, int y);
+void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y);
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
 int volumnBrightnessWidth(void);

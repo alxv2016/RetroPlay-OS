@@ -191,17 +191,19 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
 }
 
 // Return computed button width
+// NOTE: this doesn't return accurate widths...not sure why
 int getButtonWidth(char *blabel) {
+  SDL_Surface* TextSurface;
   int margin = 6;
   int btnWidth = BUTTON_SIZE + margin;
-  int computedWidth = NULL;
-  TTF_SizeUTF8(g_font.small, blabel, &computedWidth, NULL);
-  // btnWidth += computedWidth;
-  return computedWidth;
+  TextSurface = TTF_RenderUTF8_Solid(g_font.small, blabel, COLOR_LIGHT_TEXT);
+  SDL_FreeSurface(TextSurface);
+  btnWidth += TextSurface->w;
+  return btnWidth;
 }
 
 // Button
-void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int x, int y) {
+void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y) {
   SDL_Surface *btn = outline? g_gfx.button_outline : g_gfx.button;
   SDL_Surface *btnKey =
       TTF_RenderUTF8_Blended(g_font.tiny, bkey, outline?COLOR_LIGHT_TEXT:COLOR_DARK_TEXT);
@@ -214,6 +216,8 @@ void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int x, 
   int btnCY = (btn->h / 2) - (btnKey->h / 2) - 1;
   int btnLabelCY = (btn->h / 2) - (btnLabel->h / 2);
   int btnX = BUTTON_SIZE + margin;
+  int labelRightAlign = x - btnLabel->w;
+  int btnRightAlign = x - (btnLabel->w + btnX);
 
   SDL_Rect rect;
   rect.x = 0;
@@ -221,12 +225,12 @@ void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int x, 
   rect.w = BUTTON_SIZE;
   rect.h = BUTTON_SIZE;
 
-  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){x, y + btnLabelCY});
+  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY});
   SDL_FreeSurface(btnLabel);
 
-  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){x - btnX, y});
+  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
   SDL_BlitSurface(btnKey, NULL, surface,
-                  &(SDL_Rect){x + btnCX - btnX, y + btnCY});
+                  &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY});
   SDL_FreeSurface(btnKey);
 }
 
