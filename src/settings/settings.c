@@ -19,23 +19,25 @@ char *menuItems[MENU_ITEMS];
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
-static int briMax = MAX_BRIGHTNESS;
+static int britMax = MAX_BRIGHTNESS;
 
-void settingsMenu(SDL_Surface *surface, int selected, int value, int i) {
+static int calcProgress(int width, int value, int minValue, int maxValue) {
+  int progress = width * ((float)(value - minValue) / (maxValue - minValue));
+  return progress;
+};
+
+void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValue, int i) {
 #define MIN(a, b) (a) < (b) ? (a) : (b)
   char *item = menuItems[i];
   int rowCount = 4;
   int marginLeft = 32;
-  int background = selected == SETTINGS_VOLUMN || selected == SETTINGS_SCREEN
-                       ? SDL_MapRGB(surface->format, TRIAD_GRAY)
-                       : SDL_MapRGB(surface->format, TRIAD_WHITE);
+  int background = selected == SETTINGS_VOLUMN || selected == SETTINGS_SCREEN? SDL_MapRGB(surface->format, TRIAD_GRAY): SDL_MapRGB(surface->format, TRIAD_WHITE);
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_LIGHT_TEXT);
-  SDL_Surface *sIcon = i == SETTINGS_SCREEN
-                           ? g_gfx.brightness
-                           : (i == SETTINGS_VOLUMN ? g_gfx.volume : g_gfx.mute);
+  SDL_Surface *sIcon = i == SETTINGS_SCREEN? g_gfx.brightness: (i == SETTINGS_VOLUMN ? g_gfx.volume : g_gfx.mute);
   SDL_Surface *sProgressEmpty = g_gfx.settings_bar_empty;
-  SDL_Surface *sProgressBar = g_gfx.settings_bar_full;
+  SDL_Surface *sProgressBarVol = g_gfx.settings_bar_full;
+  SDL_Surface *sProgressBarBrit = g_gfx.settings_bar_full;
 
   int iconMarginLeft = ICON_SIZE + 8;
   int row_width = text->w + marginLeft * 2;
@@ -44,9 +46,10 @@ void settingsMenu(SDL_Surface *surface, int selected, int value, int i) {
   int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * rowCount) / 2);
   int cy = (ROW_HEIGHT / 2) - (sProgressEmpty->h / 2);
-  int w = sProgressBar->w *
-          ((float)(GetVolume() - volMin) / (volMax - volMin));
-  int h = sProgressBar->h;
+
+  int volProgressW = calcProgress(sProgressBarVol->w, volValue, volMin, volMax);
+  int britProgressW = calcProgress(sProgressBarBrit->w, britValue, britMin, britMax);
+  int h = sProgressEmpty->h;
 
   if (i == selected) {
     text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_DARK_TEXT);
@@ -61,9 +64,15 @@ void settingsMenu(SDL_Surface *surface, int selected, int value, int i) {
       SDL_BlitSurface(sProgressEmpty, NULL, surface,
                       &(SDL_Rect){marginLeft + iconMarginLeft,
                                   screen_center + (i * ROW_HEIGHT) + cy});
-      SDL_BlitSurface(sProgressBar, &(SDL_Rect){0, 0, w, h}, surface,
+     if (selected == SETTINGS_VOLUMN) {
+       SDL_BlitSurface(sProgressBarVol, &(SDL_Rect){0, 0, volProgressW, h}, surface,
                       &(SDL_Rect){marginLeft + iconMarginLeft,
-                                  screen_center + (i * ROW_HEIGHT) + cy, w, h});
+                                  screen_center + (i * ROW_HEIGHT) + cy, volProgressW, h});
+     } else {
+       SDL_BlitSurface(sProgressBarBrit, &(SDL_Rect){0, 0, britProgressW, h}, surface,
+                      &(SDL_Rect){marginLeft + iconMarginLeft,
+                                  screen_center + (i * ROW_HEIGHT) + cy, britProgressW, h});
+     }
     } else {
       SDL_FillRect(
           surface,
@@ -81,9 +90,9 @@ void settingsMenu(SDL_Surface *surface, int selected, int value, int i) {
     SDL_BlitSurface(sProgressEmpty, NULL, surface,
                     &(SDL_Rect){marginLeft + iconMarginLeft,
                                 screen_center + (i * ROW_HEIGHT) + cy});
-    SDL_BlitSurface(sProgressBar, &(SDL_Rect){0, 0, w, h}, surface,
+    SDL_BlitSurface(sProgressBarVol, &(SDL_Rect){0, 0, volProgressW, h}, surface,
                     &(SDL_Rect){marginLeft + iconMarginLeft,
-                                screen_center + (i * ROW_HEIGHT) + cy, w, h});
+                                screen_center + (i * ROW_HEIGHT) + cy, volProgressW, h});
   } else if (i == SETTINGS_SCREEN) {
     SDL_BlitSurface(
         sIcon, NULL, surface,
@@ -91,9 +100,9 @@ void settingsMenu(SDL_Surface *surface, int selected, int value, int i) {
     SDL_BlitSurface(sProgressEmpty, NULL, surface,
                     &(SDL_Rect){marginLeft + iconMarginLeft,
                                 screen_center + (i * ROW_HEIGHT) + cy});
-    SDL_BlitSurface(sProgressBar, &(SDL_Rect){0, 0, w, h}, surface,
+    SDL_BlitSurface(sProgressBarBrit, &(SDL_Rect){0, 0, britProgressW, h}, surface,
                     &(SDL_Rect){marginLeft + iconMarginLeft,
-                                screen_center + (i * ROW_HEIGHT) + cy, w, h});
+                                screen_center + (i * ROW_HEIGHT) + cy, britProgressW, h});
   } else {
     SDL_BlitSurface(
         text, &(SDL_Rect){0, 0, max_width, text->h}, surface,
@@ -109,11 +118,6 @@ void initSettings(SDL_Surface *surface, int selected, int volValue,int britValue
   menuItems[SETTINGS_VOLUMN] = "Adjust volumn";
 
   for (int i = 0; i < MENU_ITEMS; i++) {
-    settingsMenu(surface, selected, volValue, i);
+    settingsMenu(surface, selected, volValue, britValue, i);
   }
-}
-
-void showSomeSettings(SDL_Surface *surface) {
-  paragraph(surface, "Showing message from settings", 0, 0, SCREEN_WIDTH,
-            SCREEN_HEIGHT);
 }

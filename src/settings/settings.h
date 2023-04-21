@@ -20,6 +20,5 @@ typedef enum UtilIcons {
 extern char *menuItems[MENU_ITEMS];
 
 void initSettings(SDL_Surface *surface, int selected, int volValue, int britValue);
-void showSomeSettings(SDL_Surface *surface);
 
 #endif
