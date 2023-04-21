@@ -66,9 +66,4 @@
 #define AUTO_RESUME_PATH "/mnt/SDCARD/.userdata/.retroplay/auto_resume.txt"
 #define AUTO_RESUME_SLOT "9"
 
-// Icons
-#define BRIGHTNESS_ICON 0
-#define VOLUME_ICON 1
-#define VOLUME_MUTE_ICON 2
-
 #endif

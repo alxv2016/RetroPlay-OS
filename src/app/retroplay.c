@@ -23,13 +23,16 @@
 
 ///////////////////////////////////////
 GFX g_gfx;
-int adjustVolumnBrit = 0;
+int utilIcon = VOLUME_ICON;
+static int volMin = MIN_VOLUME;
+static int volMax = MAX_VOLUME;
+static int britMin = MIN_BRIGHTNESS;
+static int briMax = MAX_BRIGHTNESS;
 
 int main(int argc, char *argv[]) {
   rumble(OFF);
-  if (autoResume())
-    return 0; // nothing to do
   menuSuperShortPulse();
+  if (autoResume()) {return 0;}
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
 
@@ -39,7 +42,7 @@ int main(int argc, char *argv[]) {
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
                                   SDL_HWSURFACE | SDL_DOUBLEBUF);
-
+  SDL_Surface* settingSurface;
   GFX_init();
   GFX_ready();
   Menu_init();
@@ -49,110 +52,165 @@ int main(int argc, char *argv[]) {
   int was_charging = isCharging();
   unsigned long charge_start = SDL_GetTicks();
   int showSettings = 0;
-  int setting_value = 0;
-  int setting_min = 0;
-  int setting_max = 0;
-  unsigned long setting_start = 0;
-  unsigned long cancel_start = SDL_GetTicks();
+  int volValue = GetVolume();
+  int britValue = GetBrightness();
+  int settingSelected = 0;
+  // int setting_value = 0;
+  // int setting_min = 0;
+  // int setting_max = 0;
+  unsigned long settingStart = 0;
+  unsigned long cancelSettingStart = SDL_GetTicks();
+
   unsigned long power_start = 0;
 
   while (!quit) {
     unsigned long frameStart = SDL_GetTicks();
     Input_poll();
+    int oldVolValue = volValue;
+    int oldBritValue = britValue;
+    int oldUtilIcon = utilIcon;
     int selected = top->selected;
     int total = top->entries->count;
 
-    if (Input_justReleased(BTN_MENU) && !adjustVolumnBrit) {
-      showSettings = 1;
-      dirty = 1;
+    if (showSettings) {
+      if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU))) {
+				showSettings = 0;
+				dirty = 1;
+			} else if (Input_justPressed(BTN_A)) {
+        switch(settingSelected) {
+          case SETTINGS_SLEEP:
+          fauxSleep();
+          quit = 1;
+          break;
+          case SETTINGS_POWER:
+          powerOff();
+          quit = 1;
+          break;
+        }
+        //TODO: add status switch case to track options
+      } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
+        volValue = GetVolume();
+        // switch(selected) {
+        // // case SETTINGS_SCREEN:
+        // // volBritValue = GetBrightness();
+        // // volBritMax = MIN_BRIGHTNESS;
+        // // volBritMax = MAX_BRIGHTNESS;
+        // // break;
+        // case SETTINGS_VOLUMN:
+        // volBritValue = GetVolume();
+        // volBritMin = MIN_VOLUME;
+        // volBritMax = MAX_VOLUME;
+        // break;
+        // }
     }
 
-    if (total > 0) {
-      if (Input_justRepeated(BTN_UP)) {
-        selected -= 1;
-        if (selected < 0) {
-          selected = total - 1;
-          int start = total - ROW_COUNT;
-          top->start = (start < 0) ? 0 : start;
-          top->end = total;
-        } else if (selected < top->start) {
-          top->start -= 1;
-          top->end -= 1;
+      if (Input_justPressed(BTN_UP)) {
+        settingSelected -= 1;
+        if (settingSelected<0) {
+          settingSelected += MENU_ITEMS;
         }
-      } else if (Input_justRepeated(BTN_DOWN)) {
-        selected += 1;
-        if (selected >= total) {
-          selected = 0;
-          top->start = 0;
-          top->end = (total < ROW_COUNT) ? total : ROW_COUNT;
-        } else if (selected >= top->end) {
-          top->start += 1;
-          top->end += 1;
+        dirty = 1;
+      } else if (Input_justPressed(BTN_DOWN)) {
+        settingSelected += 1;
+        if (settingSelected>=MENU_ITEMS) {
+          settingSelected -= MENU_ITEMS;
         }
-      }
-      if (Input_justRepeated(BTN_LEFT)) {
-        // Scan games alphabetically
-        Entry *entry = top->entries->items[selected];
-        int i = entry->alpha - 1;
-        if (i >= 0) {
-          selected = top->alphas->items[i];
-          if (total > ROW_COUNT) {
-            top->start = selected;
-            top->end = top->start + ROW_COUNT;
-            if (top->end > total)
-              top->end = total;
-            top->start = top->end - ROW_COUNT;
-          }
-        }
-      } else if (Input_justRepeated(BTN_RIGHT)) {
-        Entry *entry = top->entries->items[selected];
-        int i = entry->alpha + 1;
-        if (i < top->alphas->count) {
-          selected = top->alphas->items[i];
-          if (total > ROW_COUNT) {
-            top->start = selected;
-            top->end = top->start + ROW_COUNT;
-            if (top->end > total)
-              top->end = total;
-            top->start = top->end - ROW_COUNT;
-          }
-        }
-      }
-    }
-
-    if (selected != top->selected) {
-      top->selected = selected;
-      dirty = 1;
-    }
-    /*   */
-    if (dirty && total > 0)
-      readyResume(top->entries->items[top->selected]);
-
-    if (total > 0 && Input_justReleased(BTN_X)) {
-      if (can_resume) {
-        should_resume = 1;
-        Entry_open(top->entries->items[top->selected]);
         dirty = 1;
       }
-    } else if (total > 0 && Input_justPressed(BTN_A)) {
-      Entry_open(top->entries->items[top->selected]);
-      total = top->entries->count;
-      dirty = 1;
 
-      if (total > 0)
-        readyResume(top->entries->items[top->selected]);
-    } else if (Input_justPressed(BTN_B) && stack->count > 1) {
-      closeDirectory();
-      total = top->entries->count;
+
+    } else if (Input_justReleased(BTN_MENU)) {
+      showSettings = 1;
       dirty = 1;
-      // can_resume = 0;
-      if (total > 0)
+    } else {
+      if (total > 0) {
+        if (Input_justRepeated(BTN_UP)) {
+          selected -= 1;
+          if (selected < 0) {
+            selected = total - 1;
+            int start = total - ROW_COUNT;
+            top->start = (start < 0) ? 0 : start;
+            top->end = total;
+          } else if (selected < top->start) {
+            top->start -= 1;
+            top->end -= 1;
+          }
+        } else if (Input_justRepeated(BTN_DOWN)) {
+          selected += 1;
+          if (selected >= total) {
+            selected = 0;
+            top->start = 0;
+            top->end = (total < ROW_COUNT) ? total : ROW_COUNT;
+          } else if (selected >= top->end) {
+            top->start += 1;
+            top->end += 1;
+          }
+        }
+        if (Input_justRepeated(BTN_LEFT)) {
+          // Scan games alphabetically
+          Entry *entry = top->entries->items[selected];
+          int i = entry->alpha - 1;
+          if (i >= 0) {
+            selected = top->alphas->items[i];
+            if (total > ROW_COUNT) {
+              top->start = selected;
+              top->end = top->start + ROW_COUNT;
+              if (top->end > total)
+                top->end = total;
+              top->start = top->end - ROW_COUNT;
+            }
+          }
+        } else if (Input_justRepeated(BTN_RIGHT)) {
+          Entry *entry = top->entries->items[selected];
+          int i = entry->alpha + 1;
+          if (i < top->alphas->count) {
+            selected = top->alphas->items[i];
+            if (total > ROW_COUNT) {
+              top->start = selected;
+              top->end = top->start + ROW_COUNT;
+              if (top->end > total)
+                top->end = total;
+              top->start = top->end - ROW_COUNT;
+            }
+          }
+        }
+      }
+
+      if (selected != top->selected) {
+        top->selected = selected;
+        dirty = 1;
+      }
+      /*   */
+      if (dirty && total > 0)
         readyResume(top->entries->items[top->selected]);
+
+      if (total > 0 && Input_justReleased(BTN_X)) {
+        if (can_resume) {
+          should_resume = 1;
+          Entry_open(top->entries->items[top->selected]);
+          dirty = 1;
+        }
+      } else if (total > 0 && Input_justPressed(BTN_A)) {
+        Entry_open(top->entries->items[top->selected]);
+        total = top->entries->count;
+        dirty = 1;
+
+        if (total > 0)
+          readyResume(top->entries->items[top->selected]);
+      } else if (Input_justPressed(BTN_B) && stack->count > 1) {
+        closeDirectory();
+        total = top->entries->count;
+        dirty = 1;
+        // can_resume = 0;
+        if (total > 0)
+          readyResume(top->entries->items[top->selected]);
+      }
+
     }
 
     unsigned long now = SDL_GetTicks();
     if (Input_anyPressed())
-      cancel_start = now;
+      cancelSettingStart = now;
 
     if (dirty || now - charge_start >= CHARGE_DELAY) {
       int is_charging = isCharging();
@@ -171,59 +229,43 @@ int main(int argc, char *argv[]) {
       power_start = now;
     }
 
-    if (now - cancel_start >= SLEEP_DELAY && preventAutosleep())
-      cancel_start = now;
+    if (now - cancelSettingStart >= SLEEP_DELAY && preventAutosleep())
+      cancelSettingStart = now;
 
-    if (now - cancel_start >= SLEEP_DELAY ||
+    if (now - cancelSettingStart >= SLEEP_DELAY ||
         Input_justReleased(BTN_POWER)) // || Input_justPressed(BTN_MENU))
     {
       fauxSleep();
-      cancel_start = SDL_GetTicks();
+      cancelSettingStart = SDL_GetTicks();
       power_start = 0;
       dirty = 1;
     }
 
     int was_dirty = dirty; // dirty list (not including settings/battery)
 
-    int old_setting = adjustVolumnBrit;
-    int old_value = setting_value;
-    adjustVolumnBrit = 0;
-
-    if (Input_isPressed(BTN_START) && (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS))) {
-      adjustVolumnBrit = 1;
-      setting_value = GetBrightness();
-      setting_min = MIN_BRIGHTNESS;
-      setting_max = MAX_BRIGHTNESS;
-    }
-    // Changed to start instead of menu to activate brightness
-    else if (Input_isPressed(BTN_START) && old_setting == 1) {
-      adjustVolumnBrit = 1;
-      setting_value = GetBrightness();
-      setting_min = MIN_BRIGHTNESS;
-      setting_max = MAX_BRIGHTNESS;
-    } else if (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS)) {
-      adjustVolumnBrit = 2;
-      setting_value = GetVolume();
-      setting_min = MIN_VOLUME;
-      setting_max = MAX_VOLUME;
+    if (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS)) {
+      utilIcon = VOLUME_ICON;
+      volValue = GetVolume();
     }
 
-    if (old_setting && !adjustVolumnBrit)
-      setting_start = SDL_GetTicks();
+    if (oldUtilIcon && !utilIcon)
+      settingStart = SDL_GetTicks();
 
-    if (old_value != setting_value)
+    if (oldVolValue != volValue)
       dirty = 1;
-    else if (!old_setting && adjustVolumnBrit)
+    else if (!oldUtilIcon && utilIcon)
       dirty = 1;
-    else if (setting_start > 0 && SDL_GetTicks() - setting_start > 500) {
+    else if (settingStart > 0 && SDL_GetTicks() - settingStart > 500) {
       dirty = 1;
-      setting_start = 0;
+      settingStart = 0;
     }
 
     if (dirty) {
       SDL_FillRect(g_gfx.screen, NULL, 0);
       if (showSettings) {
-        initSettings(g_gfx.screen);
+        initSettings(g_gfx.screen, settingSelected, volValue, britValue);
+        // showSomeSettings(g_gfx.screen);
+        // SDL_BlitSurface(nscreen, NULL, g_gfx.screen, NULL);
       } else {
         if (total > 0) {
           int selected_row = top->selected - top->start;
@@ -244,25 +286,32 @@ int main(int argc, char *argv[]) {
       //     button(g_gfx.screen, "X", "Resume", 0, 557, 419);
       // }
 
-      if (total == 0 && stack->count > 1) {
-        button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
-      } else if (total > 0 && stack->count > 1) {
-        button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
-        button(g_gfx.screen, "B", "Back", 1, 1, SCREEN_WIDTH - PADDING_LR - 101, 419);
-      } else {
+
+      if (showSettings) {
         button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+        button(g_gfx.screen, "B", "Close", 1, 1, SCREEN_WIDTH - PADDING_LR - 120, 419);
+      } else {
+        if (total == 0 && stack->count > 1) {
+          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+        } else if (total > 0 && stack->count > 1) {
+          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+          button(g_gfx.screen, "B", "Back", 1, 1, SCREEN_WIDTH - PADDING_LR - 101, 419);
+        } else {
+          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+        }
       }
+
 
       batteryStatus(g_gfx.screen, 576, 12);
 
-      if (adjustVolumnBrit) {
+      if (utilIcon) {
         volumnBrightness(g_gfx.screen, PADDING_LR, 419,
-                        adjustVolumnBrit == VOLUME_ICON
+                        utilIcon == VOLUME_ICON
                             ? BRIGHTNESS_ICON
-                            : (setting_value > BRIGHTNESS_ICON
+                            : (volValue > BRIGHTNESS_ICON
                                     ? VOLUME_ICON
-                                    : VOLUME_MUTE_ICON),
-                        setting_value, setting_min, setting_max);
+                                    : MUTE_ICON),
+                        volValue, volMin, volMax);
       }
     }
 
