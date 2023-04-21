@@ -27,12 +27,14 @@ int utilIcon = VOLUME_ICON;
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
-static int briMax = MAX_BRIGHTNESS;
+static int britMax = MAX_BRIGHTNESS;
 
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
-  if (autoResume()) {return 0;}
+  if (autoResume()) {
+    return 0;
+  }
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
 
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
                                   SDL_HWSURFACE | SDL_DOUBLEBUF);
-  SDL_Surface* settingSurface;
+  SDL_Surface *settingSurface;
   GFX_init();
   GFX_ready();
   Menu_init();
@@ -74,50 +76,69 @@ int main(int argc, char *argv[]) {
 
     if (showSettings) {
       if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU))) {
-				showSettings = 0;
-				dirty = 1;
-			} else if (Input_justPressed(BTN_A)) {
-        switch(settingSelected) {
-          case SETTINGS_SLEEP:
+        showSettings = 0;
+        dirty = 1;
+      } else if (Input_justPressed(BTN_A)) {
+        switch (settingSelected) {
+        case SETTINGS_SLEEP:
           fauxSleep();
           quit = 1;
           break;
-          case SETTINGS_POWER:
+        case SETTINGS_POWER:
           powerOff();
           quit = 1;
           break;
         }
-        //TODO: add status switch case to track options
+        // TODO: add status switch case to track options
       } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
         volValue = GetVolume();
-        // switch(selected) {
-        // // case SETTINGS_SCREEN:
-        // // volBritValue = GetBrightness();
-        // // volBritMax = MIN_BRIGHTNESS;
-        // // volBritMax = MAX_BRIGHTNESS;
-        // // break;
-        // case SETTINGS_VOLUMN:
-        // volBritValue = GetVolume();
-        // volBritMin = MIN_VOLUME;
-        // volBritMax = MAX_VOLUME;
-        // break;
-        // }
-    }
+      } else if (Input_justRepeated(BTN_LEFT)) {
+        switch (settingSelected) {
+        case SETTINGS_SCREEN:
+          britValue = GetBrightness();
+          if (britValue > britMin)
+            SetBrightness(--britValue);
+          if (britValue == britMin)
+            SetBrightness(britMin);
+          break;
+        case SETTINGS_VOLUMN:
+          volValue = GetVolume();
+          if (volValue > volMin)
+            SetVolume(--volValue);
+          if (volValue == volMin)
+            SetMute(1);
+          break;
+        }
+      } else if (Input_justRepeated(BTN_RIGHT)) {
+        switch (settingSelected) {
+        case SETTINGS_SCREEN:
+          britValue = GetBrightness();
+          if (britValue < britMax)
+            SetBrightness(++britValue);
+          break;
+        case SETTINGS_VOLUMN:
+          volValue = GetVolume();
+          if (volValue < volMax)
+            SetVolume(++volValue);
+          if (volValue > volMin)
+            SetMute(0);
+          break;
+        }
+      }
 
       if (Input_justPressed(BTN_UP)) {
         settingSelected -= 1;
-        if (settingSelected<0) {
+        if (settingSelected < 0) {
           settingSelected += MENU_ITEMS;
         }
         dirty = 1;
       } else if (Input_justPressed(BTN_DOWN)) {
         settingSelected += 1;
-        if (settingSelected>=MENU_ITEMS) {
+        if (settingSelected >= MENU_ITEMS) {
           settingSelected -= MENU_ITEMS;
         }
         dirty = 1;
       }
-
 
     } else if (Input_justReleased(BTN_MENU)) {
       showSettings = 1;
@@ -205,7 +226,6 @@ int main(int argc, char *argv[]) {
         if (total > 0)
           readyResume(top->entries->items[top->selected]);
       }
-
     }
 
     unsigned long now = SDL_GetTicks();
@@ -251,7 +271,7 @@ int main(int argc, char *argv[]) {
     if (oldUtilIcon && !utilIcon)
       settingStart = SDL_GetTicks();
 
-    if (oldVolValue != volValue)
+    if (oldVolValue != volValue || oldBritValue != britValue)
       dirty = 1;
     else if (!oldUtilIcon && utilIcon)
       dirty = 1;
@@ -272,10 +292,11 @@ int main(int argc, char *argv[]) {
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
             listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
-            selected_row);
+                     selected_row);
           }
         } else {
-          paragraph(g_gfx.screen, "No games detected,\n load some games.", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+          paragraph(g_gfx.screen, "No games detected,\n load some games.", 0, 0,
+                    SCREEN_WIDTH, SCREEN_HEIGHT);
         }
       }
 
@@ -286,32 +307,35 @@ int main(int argc, char *argv[]) {
       //     button(g_gfx.screen, "X", "Resume", 0, 557, 419);
       // }
 
-
       if (showSettings) {
-        button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
-        button(g_gfx.screen, "B", "Close", 1, 1, SCREEN_WIDTH - PADDING_LR - 120, 419);
+        button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR,
+               419);
+        button(g_gfx.screen, "B", "Close", 1, 1,
+               SCREEN_WIDTH - PADDING_LR - 120, 419);
       } else {
         if (total == 0 && stack->count > 1) {
-          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - PADDING_LR,
+                 419);
         } else if (total > 0 && stack->count > 1) {
-          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
-          button(g_gfx.screen, "B", "Back", 1, 1, SCREEN_WIDTH - PADDING_LR - 101, 419);
+          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - PADDING_LR,
+                 419);
+          button(g_gfx.screen, "B", "Back", 1, 1,
+                 SCREEN_WIDTH - PADDING_LR - 101, 419);
         } else {
-          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR, 419);
+          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR,
+                 419);
         }
       }
-
 
       batteryStatus(g_gfx.screen, 576, 12);
 
       if (utilIcon) {
-        volumnBrightness(g_gfx.screen, PADDING_LR, 419,
-                        utilIcon == VOLUME_ICON
-                            ? BRIGHTNESS_ICON
-                            : (volValue > BRIGHTNESS_ICON
-                                    ? VOLUME_ICON
-                                    : MUTE_ICON),
-                        volValue, volMin, volMax);
+        volumnBrightness(
+            g_gfx.screen, PADDING_LR, 419,
+            utilIcon == VOLUME_ICON
+                ? BRIGHTNESS_ICON
+                : (volValue > BRIGHTNESS_ICON ? VOLUME_ICON : MUTE_ICON),
+            volValue, volMin, volMax);
       }
     }
 

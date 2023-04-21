@@ -124,17 +124,20 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        if (menu_pressed > 0) {
-          val = GetBrightness();
-          if (val < MAX_BRIGHTNESS)
-            SetBrightness(++val);
-        } else {
-          val = GetVolume();
-          if (val < MAX_VOLUME)
-            SetVolume(++val);
-          if (val > 0)
-            SetMute(0);
-        }
+        val = GetVolume();
+        if (val < MAX_VOLUME) SetVolume(++val);
+        if (val > 0) SetMute(0);
+        // if (menu_pressed > 0) {
+        //   val = GetBrightness();
+        //   if (val < MAX_BRIGHTNESS)
+        //     SetBrightness(++val);
+        // } else {
+        //   val = GetVolume();
+        //   if (val < MAX_VOLUME)
+        //     SetVolume(++val);
+        //   if (val > 0)
+        //     SetMute(0);
+        // }
       }
       break;
     case BUTTON_VOLDOWN:
@@ -146,17 +149,20 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        if (menu_pressed > 0) {
-          val = GetBrightness();
-          if (val > 0)
-            SetBrightness(--val);
-        } else {
           val = GetVolume();
-          if (val > 0)
-            SetVolume(--val);
-          if (val == 0)
-            SetMute(1);
-        }
+          if (val > 0) SetVolume(--val);
+          if (val == 0) SetMute(1);
+        // if (menu_pressed > 0) {
+        //   val = GetBrightness();
+        //   if (val > 0)
+        //     SetBrightness(--val);
+        // } else {
+        //   val = GetVolume();
+        //   if (val > 0)
+        //     SetVolume(--val);
+        //   if (val == 0)
+        //     SetMute(1);
+        // }
       }
       break;
     default:

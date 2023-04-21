@@ -34,10 +34,20 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int background = selected == SETTINGS_VOLUMN || selected == SETTINGS_SCREEN? SDL_MapRGB(surface->format, TRIAD_GRAY): SDL_MapRGB(surface->format, TRIAD_WHITE);
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_LIGHT_TEXT);
-  SDL_Surface *sIcon = i == SETTINGS_SCREEN? g_gfx.brightness: (i == SETTINGS_VOLUMN ? g_gfx.volume : g_gfx.mute);
+  SDL_Surface *sIcon;
   SDL_Surface *sProgressEmpty = g_gfx.settings_bar_empty;
   SDL_Surface *sProgressBarVol = g_gfx.settings_bar_full;
   SDL_Surface *sProgressBarBrit = g_gfx.settings_bar_full;
+
+  switch(i) {
+    case SETTINGS_SCREEN:
+    sIcon = g_gfx.brightness;
+    break;
+    case SETTINGS_VOLUMN:
+    sIcon = g_gfx.volume;
+    volValue == 0 ? sIcon = g_gfx.mute : g_gfx.volume;
+    break;
+  }
 
   int iconMarginLeft = ICON_SIZE + 8;
   int row_width = text->w + marginLeft * 2;
