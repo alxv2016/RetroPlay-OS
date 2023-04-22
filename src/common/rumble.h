@@ -13,4 +13,5 @@ void superShortPulse(void);
 void menuShortPulse(void);
 void menuSuperShortPulse(void);
 
+void playClick(void);
 #endif

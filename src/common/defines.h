@@ -9,6 +9,8 @@
 #define TRIAD_DARK_GRAY 0x26, 0x26, 0x26
 #define TRIAD_LIGHT_TEXT 0xcc, 0xcc, 0xcc
 #define TRIAD_DARK_TEXT 0x00, 0x00, 0x00
+#define TRIAD_ACTIVE 0x23, 0x23, 0x23
+#define TRIAD_ACCENT 0xDB, 0xFF, 0x4D
 // Colors
 #define COLOR_WHITE (SDL_Color){TRIAD_WHITE}
 #define COLOR_GRAY (SDL_Color){TRIAD_GRAY}
@@ -17,6 +19,8 @@
 #define COLOR_DARK_TEXT (SDL_Color){TRIAD_DARK_TEXT}
 #define COLOR_GRAY_TEXT (SDL_Color){TRIAD_GRAY}
 #define COLOR_BUTTON_TEXT (SDL_Color){TRIAD_GRAY}
+#define COLOR_ACTIVE (SDL_Color){TRIAD_ACTIVE}
+#define COLOR_ACCENT (SDL_Color){TRIAD_ACCENT}
 
 // Screen size
 #define SCREEN_WIDTH 640
@@ -49,6 +53,7 @@
 #define MAX_PATH 512
 #define TEMP_PATH "/tmp/"
 #define BATTERY_INFO "/tmp/battery"
+#define SOUND_PATH "/customer/app/sound/change.wav"
 
 #define SDCARD_PATH "/mnt/SDCARD"
 #define RES_PATH "/mnt/SDCARD/.system/res"

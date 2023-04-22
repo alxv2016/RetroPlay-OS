@@ -8,6 +8,7 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include <msettings.h>
 
@@ -32,18 +33,17 @@ static int britMax = MAX_BRIGHTNESS;
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
-  if (autoResume()) {
-    return 0;
-  }
-  SDL_Init(SDL_INIT_VIDEO);
+  if (autoResume()) { return 0; }
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();
 
   SDL_ShowCursor(0);
   SDL_EnableKeyRepeat(300, 100);
 
   InitSettings();
-  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
-                                  SDL_HWSURFACE | SDL_DOUBLEBUF);
+  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  Mix_OpenAudio(48000, 32784, 1, 4096);
+  
   SDL_Surface *settingSurface;
   GFX_init();
   GFX_ready();
@@ -91,6 +91,7 @@ int main(int argc, char *argv[]) {
         }
         // TODO: add status switch case to track options
       } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
+        playClick();
         volValue = GetVolume();
       } else if (Input_justRepeated(BTN_LEFT)) {
         switch (settingSelected) {
@@ -127,12 +128,14 @@ int main(int argc, char *argv[]) {
       }
 
       if (Input_justPressed(BTN_UP)) {
+        playClick();
         settingSelected -= 1;
         if (settingSelected < 0) {
           settingSelected += MENU_ITEMS;
         }
         dirty = 1;
       } else if (Input_justPressed(BTN_DOWN)) {
+        playClick();
         settingSelected += 1;
         if (settingSelected >= MENU_ITEMS) {
           settingSelected -= MENU_ITEMS;

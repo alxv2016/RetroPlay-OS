@@ -14,7 +14,7 @@ CC = $(CROSS_COMPILE)gcc
 SYS_ROOT := $(shell $(CC) --print-sysroot)
 INCLUDE_DIR = $(SYS_ROOT)/usr/include
 CFLAGS = -I$(INCLUDE_DIR) -I. -I../common -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z) -std=gnu99
-LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lmsettings -lrt -lz -lm
+LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lSDL_mixer -lmsettings -lrt -lz -lm
 OPTM=-O3
 
 OBJS = ../common/utils.c ../common/api.c ../common/interface.c ../common/controls.c ../common/powerops.c ../common/rumble.c ../settings/settings.c

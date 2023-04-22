@@ -466,7 +466,7 @@ Array *getRoot(Array *recents) {
   Array_free(entries); // root now owns entries' entries
 
   char tools_path[256];
-  sprintf(tools_path, "%s/Tools", SDCARD_PATH);
+  sprintf(tools_path, "%s/Apps", SDCARD_PATH);
   if (exists(tools_path))
     Array_push(root, Entry_new(tools_path, ENTRY_DIR));
   return root;

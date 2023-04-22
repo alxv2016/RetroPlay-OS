@@ -75,10 +75,10 @@ build: dirs
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/miyoo354/app/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/miyoo354/app/
 
-	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Tools/Files.pak/
-	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Tools/Clock.pak/
-	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Tools/Files.pak/
-	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Tools/Screenshots.pak/
+	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Apps/Files.pak/
+	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Apps/Clock.pak/
+	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Apps/Files.pak/
+	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshots.pak/
 
 # NOTE: Saved build time with pre-build cores
 	cp $(ROOT_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
@@ -113,7 +113,7 @@ release:
 	cd $(BUILD_DIR)/dist/.system/paks/retroplay.pak && echo "$(RELEASE_NAME).zip" > version.txt
 	cd $(BUILD_DIR)/dist && zip -r retroplay.zip .system .tmp_update
 	mv $(BUILD_DIR)/dist/retroplay.zip $(BUILD_DIR)/dist/miyoo354/app/
-	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves Tools miyoo354 README.txt
+	cd $(BUILD_DIR)/dist && zip -r $(RELEASE_DIR)/$(RELEASE_NAME).zip Bios Roms Saves Apps miyoo354 README.txt
 	$(ECHO)
 
 zip-bundles: build $(BUNDLE_LIBS) zip

@@ -11,7 +11,7 @@
 
 #include "../common/defines.h"
 
-#define STOCK_FONT "/customer/app/BPreplayBold.otf"
+#define STOCK_FONT "/customer/app/Helvetica-Neue-2.ttf"
 
 /* System message, this module is used by the MainUI.sh and launch.sh
 scripts to show messages during installation, updates and other messages.

@@ -5,12 +5,15 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <SDL/SDL_mixer.h>
+#include <msettings.h>
 
+#include "defines.h"
 #include "rumble.h"
-
 
 /* RUMBLE */
 
+static Mix_Chunk *clickSound = NULL;
 static int super_short_timings[] = {0, 25, 50, 75};
 static int short_timings[] = {0, 50, 100, 150};
 static int msleep_interrupt = 0;
@@ -80,4 +83,15 @@ void menuSuperShortPulse(void) {
   rumble(ON);
   msleep(super_short_timings[vibration_timing]);
   rumble(OFF);
+}
+
+void playClick(void) {
+    if (Mix_OpenAudio(48000, 32784, 1, 4096) < 0) return;
+    char sound_path[512];
+    snprintf(sound_path, 512 * 2 - 1, "%s", SOUND_PATH);
+    // int volume = GetVolume() > 0? GetVolume() * 4: 0;
+    if (clickSound == NULL) clickSound = Mix_LoadWAV(sound_path);
+    // NOTE: Mix Volume is suppose to make a sound louder, but not getting expected results..
+    // Mix_Volume(-1, 20);
+    Mix_PlayChannel(-1, clickSound, 0);
 }

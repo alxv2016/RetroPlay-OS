@@ -32,8 +32,9 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int rowCount = 4;
   int marginLeft = 32;
   int background = selected == SETTINGS_VOLUMN || selected == SETTINGS_SCREEN
-                       ? SDL_MapRGB(surface->format, TRIAD_GRAY)
-                       : SDL_MapRGB(surface->format, TRIAD_GRAY);
+                       ? SDL_MapRGB(surface->format, TRIAD_ACTIVE)
+                       : SDL_MapRGB(surface->format, TRIAD_ACTIVE);
+  int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_LIGHT_TEXT);
   SDL_Surface *powerIcon = g_gfx.power;
@@ -57,23 +58,20 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int progressBrit = calcProgress(progressBritBar->w, britValue, britMin, britMax);
 
   if (i == selected) {
-    text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_DARK_TEXT);
+    SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
+    SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
      if (selected == SETTINGS_VOLUMN) {
-        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
         SDL_BlitSurface(volIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
         SDL_BlitSurface(progressVolBar, &(SDL_Rect){0, 0, progressVol, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressVol, h});
      } else if (selected == SETTINGS_SCREEN) {
-        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
         SDL_BlitSurface(britIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
         SDL_BlitSurface(progressBritBar, &(SDL_Rect){0, 0, progressBrit, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressBrit, h}); 
      } else if (selected == SETTINGS_POWER) {
-        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
         SDL_BlitSurface(powerIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
      } else if (selected == SETTINGS_SLEEP) {
-        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
         SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(text, &(SDL_Rect){0, 0,iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
      }
@@ -104,7 +102,6 @@ void initSettings(SDL_Surface *surface, int selected, int volValue,
   menuItems[SETTINGS_POWER] = "Shut down";
   menuItems[SETTINGS_SCREEN] = "Screen Brightness";
   menuItems[SETTINGS_VOLUMN] = "Adjust volumn";
-
   for (int i = 0; i < MENU_ITEMS; i++) {
     settingsMenu(surface, selected, volValue, britValue, i);
   }
