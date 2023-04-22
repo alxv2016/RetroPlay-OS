@@ -7,12 +7,12 @@ endif
 TARGET = keymon
 
 CC = $(CROSS_COMPILE)gcc
-FLAGS	= -Os -lmsettings -lpthread -lrt -ldl -Wl,--gc-sections -s
+FLAGS	= -Os -lmsettings -lSDL -lSDL_mixer -lpthread -lrt -ldl -Wl,--gc-sections -s
 
-OBJS =
+OBJS = ../common/rumble.c
 
 all:
-	$(CC) $(TARGET).c -o $(TARGET) $(FLAGS)
+	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(FLAGS)
 
 clean:
 	rm -rf $(TARGET).o

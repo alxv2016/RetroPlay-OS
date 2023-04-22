@@ -128,14 +128,12 @@ int main(int argc, char *argv[]) {
       }
 
       if (Input_justPressed(BTN_UP)) {
-        playClick();
         settingSelected -= 1;
         if (settingSelected < 0) {
           settingSelected += MENU_ITEMS;
         }
         dirty = 1;
       } else if (Input_justPressed(BTN_DOWN)) {
-        playClick();
         settingSelected += 1;
         if (settingSelected >= MENU_ITEMS) {
           settingSelected -= MENU_ITEMS;

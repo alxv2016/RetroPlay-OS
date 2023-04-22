@@ -9,6 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <SDL/SDL_mixer.h>
 #include <msettings.h>
 
 #include <pthread.h>
@@ -17,6 +18,7 @@
 #include <sys/types.h>
 
 #include "../common/keycontext.h"
+#include "../common/rumble.h"
 
 #include "keymon.h"
 
@@ -94,7 +96,7 @@ int main(int argc, char *argv[]) {
   register uint32_t menu_pressed = 0;
   register uint32_t power_pressed = 0;
   uint32_t repeat_vol = 0;
-  
+
   while (read(input_fd, &ev, sizeof(ev)) == sizeof(ev)) {
     val = ev.value;
     if ((ev.type != EV_KEY) || (val > REPEAT))
@@ -104,16 +106,23 @@ int main(int argc, char *argv[]) {
       if (val != REPEAT)
         menu_pressed = val;
       if (val == PRESSED)
+        playClick();
       break;
     case BUTTON_POWER:
       if (val != REPEAT)
         power_pressed = val;
       if (val == PRESSED)
-      break;
+        break;
     case BUTTON_START:
       if (val != REPEAT) {
         button_flag = button_flag & (~START) | (val << START_BIT);
       }
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_SELECT:
+      if (val == PRESSED)
+        playClick();
       break;
     case BUTTON_VOLUP:
       if (val == REPEAT) {
@@ -124,9 +133,12 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
+        playClick();
         val = GetVolume();
-        if (val < MAX_VOLUME) SetVolume(++val);
-        if (val > 0) SetMute(0);
+        if (val < MAX_VOLUME)
+          SetVolume(++val);
+        if (val > 0)
+          SetMute(0);
         // if (menu_pressed > 0) {
         //   val = GetBrightness();
         //   if (val < MAX_BRIGHTNESS)
@@ -149,9 +161,12 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-          val = GetVolume();
-          if (val > 0) SetVolume(--val);
-          if (val == 0) SetMute(1);
+        playClick();
+        val = GetVolume();
+        if (val > 0)
+          SetVolume(--val);
+        if (val == 0)
+          SetMute(1);
         // if (menu_pressed > 0) {
         //   val = GetBrightness();
         //   if (val > 0)
@@ -164,6 +179,38 @@ int main(int argc, char *argv[]) {
         //     SetMute(1);
         // }
       }
+      break;
+    case BUTTON_UP:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_DOWN:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_LEFT:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_RIGHT:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_A:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_B:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_X:
+      if (val == PRESSED)
+        playClick();
+      break;
+    case BUTTON_Y:
+      if (val == PRESSED)
+        playClick();
       break;
     default:
       break;
