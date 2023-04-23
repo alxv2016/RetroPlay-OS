@@ -309,8 +309,7 @@ int main(int argc, char *argv[]) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,
-                     selected_row);
+            listMenu(g_gfx.screen, entry->name, entry->path, entry->unique, j,selected_row);
           }
         } else {
           paragraph(g_gfx.screen, "No games detected,\n load some games.", 0, 0,

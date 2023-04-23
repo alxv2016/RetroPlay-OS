@@ -70,7 +70,7 @@
 #define FONT_PATH "/mnt/SDCARD/.system/res/OpenSans-SemiBold.ttf"
 #define DEBUG_PATH "/mnt/SDCARD/debug.txt"
 
-#define LAST_PATH "/tmp/last.txt" // transient
+#define LAST_PATH "/tmp/last.txt"
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"
 #define RESUME_SLOT_PATH "/tmp/mmenu_slot.txt"
 #define AUTO_RESUME_PATH "/mnt/SDCARD/.userdata/.retroplay/auto_resume.txt"

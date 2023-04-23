@@ -103,6 +103,14 @@ void putFile(char *path, char *contents) {
   }
 }
 
+void consoleLog(char *path, char *contents) {
+  FILE *file = fopen(path, "a+");
+  if (file) {
+    fputs(contents, file);
+    fclose(file);
+  }
+}
+
 void getFile(char *path, char *buffer, size_t buffer_size) {
   FILE *file = fopen(path, "r");
   if (file) {

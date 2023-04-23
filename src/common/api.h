@@ -16,6 +16,7 @@ typedef struct Entry {
   char *path;
   char *name;
   char *unique;
+  char *emuTag;
   int type;
   int alpha;
   int has_alt;
@@ -25,6 +26,7 @@ typedef struct Entry {
 typedef struct Directory {
   char *path;
   char *name;
+  char *emuTag;
   Array *entries;
   IntArray *alphas;
   // rendering

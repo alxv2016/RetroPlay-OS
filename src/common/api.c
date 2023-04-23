@@ -334,10 +334,13 @@ void queueNext(char *cmd) {
 
 Entry *Entry_new(char *path, int type) {
   char display_name[256];
+  char emu_tag[256];
   getDisplayName(path, display_name);
+  getEmuName(path, emu_tag);
   Entry *self = malloc(sizeof(Entry));
   self->path = strdup(path);
   self->name = strdup(display_name);
+  self->emuTag = hasEmu(emu_tag)? strdup(emu_tag): "NA";
   self->unique = NULL;
   self->type = type;
   self->alpha = 0;
@@ -349,6 +352,8 @@ Entry *Entry_new(char *path, int type) {
 void Entry_free(Entry *self) {
   free(self->path);
   free(self->name);
+  if (hasEmu(self->emuTag))
+    free(self->emuTag);
   if (self->unique)
     free(self->unique);
   free(self);
@@ -604,11 +609,14 @@ void Directory_index(Directory *self) {
 
 Directory *Directory_new(char *path, int selected, Array *recents) {
   char display_name[256];
+  char emu_tag[256];
   getDisplayName(path, display_name);
+  getEmuName(path, emu_tag);
 
   Directory *self = malloc(sizeof(Directory));
   self->path = strdup(path);
   self->name = strdup(display_name);
+  self->emuTag = hasEmu(emu_tag)? strdup(emu_tag): "NA";
   if (exactMatch(path, SDCARD_PATH)) {
     self->entries = getRoot(recents);
   } else if (exactMatch(path, FAUX_RECENT_PATH)) {
@@ -630,6 +638,8 @@ Directory *Directory_new(char *path, int selected, Array *recents) {
 void Directory_free(Directory *self) {
   free(self->path);
   free(self->name);
+  if (hasEmu(self->emuTag))
+    free(self->emuTag);
   EntryArray_free(self->entries);
   IntArray_free(self->alphas);
   free(self);
