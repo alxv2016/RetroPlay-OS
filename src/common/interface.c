@@ -39,6 +39,7 @@ void GFX_init(void) {
   g_gfx.battery_low = loadImage("battery-low.png");
   g_gfx.power = loadImage("power.png");
   g_gfx.sleep = loadImage("sleep.png");
+  g_gfx.sleep_timer = loadImage("sleep-timer.png");
 }
 
 void GFX_clear(void) {

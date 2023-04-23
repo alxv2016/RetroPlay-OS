@@ -22,6 +22,7 @@ typedef struct GFX_Context {
   SDL_Surface *digits;
   SDL_Surface *power;
   SDL_Surface *sleep;
+  SDL_Surface *sleep_timer;
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {

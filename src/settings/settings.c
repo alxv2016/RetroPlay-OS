@@ -49,6 +49,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   text = TTF_RenderUTF8_Blended(g_font.small, item, COLOR_LIGHT_TEXT);
   SDL_Surface *powerIcon = g_gfx.power;
   SDL_Surface *sleepIcon = g_gfx.sleep;
+  SDL_Surface *sleepTimerIcon = g_gfx.sleep_timer;
   SDL_Surface *britIcon = g_gfx.brightness;
   SDL_Surface *volIcon = volValue == 0? g_gfx.mute: g_gfx.volume;
   SDL_Surface *progressEmptyBar = g_gfx.settings_bar_empty;
@@ -93,7 +94,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
      } else if (selected == SETTINGS_SLEEPTIME) {
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
-        SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
+        SDL_BlitSurface(sleepTimerIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(text, &(SDL_Rect){0, 0,iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
      } 
     SDL_FreeSurface(text);
@@ -114,7 +115,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
     SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_FreeSurface(text);
   } else if (i == SETTINGS_SLEEPTIME) {
-    SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
+    SDL_BlitSurface(sleepTimerIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_FreeSurface(text);
   }
@@ -124,7 +125,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
 void initSettings(SDL_Surface *surface, int selected, int volValue, int britValue, int sleepValue) {
   setSleepTime(sleepValue);
   char sleepTimer[256];
-  sprintf(sleepTimer, "Sleep timer: %imin", sleepValue);
+  sprintf(sleepTimer, "Sleep timer: %imin", timerItems[sleepValue]);
   menuItems[SETTINGS_SLEEP] = "Sleep device";
   menuItems[SETTINGS_POWER] = "Shut down";
   menuItems[SETTINGS_SLEEPTIME] = sleepTimer;

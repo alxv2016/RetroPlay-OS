@@ -54,11 +54,10 @@ int main(int argc, char *argv[]) {
   int was_charging = isCharging();
   unsigned long charge_start = SDL_GetTicks();
   int showSettings = 0;
-  int timerValue = getSleepTime();
   int volValue = GetVolume();
   int britValue = GetBrightness();
   int settingSelected = 0;
-  int timerSelected = 0;
+  int timerSelected = getSleepTime() ? getSleepTime(): 1;
   // int setting_value = 0;
   // int setting_min = 0;
   // int setting_max = 0;
@@ -70,7 +69,7 @@ int main(int argc, char *argv[]) {
   while (!quit) {
     unsigned long frameStart = SDL_GetTicks();
     Input_poll();
-    int oldTimerValue = timerValue;
+    int oldTimerValue = timerSelected;
     int oldVolValue = volValue;
     int oldBritValue = britValue;
     int oldUtilIcon = utilIcon;
@@ -116,7 +115,7 @@ int main(int argc, char *argv[]) {
           timerSelected = getSleepTime();
           if (timerSelected > 0) {
             setSleepTime(--timerSelected);
-            timerValue = getSleepTime();
+            timerSelected = getSleepTime();
           }
           dirty = 1;
           break;
@@ -137,9 +136,9 @@ int main(int argc, char *argv[]) {
           break;
         case SETTINGS_SLEEPTIME:
           timerSelected = getSleepTime();
-          if (timerSelected < TIMER_ITEMS) {
+          if (timerSelected < TIMER_ITEMS - 1) {
             setSleepTime(++timerSelected);
-            timerValue = getSleepTime();
+            timerSelected = getSleepTime();
           }
           dirty = 1;
           break;
@@ -291,7 +290,7 @@ int main(int argc, char *argv[]) {
     if (oldUtilIcon && !utilIcon)
       settingStart = SDL_GetTicks();
 
-    if (oldVolValue != volValue || oldBritValue != britValue || oldTimerValue != timerValue)
+    if (oldVolValue != volValue || oldBritValue != britValue || oldTimerValue != timerSelected)
       dirty = 1;
     else if (!oldUtilIcon && utilIcon)
       dirty = 1;
@@ -303,7 +302,7 @@ int main(int argc, char *argv[]) {
     if (dirty) {
       SDL_FillRect(g_gfx.screen, NULL, 0);
       if (showSettings) {
-        initSettings(g_gfx.screen, settingSelected, volValue, britValue, timerValue);
+        initSettings(g_gfx.screen, settingSelected, volValue, britValue, timerSelected);
         // showSomeSettings(g_gfx.screen);
         // SDL_BlitSurface(nscreen, NULL, g_gfx.screen, NULL);
       } else {
