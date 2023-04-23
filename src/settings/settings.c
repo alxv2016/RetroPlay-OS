@@ -126,12 +126,18 @@ void initSettings(SDL_Surface *surface, int selected, int volValue, int britValu
   setSleepTime(sleepValue);
   char sleepTimer[256];
   sprintf(sleepTimer, "Sleep timer: %imin", timerItems[sleepValue]);
-  menuItems[SETTINGS_SLEEP] = "Sleep device";
-  menuItems[SETTINGS_POWER] = "Shut down";
+  menuItems[SETTINGS_SLEEP] = "Sleep mode";
+  menuItems[SETTINGS_POWER] = "Power off";
   menuItems[SETTINGS_SLEEPTIME] = sleepTimer;
-  menuItems[SETTINGS_SCREEN] = "Screen Brightness";
-  menuItems[SETTINGS_VOLUMN] = "Adjust volumn";
+  menuItems[SETTINGS_SCREEN] = "Brightness";
+  menuItems[SETTINGS_VOLUMN] = "Volumn";
 
+  SDL_Surface *firmwareInfo;
+  char firmware[256];
+  sprintf(firmware, "Firmware: %s", getenv("MIYOO_VERSION"));
+  firmwareInfo = TTF_RenderUTF8_Blended(g_font.footnote, firmware, COLOR_GRAY200);
+  SDL_BlitSurface(firmwareInfo, NULL, surface, &(SDL_Rect){32, SCREEN_HEIGHT - ((ICON_SIZE / 2) + 20)});
+  SDL_FreeSurface(firmwareInfo);
   for (int i = 0; i < MENU_ITEMS; i++) {
     settingsMenu(surface, selected, volValue, britValue, i);
   }

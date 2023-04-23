@@ -23,6 +23,7 @@ typedef struct GFX_Context {
   SDL_Surface *power;
   SDL_Surface *sleep;
   SDL_Surface *sleep_timer;
+  SDL_Surface *gameboy;
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {
@@ -30,6 +31,7 @@ typedef struct GFX_Fonts {
   TTF_Font *medium;
   TTF_Font *small;
   TTF_Font *tiny;
+  TTF_Font *footnote;
 } Font;
 
 extern GFX g_gfx;

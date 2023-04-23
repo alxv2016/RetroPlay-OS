@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         switch (settingSelected) {
         case SETTINGS_SLEEP:
           fauxSleep();
-          quit = 1;
+          dirty = 1;
           break;
         case SETTINGS_POWER:
           powerOff();
@@ -93,7 +93,6 @@ int main(int argc, char *argv[]) {
         }
         // TODO: add status switch case to track options
       } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
-        playClick();
         volValue = GetVolume();
       } else if (Input_justRepeated(BTN_LEFT)) {
         switch (settingSelected) {

@@ -11,6 +11,7 @@
 #define TRIAD_DARK_TEXT 0x00, 0x00, 0x00
 #define TRIAD_ACTIVE 0x23, 0x23, 0x23
 #define TRIAD_ACCENT 0xDB, 0xFF, 0x4D
+#define TRIAD_GRAY200 0x51, 0x51, 0x51
 // Colors
 #define COLOR_WHITE (SDL_Color){TRIAD_WHITE}
 #define COLOR_GRAY (SDL_Color){TRIAD_GRAY}
@@ -21,6 +22,7 @@
 #define COLOR_BUTTON_TEXT (SDL_Color){TRIAD_GRAY}
 #define COLOR_ACTIVE (SDL_Color){TRIAD_ACTIVE}
 #define COLOR_ACCENT (SDL_Color){TRIAD_ACCENT}
+#define COLOR_GRAY200 (SDL_Color){TRIAD_GRAY200}
 
 // Screen size
 #define SCREEN_WIDTH 640
@@ -47,6 +49,7 @@
 #define FONT_MEDIUM 28
 #define FONT_SMALL 24
 #define FONT_TINY 22
+#define FONT_FOOTNOTE 16
 #define FONT_LINEHEIGHT 32
 
 // Paths
@@ -65,6 +68,7 @@
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"
 #define COLLECTIONS_PATH "/mnt/SDCARD/Collections"
 #define FONT_PATH "/mnt/SDCARD/.system/res/OpenSans-SemiBold.ttf"
+#define DEBUG_PATH "/mnt/SDCARD/debug.txt"
 
 #define LAST_PATH "/tmp/last.txt" // transient
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"

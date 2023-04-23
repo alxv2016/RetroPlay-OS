@@ -23,6 +23,7 @@ void GFX_init(void) {
   g_font.medium = TTF_OpenFont(FONT_PATH, FONT_MEDIUM);
   g_font.small = TTF_OpenFont(FONT_PATH, FONT_SMALL);
   g_font.tiny = TTF_OpenFont(FONT_PATH, FONT_TINY);
+  g_font.footnote = TTF_OpenFont(FONT_PATH, FONT_FOOTNOTE);
 
   g_gfx.button = loadImage("btn.png");
   g_gfx.button_outline = loadImage("btn-outline.png");
@@ -40,6 +41,7 @@ void GFX_init(void) {
   g_gfx.power = loadImage("power.png");
   g_gfx.sleep = loadImage("sleep.png");
   g_gfx.sleep_timer = loadImage("sleep-timer.png");
+  g_gfx.gameboy = loadImage("gameboy.png");
 }
 
 void GFX_clear(void) {
@@ -71,11 +73,13 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.battery);
   SDL_FreeSurface(g_gfx.battery_low_power);
   SDL_FreeSurface(g_gfx.battery_low);
+  SDL_FreeSurface(g_gfx.gameboy);
 
   TTF_CloseFont(g_font.large);
   TTF_CloseFont(g_font.medium);
   TTF_CloseFont(g_font.small);
   TTF_CloseFont(g_font.tiny);
+  TTF_CloseFont(g_font.footnote);
 
   if (g_gfx.screen)
     SDL_FreeSurface(g_gfx.screen);
@@ -118,7 +122,10 @@ void listMenu(SDL_Surface *surface, char *name, char *path, char *unique,
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
   int margin_left = 32;
-
+  int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
+  int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
+  int iconTotalWidth = 48 + 24;
+  SDL_Surface *gameboy = g_gfx.gameboy;
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
   int row_width = text->w + margin_left * 2;
@@ -126,23 +133,17 @@ void listMenu(SDL_Surface *surface, char *name, char *path, char *unique,
   // int max_width = MIN(row_width, text_width);
   int max_width = MIN(row_width, 580);
   int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
+  int icon_cy = (ROW_HEIGHT / 2) - (gameboy->h / 2);
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
   if (row == selected_row) {
-    // Selected rows
-    text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_DARK_TEXT);
-    SDL_FillRect(
-        surface,
-        &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT},
-        SDL_MapRGB(surface->format, TRIAD_WHITE));
-    SDL_BlitSurface(
-        text, &(SDL_Rect){0, 0, max_width, text->h}, surface,
-        &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+    SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, background);
+    SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
+    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
     SDL_FreeSurface(text);
   } else {
-    SDL_BlitSurface(
-        text, &(SDL_Rect){0, 0, max_width, text->h}, surface,
-        &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+    // if (name == "Game Boy") SDL_BlitSurface(gameboy, NULL, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + icon_cy});
+    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
     SDL_FreeSurface(text);
   }
 }
