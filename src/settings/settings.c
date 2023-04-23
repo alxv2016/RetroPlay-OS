@@ -16,6 +16,7 @@
 
 /* SETTINGS */
 char *menuItems[MENU_ITEMS];
+int timerItems[TIMER_ITEMS] = {0, 15, 25, 30};
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
@@ -26,10 +27,19 @@ static int calcProgress(int width, int value, int minValue, int maxValue) {
   return progress;
 };
 
+void setSleepTime(int value) {
+  putInt(CONFIG_PATH, value);
+}
+
+int getSleepTime(void) {
+  int time = getInt(CONFIG_PATH);
+  return time ? time: 0;
+}
+
 void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValue, int i) {
 #define MIN(a, b) (a) < (b) ? (a) : (b)
   char *item = menuItems[i];
-  int rowCount = 4;
+  int rowCount = MENU_ITEMS;
   int marginLeft = 32;
   int background = selected == SETTINGS_VOLUMN || selected == SETTINGS_SCREEN
                        ? SDL_MapRGB(surface->format, TRIAD_ACTIVE)
@@ -46,7 +56,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   SDL_Surface *progressBritBar = g_gfx.settings_bar_full;
 
   int iconTotalWidth = ICON_SIZE + 24;
-  int progressTotalWidth = iconTotalWidth + progressEmptyBar->w + marginLeft * 2;
+  int progressTotalWidth = iconTotalWidth + progressEmptyBar->w + marginLeft;
   int rowWidth = text->w + marginLeft * 2;
   int maxLabelWidth = MIN(rowWidth, 580);
   int rowCY = (ROW_HEIGHT / 2) - (text->h / 2);
@@ -58,23 +68,34 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int progressBrit = calcProgress(progressBritBar->w, britValue, britMin, britMax);
 
   if (i == selected) {
-    SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
-    SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
      if (selected == SETTINGS_VOLUMN) {
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(volIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
         SDL_BlitSurface(progressVolBar, &(SDL_Rect){0, 0, progressVol, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressVol, h});
      } else if (selected == SETTINGS_SCREEN) {
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(britIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
         SDL_BlitSurface(progressBritBar, &(SDL_Rect){0, 0, progressBrit, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressBrit, h}); 
      } else if (selected == SETTINGS_POWER) {
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(powerIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
      } else if (selected == SETTINGS_SLEEP) {
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
         SDL_BlitSurface(text, &(SDL_Rect){0, 0,iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
-     }
+     } else if (selected == SETTINGS_SLEEPTIME) {
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
+        SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
+        SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
+        SDL_BlitSurface(text, &(SDL_Rect){0, 0,iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
+     } 
     SDL_FreeSurface(text);
   } else if (i == SETTINGS_VOLUMN) {
     SDL_BlitSurface(volIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
@@ -92,16 +113,24 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
     SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_FreeSurface(text);
+  } else if (i == SETTINGS_SLEEPTIME) {
+    SDL_BlitSurface(sleepIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
+    SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});
+    SDL_FreeSurface(text);
   }
 
 }
 
-void initSettings(SDL_Surface *surface, int selected, int volValue,
-                  int britValue) {
+void initSettings(SDL_Surface *surface, int selected, int volValue, int britValue, int sleepValue) {
+  setSleepTime(sleepValue);
+  char sleepTimer[256];
+  sprintf(sleepTimer, "Sleep timer: %imin", sleepValue);
   menuItems[SETTINGS_SLEEP] = "Sleep device";
   menuItems[SETTINGS_POWER] = "Shut down";
+  menuItems[SETTINGS_SLEEPTIME] = sleepTimer;
   menuItems[SETTINGS_SCREEN] = "Screen Brightness";
   menuItems[SETTINGS_VOLUMN] = "Adjust volumn";
+
   for (int i = 0; i < MENU_ITEMS; i++) {
     settingsMenu(surface, selected, volValue, britValue, i);
   }

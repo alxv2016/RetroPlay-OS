@@ -61,6 +61,7 @@
 #define USERDATA_PATH "/mnt/SDCARD/.userdata"
 #define ROMS_PATH "/mnt/SDCARD/Roms"
 #define RECENT_PATH "/mnt/SDCARD/.userdata/.retroplay/recent.txt"
+#define CONFIG_PATH "/mnt/SDCARD/.userdata/.retroplay/sleeptime.txt"
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"
 #define COLLECTIONS_PATH "/mnt/SDCARD/Collections"
 #define FONT_PATH "/mnt/SDCARD/.system/res/OpenSans-SemiBold.ttf"
