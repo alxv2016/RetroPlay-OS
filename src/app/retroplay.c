@@ -33,6 +33,7 @@ static int britMax = MAX_BRIGHTNESS;
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
+  if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
   if (autoResume()) { return 0; }
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();
@@ -42,7 +43,6 @@ int main(int argc, char *argv[]) {
 
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
-  Mix_OpenAudio(48000, 32784, 1, 4096);
   
   SDL_Surface *settingSurface;
   GFX_init();
@@ -370,5 +370,6 @@ int main(int argc, char *argv[]) {
   Menu_quit();
   GFX_quit();
   SDL_Quit();
+  freeSound();
   QuitSettings();
 }

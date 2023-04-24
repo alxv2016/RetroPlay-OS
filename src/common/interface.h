@@ -23,6 +23,8 @@ typedef struct GFX_Context {
   SDL_Surface *power;
   SDL_Surface *sleep;
   SDL_Surface *sleep_timer;
+  SDL_Surface *recents;
+  SDL_Surface *apps;
   SDL_Surface *arcade;
   SDL_Surface *nes;
   SDL_Surface *gameboy;

@@ -12,7 +12,7 @@ FLAGS	= -Os -lmsettings -lSDL -lSDL_mixer -lpthread -lrt -ldl -Wl,--gc-sections 
 OBJS = ../common/rumble.c
 
 all:
-	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(FLAGS)
+	$(CC) $(TARGET).c -o $(TARGET) $(FLAGS)
 
 clean:
 	rm -rf $(TARGET).o

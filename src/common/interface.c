@@ -40,6 +40,8 @@ void GFX_init(void) {
   g_gfx.battery_low = loadImage("battery-low.png");
   g_gfx.power = loadImage("power.png");
   g_gfx.sleep = loadImage("sleep.png");
+  g_gfx.recents = loadImage("recents.png");
+  g_gfx.apps = loadImage("apps.png");
   g_gfx.sleep_timer = loadImage("sleep-timer.png");
   g_gfx.arcade = loadImage("arcade.png");
   g_gfx.nes = loadImage("nes.png");
@@ -80,6 +82,8 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.battery);
   SDL_FreeSurface(g_gfx.battery_low_power);
   SDL_FreeSurface(g_gfx.battery_low);
+  SDL_FreeSurface(g_gfx.recents);
+  SDL_FreeSurface(g_gfx.apps);
   SDL_FreeSurface(g_gfx.arcade);
   SDL_FreeSurface(g_gfx.nes);
   SDL_FreeSurface(g_gfx.gameboy);
@@ -130,17 +134,18 @@ void window(SDL_Surface *surface, int x, int y, int width, int height) {
 }
 
 
-static void listItem(SDL_Surface *surface, int showIcon, char *displayName, int row, int selected_row) {
+static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char *displayName, int row, int selected_row) {
   #define MIN(a, b) (a) < (b) ? (a) : (b)
-  SDL_Surface *console[8] = {g_gfx.arcade, g_gfx.gameboy, g_gfx.gba, g_gfx.gbc, g_gfx.nes, g_gfx.playstation, g_gfx.sega, g_gfx.snes};
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(g_font.small, displayName, COLOR_LIGHT_TEXT);
-  int margin_left = 32;
   int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
   int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
   int iconTotalWidth = 48 + 24;
-  int row_width = text->w + margin_left + iconTotalWidth * 2;
-  if (!showIcon) row_width = text->w + margin_left * 2;
+  int marginLeft = 32;
+  int labelMarginLeft = marginLeft;
+  int row_width = text->w + marginLeft + iconTotalWidth * 2;
+  if (!showIcon) row_width = text->w + marginLeft * 2;
+  if (showIcon) labelMarginLeft += iconTotalWidth;
 
   int max_width = MIN(row_width, 580);
   int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
@@ -153,60 +158,40 @@ static void listItem(SDL_Surface *surface, int showIcon, char *displayName, int 
   }
 
   if (showIcon) {
-    SDL_BlitSurface(console[row], NULL, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + icon_cy});
-    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left + iconTotalWidth, screen_center + (row * ROW_HEIGHT) + row_cy});
-    SDL_FreeSurface(text);
-  } else {
-    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
-    SDL_FreeSurface(text);
+    SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){marginLeft, screen_center + (row * ROW_HEIGHT) + icon_cy});
   }
+    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){labelMarginLeft, screen_center + (row * ROW_HEIGHT) + row_cy});
+    SDL_FreeSurface(text);
 }
 
 // Menu list component
 void listMenu(SDL_Surface *surface, char *path, char *emuTag, char *name, char *unique, int row, int selected_row) {
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
-  // int margin_left = 32;
-  // int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
-  // int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
-  // int iconTotalWidth = 48 + 24;
-  // SDL_Surface *gameboy = g_gfx.gameboy;
-  // SDL_Surface *text;
-  // text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
-  // int text_width = truncateText(g_font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
-  // int max_width = MIN(row_width, text_width);
-  // int max_width = MIN(row_width, 580);
-  // int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
-  // int icon_cy = (ROW_HEIGHT / 2) - (gameboy->h / 2);
-  // int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
-  // if (row == selected_row) {
-  //   SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, background);
-  //   SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
-  //   SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
-  //   SDL_FreeSurface(text);
-  // } else {
-  //   SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
-  //   SDL_FreeSurface(text);
-  // }
   if (!strcmp(emuTag, "FBA")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "FC")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.nes, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GB")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.gameboy, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBA")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.gba, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBC")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface,g_gfx.gbc, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "MD")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.sega, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "PS")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface, g_gfx.playstation, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "SFC")) {
-    listItem(surface, 1, display_name, row, selected_row);
+    listItem(surface,g_gfx.snes, 1, display_name, row, selected_row);
+  } else if (!strcmp(name, "Apps")) {
+    listItem(surface,g_gfx.apps, 1, display_name, row, selected_row);
+  } else if (!strcmp(name, "Recently Played")) {
+    listItem(surface,g_gfx.recents, 1, display_name, row, selected_row);
   } else {
-    listItem(surface, 0, display_name, row, selected_row);
+    // Just passing in any dummy icon for non consoles items
+    listItem(surface,g_gfx.nes, 0, display_name, row, selected_row);
   }
 
 }

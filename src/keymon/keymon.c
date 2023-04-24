@@ -18,7 +18,6 @@
 #include <sys/types.h>
 
 #include "../common/keycontext.h"
-#include "../common/rumble.h"
 
 #include "keymon.h"
 
@@ -106,7 +105,6 @@ int main(int argc, char *argv[]) {
       if (val != REPEAT)
         menu_pressed = val;
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_POWER:
       if (val != REPEAT)
@@ -118,11 +116,9 @@ int main(int argc, char *argv[]) {
         button_flag = button_flag & (~START) | (val << START_BIT);
       }
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_SELECT:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_VOLUP:
       if (val == REPEAT) {
@@ -133,7 +129,6 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        playClick();
         val = GetVolume();
         if (val < MAX_VOLUME)
           SetVolume(++val);
@@ -161,7 +156,6 @@ int main(int argc, char *argv[]) {
         repeat_vol = 0;
       }
       if (val == PRESSED) {
-        playClick();
         val = GetVolume();
         if (val > 0)
           SetVolume(--val);
@@ -182,35 +176,27 @@ int main(int argc, char *argv[]) {
       break;
     case BUTTON_UP:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_DOWN:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_LEFT:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_RIGHT:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_A:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_B:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_X:
       if (val == PRESSED)
-        playClick();
       break;
     case BUTTON_Y:
       if (val == PRESSED)
-        playClick();
       break;
     default:
       break;

@@ -95,3 +95,7 @@ void playClick(void) {
     // Mix_Volume(-1, 20);
     Mix_PlayChannel(-1, clickSound, 0);
 }
+
+void freeSound() {
+  Mix_FreeChunk(clickSound);
+}
