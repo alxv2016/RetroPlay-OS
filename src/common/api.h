@@ -33,6 +33,7 @@ typedef struct Directory {
   int selected;
   int start;
   int end;
+  int consoleDir;
 } Directory;
 
 typedef struct Recent {

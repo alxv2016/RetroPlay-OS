@@ -244,6 +244,10 @@ int main(int argc, char *argv[]) {
         if (total > 0)
           readyResume(top->entries->items[top->selected]);
       }
+      if (Input_justPressed(BTN_Y)) {
+        consoleLog(DEBUG_PATH, top->path);
+        // consoleLog(DEBUG_PATH, top->entries);
+      }
     }
 
     unsigned long now = SDL_GetTicks();
@@ -309,7 +313,7 @@ int main(int argc, char *argv[]) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            listMenu(g_gfx.screen, entry->path, entry->emuTag, entry->name, entry->unique, j, selected_row);
+            listMenu(g_gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
           }
         } else {
           paragraph(g_gfx.screen, "No games detected,\n load some games.", 0, 0,

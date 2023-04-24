@@ -165,27 +165,27 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
 }
 
 // Menu list component
-void listMenu(SDL_Surface *surface, char *path, char *emuTag, char *name, char *unique, int row, int selected_row) {
+void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected_row) {
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
 
-  if (!strcmp(emuTag, "FBA")) {
+  if (!strcmp(emuTag, "FBA") && !consoleDir) {
     listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "FC")) {
+  } else if (!strcmp(emuTag, "FC") && !consoleDir) {
     listItem(surface, g_gfx.nes, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "GB")) {
+  } else if (!strcmp(emuTag, "GB") && !consoleDir) {
     listItem(surface, g_gfx.gameboy, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "GBA")) {
+  } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
     listItem(surface, g_gfx.gba, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "GBC")) {
+  } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
     listItem(surface,g_gfx.gbc, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "MD")) {
+  } else if (!strcmp(emuTag, "MD") && !consoleDir) {
     listItem(surface, g_gfx.sega, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "PS")) {
+  } else if (!strcmp(emuTag, "PS") && !consoleDir) {
     listItem(surface, g_gfx.playstation, 1, display_name, row, selected_row);
-  } else if (!strcmp(emuTag, "SFC")) {
+  } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
     listItem(surface,g_gfx.snes, 1, display_name, row, selected_row);
-  } else if (!strcmp(name, "Apps")) {
+  } else if (!strcmp(name, "Apps") && !consoleDir) {
     listItem(surface,g_gfx.apps, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Recently Played")) {
     listItem(surface,g_gfx.recents, 1, display_name, row, selected_row);

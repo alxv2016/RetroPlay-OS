@@ -631,6 +631,7 @@ Directory *Directory_new(char *path, int selected, Array *recents) {
   }
   self->alphas = IntArray_new();
   self->selected = selected;
+  self->consoleDir = isConsoleDir(path);
   Directory_index(self);
   return self;
 }
