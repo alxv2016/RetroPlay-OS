@@ -41,7 +41,14 @@ void GFX_init(void) {
   g_gfx.power = loadImage("power.png");
   g_gfx.sleep = loadImage("sleep.png");
   g_gfx.sleep_timer = loadImage("sleep-timer.png");
+  g_gfx.arcade = loadImage("arcade.png");
+  g_gfx.nes = loadImage("nes.png");
   g_gfx.gameboy = loadImage("gameboy.png");
+  g_gfx.gba = loadImage("gba.png");
+  g_gfx.gbc = loadImage("gbc.png");
+  g_gfx.sega = loadImage("sega.png");
+  g_gfx.playstation = loadImage("playstation.png");
+  g_gfx.snes = loadImage("snes.png");
 }
 
 void GFX_clear(void) {
@@ -73,7 +80,14 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.battery);
   SDL_FreeSurface(g_gfx.battery_low_power);
   SDL_FreeSurface(g_gfx.battery_low);
+  SDL_FreeSurface(g_gfx.arcade);
+  SDL_FreeSurface(g_gfx.nes);
   SDL_FreeSurface(g_gfx.gameboy);
+  SDL_FreeSurface(g_gfx.gba);
+  SDL_FreeSurface(g_gfx.gbc);
+  SDL_FreeSurface(g_gfx.sega);
+  SDL_FreeSurface(g_gfx.playstation);
+  SDL_FreeSurface(g_gfx.snes);
 
   TTF_CloseFont(g_font.large);
   TTF_CloseFont(g_font.medium);
@@ -115,37 +129,86 @@ void window(SDL_Surface *surface, int x, int y, int width, int height) {
                SDL_MapRGB(surface->format, TRIAD_BLACK));
 }
 
-// Menu list component
-void listMenu(SDL_Surface *surface, char *name, char *path, char *unique,
-              int row, int selected_row) {
-#define MIN(a, b) (a) < (b) ? (a) : (b)
-  char *display_name = unique ? unique : name;
-  trimSortingMeta(&display_name);
+
+static void listItem(SDL_Surface *surface, int showIcon, char *displayName, int row, int selected_row) {
+  #define MIN(a, b) (a) < (b) ? (a) : (b)
+  SDL_Surface *console[8] = {g_gfx.arcade, g_gfx.gameboy, g_gfx.gba, g_gfx.gbc, g_gfx.nes, g_gfx.playstation, g_gfx.sega, g_gfx.snes};
+  SDL_Surface *text;
+  text = TTF_RenderUTF8_Blended(g_font.small, displayName, COLOR_LIGHT_TEXT);
   int margin_left = 32;
   int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
   int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
   int iconTotalWidth = 48 + 24;
-  SDL_Surface *gameboy = g_gfx.gameboy;
-  SDL_Surface *text;
-  text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
-  int row_width = text->w + margin_left * 2;
-  // int text_width = truncateText(g_font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
-  // int max_width = MIN(row_width, text_width);
+  int row_width = text->w + margin_left + iconTotalWidth * 2;
+  if (!showIcon) row_width = text->w + margin_left * 2;
+
   int max_width = MIN(row_width, 580);
   int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
-  int icon_cy = (ROW_HEIGHT / 2) - (gameboy->h / 2);
+  int icon_cy = (ROW_HEIGHT / 2) - (48 / 2);
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
   if (row == selected_row) {
     SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, background);
     SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
-    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+  }
+
+  if (showIcon) {
+    SDL_BlitSurface(console[row], NULL, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + icon_cy});
+    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left + iconTotalWidth, screen_center + (row * ROW_HEIGHT) + row_cy});
     SDL_FreeSurface(text);
   } else {
-    // if (name == "Game Boy") SDL_BlitSurface(gameboy, NULL, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + icon_cy});
     SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
     SDL_FreeSurface(text);
   }
+}
+
+// Menu list component
+void listMenu(SDL_Surface *surface, char *path, char *emuTag, char *name, char *unique, int row, int selected_row) {
+  char *display_name = unique ? unique : name;
+  trimSortingMeta(&display_name);
+  // int margin_left = 32;
+  // int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
+  // int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
+  // int iconTotalWidth = 48 + 24;
+  // SDL_Surface *gameboy = g_gfx.gameboy;
+  // SDL_Surface *text;
+  // text = TTF_RenderUTF8_Blended(g_font.small, display_name, COLOR_LIGHT_TEXT);
+  // int text_width = truncateText(g_font.small, display_name, display_name, SCREEN_WIDTH / 2, margin_left) + margin_left;
+  // int max_width = MIN(row_width, text_width);
+  // int max_width = MIN(row_width, 580);
+  // int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
+  // int icon_cy = (ROW_HEIGHT / 2) - (gameboy->h / 2);
+  // int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
+
+  // if (row == selected_row) {
+  //   SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, background);
+  //   SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
+  //   SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+  //   SDL_FreeSurface(text);
+  // } else {
+  //   SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){margin_left, screen_center + (row * ROW_HEIGHT) + row_cy});
+  //   SDL_FreeSurface(text);
+  // }
+  if (!strcmp(emuTag, "FBA")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "FC")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "GB")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "GBA")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "GBC")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "MD")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "PS")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "SFC")) {
+    listItem(surface, 1, display_name, row, selected_row);
+  } else {
+    listItem(surface, 0, display_name, row, selected_row);
+  }
+
 }
 
 // Battery
