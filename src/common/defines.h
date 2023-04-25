@@ -29,7 +29,7 @@
 #define SCREEN_HEIGHT 480
 
 // UI Dimensions
-#define ICON_SIZE 32
+#define ICON_SIZE 28
 #define BUTTON_SIZE 32
 #define RADIUS 16
 
