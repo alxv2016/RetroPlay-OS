@@ -63,7 +63,6 @@ void GFX_ready(void);
 void GFX_quit(void);
 void GFX_sync(unsigned long frameStart );
 
-void window(SDL_Surface *surface, int x, int y, int width, int height);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);
 void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y);

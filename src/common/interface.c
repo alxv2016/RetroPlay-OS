@@ -106,34 +106,6 @@ void GFX_quit(void) {
 
 /* COMPONENTS */
 
-void window(SDL_Surface *surface, int x, int y, int width, int height) {
-  int radius_w = (RADIUS / 2);
-  int radius_h = (RADIUS / 2);
-  // Window corner radius
-  SDL_BlitSurface(g_gfx.corner_radius, &(SDL_Rect){0, 0, radius_w, radius_h},
-                  surface, &(SDL_Rect){x, y});
-  SDL_BlitSurface(g_gfx.corner_radius,
-                  &(SDL_Rect){radius_w, 0, radius_w, radius_h}, surface,
-                  &(SDL_Rect){x + width - radius_w, y});
-  SDL_BlitSurface(g_gfx.corner_radius,
-                  &(SDL_Rect){0, radius_h, radius_w, radius_h}, surface,
-                  &(SDL_Rect){x, y + height - radius_h});
-  SDL_BlitSurface(g_gfx.corner_radius,
-                  &(SDL_Rect){radius_w, radius_h, radius_w, radius_h}, surface,
-                  &(SDL_Rect){x + width - radius_w, y + height - radius_h});
-
-  // Window fill
-  SDL_FillRect(surface, &(SDL_Rect){x + radius_w, y, width - RADIUS, radius_h},
-               SDL_MapRGB(surface->format, TRIAD_BLACK));
-  SDL_FillRect(surface, &(SDL_Rect){x, y + radius_h, width, height - RADIUS},
-               SDL_MapRGB(surface->format, TRIAD_BLACK));
-  SDL_FillRect(surface,
-               &(SDL_Rect){x + radius_w, y + height - radius_h, width - RADIUS,
-                           radius_h},
-               SDL_MapRGB(surface->format, TRIAD_BLACK));
-}
-
-
 static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char *displayName, int row, int selected_row) {
   #define MIN(a, b) (a) < (b) ? (a) : (b)
   SDL_Surface *text;
@@ -168,7 +140,7 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected_row) {
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
-
+  // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
     listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "FC") && !consoleDir) {
@@ -199,26 +171,24 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
 // Battery
 void batteryStatus(SDL_Surface *surface, int x, int y) {
   int charge = getInt(BATTERY_INFO);
-  SDL_Surface *batPower =
-      charge <= 50 ? g_gfx.battery_low_power : g_gfx.battery_power;
+  SDL_Surface *batPower = charge < 40 ? g_gfx.battery_low_power : g_gfx.battery_power;
   SDL_Surface *batIcon = g_gfx.battery;
   SDL_Surface *batLabel;
 
   char percentStr[5];
   sprintf(percentStr, "%i%%", charge);
-
-  batLabel = TTF_RenderUTF8_Blended(g_font.small, percentStr, COLOR_LIGHT_TEXT);
-  int marginRight = batLabel->w + 8;
+  batLabel = TTF_RenderUTF8_Blended(g_font.tiny, percentStr, COLOR_LIGHT_TEXT);
+  
+  int margin = 8;
+  int batteryRightAlign = x - batIcon->w;
+  int labelRightAlign = x - (batLabel->w + batIcon->w + margin);
   int batLabelCY = (batIcon->h / 2) - (batLabel->h / 2);
 
   if (isCharging()) {
     // NOTE: Not sure how we can get battery percent during charging.
-    batLabel =
-        TTF_RenderUTF8_Blended(g_font.small, "Charging", COLOR_LIGHT_TEXT);
-    marginRight = batLabel->w + 8;
-    SDL_BlitSurface(g_gfx.battery_charge, NULL, surface, &(SDL_Rect){x, y});
-    SDL_BlitSurface(batLabel, NULL, surface,
-                    &(SDL_Rect){x - marginRight, y + batLabelCY});
+    batLabel = TTF_RenderUTF8_Blended(g_font.tiny, "Charging", COLOR_LIGHT_TEXT);
+    SDL_BlitSurface(g_gfx.battery_charge, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
+    SDL_BlitSurface(batLabel, NULL, surface, &(SDL_Rect){labelRightAlign, y + batLabelCY});
     SDL_FreeSurface(batLabel);
   } else {
     int pwrWidth = 24;
@@ -234,10 +204,9 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
     rect.w = pwrAmount;
     rect.h = pwrHeight;
 
-    SDL_BlitSurface(batIcon, NULL, surface, &(SDL_Rect){x, y});
-    SDL_BlitSurface(batPower, &rect, surface, &(SDL_Rect){x + cx, y + cy});
-    SDL_BlitSurface(batLabel, NULL, surface,
-                    &(SDL_Rect){x - marginRight, y + batLabelCY});
+    SDL_BlitSurface(batIcon, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
+    SDL_BlitSurface(batPower, &rect, surface, &(SDL_Rect){batteryRightAlign + cx, y + cy});
+    SDL_BlitSurface(batLabel, NULL, surface, &(SDL_Rect){labelRightAlign, y + batLabelCY});
     SDL_FreeSurface(batLabel);
   }
 }
@@ -279,10 +248,8 @@ void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rig
 
   SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY});
   SDL_FreeSurface(btnLabel);
-
   SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
-  SDL_BlitSurface(btnKey, NULL, surface,
-                  &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY});
+  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY});
   SDL_FreeSurface(btnKey);
 }
 

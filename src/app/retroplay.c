@@ -24,67 +24,90 @@
 
 ///////////////////////////////////////
 GFX g_gfx;
-int utilIcon = VOLUME_ICON;
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
 static int britMax = MAX_BRIGHTNESS;
 
+// Power functions
+static void checkCharging(int dirty, int currentTime, int startTime, int chargeStatus) {
+    if (dirty || currentTime - startTime >= CHARGE_DELAY) {
+      int nowcharging = isCharging();
+      if (chargeStatus != nowcharging) {
+        chargeStatus = nowcharging;
+        dirty = 1;
+      }
+      startTime = currentTime;
+    }
+}
+
+static void checkDevicePower(int currentTime, int startTime) {
+    // Power off device by watching for long press
+    if (startTime && currentTime - startTime >= 1000) powerOff();
+    if (Input_justPressed(BTN_POWER)) startTime = currentTime;
+}
+
+static void checkDeviceSleep(int dirty, int currentTime, int powerStartTime, int deviceSleeptTime) {
+    if (Input_anyPressed()) deviceSleeptTime = currentTime;
+    if (currentTime - deviceSleeptTime >= SLEEP_DELAY && preventAutosleep()) deviceSleeptTime = currentTime;
+    if (currentTime - deviceSleeptTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
+      fauxSleep();
+      deviceSleeptTime = SDL_GetTicks();
+      powerStartTime = 0;
+      dirty = 1;
+    }
+}
+
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
-  if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
-  if (autoResume()) { return 0; }
+  if (autoResume() || Mix_OpenAudio(48000, 32784, 2, 4096) < 0) { return 0; }
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();
-
   SDL_ShowCursor(0);
   SDL_EnableKeyRepeat(300, 100);
-
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
   
-  SDL_Surface *settingSurface;
   GFX_init();
   GFX_ready();
   Menu_init();
   Input_reset();
 
   int dirty = 1;
-  int was_charging = isCharging();
-  unsigned long charge_start = SDL_GetTicks();
-  int showSettings = 0;
-  int volValue = GetVolume();
-  int britValue = GetBrightness();
-  int settingSelected = 0;
-  int timerSelected = getSleepTime() ? getSleepTime(): 1;
-  // int setting_value = 0;
-  // int setting_min = 0;
-  // int setting_max = 0;
-  unsigned long settingStart = 0;
-  unsigned long cancelSettingStart = SDL_GetTicks();
-
-  unsigned long power_start = 0;
+  int chargeStatus = isCharging();
+  unsigned long chargeStartTime = SDL_GetTicks();
+  unsigned long powerStartTime = 0;
+  unsigned long deviceSleepTime = SDL_GetTicks();
+  // Volumne adjustment auto UI display timer
+  unsigned long volumeAdjustTime = 0;
+  // Settings menu current values
+  int showSettingsMenu = 0;
+  int settingItemSelected = 0;
+  int currentSleepTime = getSleepTime() ? getSleepTime(): 1;
+  int currentVolume = GetVolume();
+  int currentBrightness = GetBrightness();
 
   while (!quit) {
     unsigned long frameStart = SDL_GetTicks();
-    Input_poll();
-    int oldTimerValue = timerSelected;
-    int oldVolValue = volValue;
-    int oldBritValue = britValue;
-    int oldUtilIcon = utilIcon;
+    unsigned long currentTime = SDL_GetTicks();
+    int oldSleepTime = currentSleepTime;
+    int oldVolume = currentVolume;
+    int oldBrightness = currentBrightness;
     int selected = top->selected;
     int total = top->entries->count;
 
-    if (showSettings) {
+    Input_poll();
+
+    if (showSettingsMenu) {
       if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU))) {
-        showSettings = 0;
+        showSettingsMenu = 0;
         dirty = 1;
       } else if (Input_justPressed(BTN_A)) {
-        switch (settingSelected) {
+        switch (settingItemSelected) {
         case SETTINGS_SLEEP:
           fauxSleep();
-          dirty = 1;
+          quit = 1;
           break;
         case SETTINGS_POWER:
           powerOff();
@@ -93,51 +116,51 @@ int main(int argc, char *argv[]) {
         }
         // TODO: add status switch case to track options
       } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
-        volValue = GetVolume();
+        currentVolume = GetVolume();
       } else if (Input_justRepeated(BTN_LEFT)) {
-        switch (settingSelected) {
+        switch (settingItemSelected) {
         case SETTINGS_SCREEN:
-          britValue = GetBrightness();
-          if (britValue > britMin)
-            SetBrightness(--britValue);
-          if (britValue == britMin)
+          currentBrightness = GetBrightness();
+          if (currentBrightness > britMin)
+            SetBrightness(--currentBrightness);
+          if (currentBrightness == britMin)
             SetBrightness(britMin);
           break;
         case SETTINGS_VOLUMN:
-          volValue = GetVolume();
-          if (volValue > volMin)
-            SetVolume(--volValue);
-          if (volValue == volMin)
+          currentVolume = GetVolume();
+          if (currentVolume > volMin)
+            SetVolume(--currentVolume);
+          if (currentVolume == volMin)
             SetMute(1);
           break;
         case SETTINGS_SLEEPTIME:
-          timerSelected = getSleepTime();
-          if (timerSelected > 0) {
-            setSleepTime(--timerSelected);
-            timerSelected = getSleepTime();
+          currentSleepTime = getSleepTime();
+          if (currentSleepTime > 0) {
+            setSleepTime(--currentSleepTime);
+            currentSleepTime = getSleepTime();
           }
           dirty = 1;
           break;
         }
       } else if (Input_justRepeated(BTN_RIGHT)) {
-        switch (settingSelected) {
+        switch (settingItemSelected) {
         case SETTINGS_SCREEN:
-          britValue = GetBrightness();
-          if (britValue < britMax)
-            SetBrightness(++britValue);
+          currentBrightness = GetBrightness();
+          if (currentBrightness < britMax)
+            SetBrightness(++currentBrightness);
           break;
         case SETTINGS_VOLUMN:
-          volValue = GetVolume();
-          if (volValue < volMax)
-            SetVolume(++volValue);
-          if (volValue > volMin)
+          currentVolume = GetVolume();
+          if (currentVolume < volMax)
+            SetVolume(++currentVolume);
+          if (currentVolume > volMin)
             SetMute(0);
           break;
         case SETTINGS_SLEEPTIME:
-          timerSelected = getSleepTime();
-          if (timerSelected < TIMER_ITEMS - 1) {
-            setSleepTime(++timerSelected);
-            timerSelected = getSleepTime();
+          currentSleepTime = getSleepTime();
+          if (currentSleepTime < TIMER_ITEMS - 1) {
+            setSleepTime(++currentSleepTime);
+            currentSleepTime = getSleepTime();
           }
           dirty = 1;
           break;
@@ -145,21 +168,21 @@ int main(int argc, char *argv[]) {
       }
 
       if (Input_justPressed(BTN_UP)) {
-        settingSelected -= 1;
-        if (settingSelected < 0) {
-          settingSelected += MENU_ITEMS;
+        settingItemSelected -= 1;
+        if (settingItemSelected < 0) {
+          settingItemSelected += MENU_ITEMS;
         }
         dirty = 1;
       } else if (Input_justPressed(BTN_DOWN)) {
-        settingSelected += 1;
-        if (settingSelected >= MENU_ITEMS) {
-          settingSelected -= MENU_ITEMS;
+        settingItemSelected += 1;
+        if (settingItemSelected >= MENU_ITEMS) {
+          settingItemSelected -= MENU_ITEMS;
         }
         dirty = 1;
       }
 
     } else if (Input_justReleased(BTN_MENU)) {
-      showSettings = 1;
+      showSettingsMenu = 1;
       dirty = 1;
     } else {
       if (total > 0) {
@@ -219,7 +242,7 @@ int main(int argc, char *argv[]) {
         top->selected = selected;
         dirty = 1;
       }
-      /*   */
+
       if (dirty && total > 0)
         readyResume(top->entries->items[top->selected]);
 
@@ -250,64 +273,30 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    unsigned long now = SDL_GetTicks();
-    if (Input_anyPressed())
-      cancelSettingStart = now;
-
-    if (dirty || now - charge_start >= CHARGE_DELAY) {
-      int is_charging = isCharging();
-      if (was_charging != is_charging) {
-        was_charging = is_charging;
-        dirty = 1;
-      }
-      charge_start = now;
-    }
-
-    if (power_start && now - power_start >= 1000) {
-      powerOff();
-      // return 0; // we should never reach this point
-    }
-    if (Input_justPressed(BTN_POWER)) {
-      power_start = now;
-    }
-
-    if (now - cancelSettingStart >= SLEEP_DELAY && preventAutosleep())
-      cancelSettingStart = now;
-
-    if (now - cancelSettingStart >= SLEEP_DELAY ||
-        Input_justReleased(BTN_POWER)) // || Input_justPressed(BTN_MENU))
-    {
-      fauxSleep();
-      cancelSettingStart = SDL_GetTicks();
-      power_start = 0;
-      dirty = 1;
-    }
-
-    int was_dirty = dirty; // dirty list (not including settings/battery)
+    // Power functions
+    checkCharging(dirty, currentTime, chargeStartTime, chargeStatus);
+    checkDevicePower(currentTime, powerStartTime);
+    checkDeviceSleep(dirty, currentTime, powerStartTime, deviceSleepTime);
+    // dirty list (not including settings/battery)
+    int was_dirty = dirty;
 
     if (Input_isPressed(BTN_MINUS) || Input_isPressed(BTN_PLUS)) {
-      utilIcon = VOLUME_ICON;
-      volValue = GetVolume();
+      currentVolume = GetVolume();
     }
 
-    if (oldUtilIcon && !utilIcon)
-      settingStart = SDL_GetTicks();
-
-    if (oldVolValue != volValue || oldBritValue != britValue || oldTimerValue != timerSelected)
+    if (oldVolume != currentVolume || oldBrightness != currentBrightness || oldSleepTime != currentSleepTime) {
       dirty = 1;
-    else if (!oldUtilIcon && utilIcon)
+      volumeAdjustTime = SDL_GetTicks();
+    }
+    else if (volumeAdjustTime > 0 && SDL_GetTicks() - volumeAdjustTime > 500) {
       dirty = 1;
-    else if (settingStart > 0 && SDL_GetTicks() - settingStart > 500) {
-      dirty = 1;
-      settingStart = 0;
+      volumeAdjustTime = 0;
     }
 
     if (dirty) {
       SDL_FillRect(g_gfx.screen, NULL, 0);
-      if (showSettings) {
-        initSettings(g_gfx.screen, settingSelected, volValue, britValue, timerSelected);
-        // showSomeSettings(g_gfx.screen);
-        // SDL_BlitSurface(nscreen, NULL, g_gfx.screen, NULL);
+      if (showSettingsMenu) {
+        initSettings(g_gfx.screen, settingItemSelected, currentVolume, currentBrightness, currentSleepTime);
       } else {
         if (total > 0) {
           int selected_row = top->selected - top->start;
@@ -328,7 +317,7 @@ int main(int argc, char *argv[]) {
       //     button(g_gfx.screen, "X", "Resume", 0, 557, 419);
       // }
 
-      if (showSettings) {
+      if (showSettingsMenu) {
         button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR,
                419);
         button(g_gfx.screen, "B", "Close", 1, 1,
@@ -348,19 +337,11 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      batteryStatus(g_gfx.screen, 576, 12);
+      batteryStatus(g_gfx.screen, SCREEN_WIDTH - PADDING_LR, 12);
 
-      if (utilIcon) {
-        volumnBrightness(
-            g_gfx.screen, PADDING_LR, 419,
-            utilIcon == VOLUME_ICON
-                ? BRIGHTNESS_ICON
-                : (volValue > BRIGHTNESS_ICON ? VOLUME_ICON : MUTE_ICON),
-            volValue, volMin, volMax);
+      if (volumeAdjustTime && !showSettingsMenu) {
+        volumnBrightness(g_gfx.screen, PADDING_LR, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
       }
-    }
-
-    if (dirty) {
       SDL_Flip(g_gfx.screen);
       dirty = 0;
     }

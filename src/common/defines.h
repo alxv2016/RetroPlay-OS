@@ -67,7 +67,7 @@
 #define CONFIG_PATH "/mnt/SDCARD/.userdata/.retroplay/sleeptime.txt"
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"
 #define COLLECTIONS_PATH "/mnt/SDCARD/Collections"
-#define FONT_PATH "/mnt/SDCARD/.system/res/OpenSans-SemiBold.ttf"
+#define FONT_PATH "/mnt/SDCARD/.system/res/Roboto-Regular.ttf"
 #define DEBUG_PATH "/mnt/SDCARD/debug.txt"
 
 #define LAST_PATH "/tmp/last.txt"
