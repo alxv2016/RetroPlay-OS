@@ -30,45 +30,52 @@ static int britMin = MIN_BRIGHTNESS;
 static int britMax = MAX_BRIGHTNESS;
 
 // Power functions
-static void checkCharging(int dirty, int currentTime, int startTime, int chargeStatus) {
-    if (dirty || currentTime - startTime >= CHARGE_DELAY) {
-      int nowcharging = isCharging();
-      if (chargeStatus != nowcharging) {
-        chargeStatus = nowcharging;
-        dirty = 1;
-      }
-      startTime = currentTime;
-    }
-}
+// static int checkCharging(int dirty, int currentTime, int startTime, int chargeStatus) {
+//     if (dirty || currentTime - startTime >= CHARGE_DELAY) {
+//       int nowcharging = isCharging();
+//       if (chargeStatus != nowcharging) {
+//         chargeStatus = nowcharging;
+//         dirty = 1;
+//         return dirty;
+//       }
+//       startTime = currentTime;
+//       return dirty;
+//     }
+// }
 
-static void checkDevicePower(int currentTime, int startTime) {
-    // Power off device by watching for long press
-    if (startTime && currentTime - startTime >= 1000) powerOff();
-    if (Input_justPressed(BTN_POWER)) startTime = currentTime;
-}
+// static int checkDevicePower(int currentTime, int startTime) {
+//     // Power off device by watching for long press
+//     if (startTime && currentTime - startTime >= 1000) powerOff();
+//     if (Input_justPressed(BTN_POWER)){ 
+//       startTime = currentTime;
+//       return startTime;
+//     }
+// }
 
-static void checkDeviceSleep(int dirty, int currentTime, int powerStartTime, int deviceSleeptTime) {
-    if (Input_anyPressed()) deviceSleeptTime = currentTime;
-    if (currentTime - deviceSleeptTime >= SLEEP_DELAY && preventAutosleep()) deviceSleeptTime = currentTime;
-    if (currentTime - deviceSleeptTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
-      fauxSleep();
-      deviceSleeptTime = SDL_GetTicks();
-      powerStartTime = 0;
-      dirty = 1;
-    }
-}
+// static int checkDeviceSleep(int dirty, int currentTime, int powerStartTime, int deviceSleepTime) {
+//     if (Input_anyPressed()) deviceSleepTime = currentTime;
+//     if (currentTime - deviceSleepTime >= SLEEP_DELAY && preventAutosleep()) deviceSleepTime = currentTime;
+//     if (currentTime - deviceSleepTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
+//       fauxSleep();
+//       deviceSleepTime = SDL_GetTicks();
+//       powerStartTime = 0;
+//       dirty = 1;
+//       return dirty;
+//     } 
+//     return dirty;
+// }
 
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
-  if (autoResume() || Mix_OpenAudio(48000, 32784, 2, 4096) < 0) { return 0; }
+  if (autoResume()) return 0;
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();
   SDL_ShowCursor(0);
   SDL_EnableKeyRepeat(300, 100);
   InitSettings();
   g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
-  
+  if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
   GFX_init();
   GFX_ready();
   Menu_init();
@@ -273,10 +280,26 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // Power functions
-    checkCharging(dirty, currentTime, chargeStartTime, chargeStatus);
-    checkDevicePower(currentTime, powerStartTime);
-    checkDeviceSleep(dirty, currentTime, powerStartTime, deviceSleepTime);
+    // Device Charge, Sleep, Power logic
+    if (dirty || currentTime - chargeStartTime >= CHARGE_DELAY) {
+      int nowcharging = isCharging();
+      if (chargeStatus != nowcharging) {
+        chargeStatus = nowcharging;
+        dirty = 1;
+      }
+      chargeStartTime = currentTime;
+    }
+    if (powerStartTime && currentTime - powerStartTime >= 1000) powerOff();
+    if (Input_justPressed(BTN_POWER)) powerStartTime = currentTime;
+    if (Input_anyPressed()) deviceSleepTime = currentTime;
+    if (currentTime - deviceSleepTime >= SLEEP_DELAY && preventAutosleep()) deviceSleepTime = currentTime;
+    if (currentTime - deviceSleepTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
+      fauxSleep();
+      deviceSleepTime = SDL_GetTicks();
+      powerStartTime = 0;
+      dirty = 1;
+    } 
+
     // dirty list (not including settings/battery)
     int was_dirty = dirty;
 

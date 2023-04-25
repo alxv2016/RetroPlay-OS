@@ -187,6 +187,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
   if (isCharging()) {
     // NOTE: Not sure how we can get battery percent during charging.
     batLabel = TTF_RenderUTF8_Blended(g_font.tiny, "Charging", COLOR_LIGHT_TEXT);
+    labelRightAlign = x - (batLabel->w + batIcon->w + margin);
     SDL_BlitSurface(g_gfx.battery_charge, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
     SDL_BlitSurface(batLabel, NULL, surface, &(SDL_Rect){labelRightAlign, y + batLabelCY});
     SDL_FreeSurface(batLabel);
@@ -254,23 +255,19 @@ void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rig
 }
 
 // Volumn settings component
-void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value,
-                      int minValue, int maxValue) {
-  SDL_Surface *sIcon =
-      icon == 0 ? g_gfx.brightness : (icon == 1 ? g_gfx.volume : g_gfx.mute);
-  SDL_Surface *sProgressEmpty = g_gfx.settings_bar_empty;
-  SDL_Surface *sProgressBar = g_gfx.settings_bar_full;
-
-  int cy = (sIcon->h / 2) - (sProgressEmpty->h / 2);
-  int w = sProgressBar->w * ((float)(value - minValue) / (maxValue - minValue));
-  int h = sProgressBar->h;
+void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, int minValue, int maxValue) {
+  SDL_Surface *displayIcon = icon == 0 ? g_gfx.brightness : (icon == 1 ? g_gfx.volume : g_gfx.mute);
   int marginLeft = ICON_SIZE + 8;
+  int w = SCREEN_WIDTH / 2 - marginLeft;
+  int h = 4;
+  int pw = w * ((float)(value - minValue) / (maxValue - minValue));
+  int cy = (displayIcon->h / 2) - (h / 2);
+  int progress = SDL_MapRGB(surface->format, TRIAD_WHITE);
+  int background = SDL_MapRGB(surface->format, TRIAD_GRAY200);
 
-  SDL_BlitSurface(sIcon, NULL, surface, &(SDL_Rect){x, y});
-  SDL_BlitSurface(sProgressEmpty, NULL, surface,
-                  &(SDL_Rect){x + marginLeft, y + cy});
-  SDL_BlitSurface(sProgressBar, &(SDL_Rect){0, 0, w, h}, surface,
-                  &(SDL_Rect){x + marginLeft, y + cy, w, h});
+  SDL_BlitSurface(displayIcon, NULL, surface, &(SDL_Rect){x, y});
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
 }
 
 int volumnBrightnessWidth(void) {
