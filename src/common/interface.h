@@ -33,6 +33,15 @@ typedef struct GFX_Context {
   SDL_Surface *sega;
   SDL_Surface *snes;
   SDL_Surface *playstation;
+  SDL_Surface *sys_arcade;
+  SDL_Surface *sys_gb;
+  SDL_Surface *sys_gba;
+  SDL_Surface *sys_gbc;
+  SDL_Surface *sys_gg;
+  SDL_Surface *sys_nes;
+  SDL_Surface *sys_playstation;
+  SDL_Surface *sys_sega;
+  SDL_Surface *sys_snes;
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {

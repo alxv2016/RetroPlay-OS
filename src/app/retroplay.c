@@ -29,42 +29,6 @@ static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
 static int britMax = MAX_BRIGHTNESS;
 
-// Power functions
-// static int checkCharging(int dirty, int currentTime, int startTime, int chargeStatus) {
-//     if (dirty || currentTime - startTime >= CHARGE_DELAY) {
-//       int nowcharging = isCharging();
-//       if (chargeStatus != nowcharging) {
-//         chargeStatus = nowcharging;
-//         dirty = 1;
-//         return dirty;
-//       }
-//       startTime = currentTime;
-//       return dirty;
-//     }
-// }
-
-// static int checkDevicePower(int currentTime, int startTime) {
-//     // Power off device by watching for long press
-//     if (startTime && currentTime - startTime >= 1000) powerOff();
-//     if (Input_justPressed(BTN_POWER)){ 
-//       startTime = currentTime;
-//       return startTime;
-//     }
-// }
-
-// static int checkDeviceSleep(int dirty, int currentTime, int powerStartTime, int deviceSleepTime) {
-//     if (Input_anyPressed()) deviceSleepTime = currentTime;
-//     if (currentTime - deviceSleepTime >= SLEEP_DELAY && preventAutosleep()) deviceSleepTime = currentTime;
-//     if (currentTime - deviceSleepTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
-//       fauxSleep();
-//       deviceSleepTime = SDL_GetTicks();
-//       powerStartTime = 0;
-//       dirty = 1;
-//       return dirty;
-//     } 
-//     return dirty;
-// }
-
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
@@ -103,7 +67,6 @@ int main(int argc, char *argv[]) {
     int oldBrightness = currentBrightness;
     int selected = top->selected;
     int total = top->entries->count;
-
     Input_poll();
 
     if (showSettingsMenu) {
@@ -273,10 +236,6 @@ int main(int argc, char *argv[]) {
         // can_resume = 0;
         if (total > 0)
           readyResume(top->entries->items[top->selected]);
-      }
-      if (Input_justPressed(BTN_Y)) {
-        consoleLog(DEBUG_PATH, top->path);
-        // consoleLog(DEBUG_PATH, top->entries);
       }
     }
 

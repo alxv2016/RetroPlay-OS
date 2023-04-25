@@ -51,6 +51,15 @@ void GFX_init(void) {
   g_gfx.sega = loadImage("sega.png");
   g_gfx.playstation = loadImage("playstation.png");
   g_gfx.snes = loadImage("snes.png");
+  g_gfx.sys_arcade = loadImage("sys-arcade.png");
+  g_gfx.sys_gb = loadImage("sys-gb.png");
+  g_gfx.sys_gba = loadImage("sys-gba.png");
+  g_gfx.sys_gbc = loadImage("sys-gbc.png");
+  g_gfx.sys_gg = loadImage("sys-gg.png");
+  g_gfx.sys_nes = loadImage("sys-nes.png");
+  g_gfx.sys_playstation = loadImage("sys-playstation.png");
+  g_gfx.sys_sega = loadImage("sys-sega.png");
+  g_gfx.sys_snes = loadImage("sys-snes.png");
 }
 
 void GFX_clear(void) {
@@ -92,6 +101,15 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.sega);
   SDL_FreeSurface(g_gfx.playstation);
   SDL_FreeSurface(g_gfx.snes);
+  SDL_FreeSurface(g_gfx.sys_arcade);
+  SDL_FreeSurface(g_gfx.sys_gb);
+  SDL_FreeSurface(g_gfx.sys_gba);
+  SDL_FreeSurface(g_gfx.sys_gbc);
+  SDL_FreeSurface(g_gfx.sys_gg);
+  SDL_FreeSurface(g_gfx.sys_nes);
+  SDL_FreeSurface(g_gfx.sys_playstation);
+  SDL_FreeSurface(g_gfx.sys_sega);
+  SDL_FreeSurface(g_gfx.sys_snes);
 
   TTF_CloseFont(g_font.large);
   TTF_CloseFont(g_font.medium);
@@ -138,24 +156,69 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
 
 // Menu list component
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected_row) {
+  SDL_Surface *sysCover;
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
+  sysCover = g_gfx.sys_arcade;
+  int w = sysCover->w;
+  int x = SCREEN_WIDTH - (w + PADDING_LR);
+  int cy = (SCREEN_HEIGHT / 2) - (sysCover->h / 2);
+  // Display system covers images within rom directory
+  // if (!strcmp(emuTag, "FBA") && consoleDir) {
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "FC") && consoleDir) {
+  //   sysCover = g_gfx.sys_nes;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "GB") && consoleDir) {
+  //   sysCover = g_gfx.sys_gb;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "GBA") && consoleDir) {
+  //   sysCover = g_gfx.sys_gba;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "GBC") && consoleDir) {
+  //   sysCover = g_gfx.sys_gbc;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "MD") && consoleDir) {
+  //   sysCover = g_gfx.sys_sega;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "PS") && consoleDir) {
+  //   sysCover = g_gfx.sys_playstation;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // } else if (!strcmp(emuTag, "SFC") && consoleDir) {
+  //   sysCover = g_gfx.sys_snes;
+  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+  // }
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "FC") && !consoleDir) {
+    sysCover = g_gfx.sys_nes;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.nes, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GB") && !consoleDir) {
+    sysCover = g_gfx.sys_gb;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.gameboy, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
+    sysCover = g_gfx.sys_gba;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.gba, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
+    sysCover = g_gfx.sys_gbc;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface,g_gfx.gbc, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "MD") && !consoleDir) {
+    sysCover = g_gfx.sys_sega;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.sega, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "PS") && !consoleDir) {
+    sysCover = g_gfx.sys_playstation;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.playstation, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
+    sysCover = g_gfx.sys_snes;
+    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface,g_gfx.snes, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Apps") && !consoleDir) {
     listItem(surface,g_gfx.apps, 1, display_name, row, selected_row);
