@@ -30,6 +30,7 @@
 
 // UI Dimensions
 #define ICON_SIZE 28
+#define CONSOLE_ICON_SIZE 48
 #define BUTTON_SIZE 32
 #define RADIUS 16
 

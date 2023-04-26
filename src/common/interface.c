@@ -125,33 +125,32 @@ void GFX_quit(void) {
 /* COMPONENTS */
 
 static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char *displayName, int row, int selected_row) {
-  #define MIN(a, b) (a) < (b) ? (a) : (b)
-  SDL_Surface *text;
-  text = TTF_RenderUTF8_Blended(g_font.small, displayName, COLOR_LIGHT_TEXT);
+  #define MIN(min, max) (min) < (max) ? (min) : (max)
+  int marginLeft = 32;
+  int titleMarginLeft = showIcon? marginLeft + CONSOLE_ICON_SIZE + 18: marginLeft;
+  int availableWidth = SCREEN_WIDTH - marginLeft * 2;
+  int titleWidth = truncateText(g_font.small, displayName, availableWidth, marginLeft * 2);
+  SDL_Surface *title = TTF_RenderUTF8_Blended(g_font.small, displayName, COLOR_LIGHT_TEXT);
   int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
   int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
-  int iconTotalWidth = 48 + 24;
-  int marginLeft = 32;
-  int labelMarginLeft = marginLeft;
-  int row_width = text->w + marginLeft + iconTotalWidth * 2;
-  if (!showIcon) row_width = text->w + marginLeft * 2;
-  if (showIcon) labelMarginLeft += iconTotalWidth;
 
-  int max_width = MIN(row_width, 580);
-  int row_cy = (ROW_HEIGHT / 2) - (text->h / 2);
+  int rowWidth = showIcon? marginLeft + CONSOLE_ICON_SIZE + 18 + title->w + marginLeft: marginLeft + title->w + marginLeft;
+  // if (!showIcon) rowWidth = marginLeft + title->w + marginLeft;
+  int maxTitleWidth = MIN(rowWidth, titleWidth);
+  int row_cy = (ROW_HEIGHT / 2) - (title->h / 2);
   int icon_cy = (ROW_HEIGHT / 2) - (48 / 2);
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * ROW_COUNT) / 2);
 
   if (row == selected_row) {
-    SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, max_width, ROW_HEIGHT}, background);
+    SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, rowWidth, ROW_HEIGHT}, background);
     SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
   }
 
   if (showIcon) {
     SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){marginLeft, screen_center + (row * ROW_HEIGHT) + icon_cy});
   }
-    SDL_BlitSurface(text, &(SDL_Rect){0, 0, max_width, text->h}, surface, &(SDL_Rect){labelMarginLeft, screen_center + (row * ROW_HEIGHT) + row_cy});
-    SDL_FreeSurface(text);
+    SDL_BlitSurface(title, &(SDL_Rect){0, 0, maxTitleWidth, title->h}, surface, &(SDL_Rect){titleMarginLeft, screen_center + (row * ROW_HEIGHT) + row_cy});
+    SDL_FreeSurface(title);
 }
 
 // Menu list component
@@ -163,68 +162,53 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
   int w = sysCover->w;
   int x = SCREEN_WIDTH - (w + PADDING_LR);
   int cy = (SCREEN_HEIGHT / 2) - (sysCover->h / 2);
-  // Display system covers images within rom directory
-  // if (!strcmp(emuTag, "FBA") && consoleDir) {
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "FC") && consoleDir) {
-  //   sysCover = g_gfx.sys_nes;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "GB") && consoleDir) {
-  //   sysCover = g_gfx.sys_gb;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "GBA") && consoleDir) {
-  //   sysCover = g_gfx.sys_gba;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "GBC") && consoleDir) {
-  //   sysCover = g_gfx.sys_gbc;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "MD") && consoleDir) {
-  //   sysCover = g_gfx.sys_sega;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "PS") && consoleDir) {
-  //   sysCover = g_gfx.sys_playstation;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // } else if (!strcmp(emuTag, "SFC") && consoleDir) {
-  //   sysCover = g_gfx.sys_snes;
-  //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-  // }
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "FC") && !consoleDir) {
-    sysCover = g_gfx.sys_nes;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.nes, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GB") && !consoleDir) {
-    sysCover = g_gfx.sys_gb;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.gameboy, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
-    sysCover = g_gfx.sys_gba;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.gba, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
-    sysCover = g_gfx.sys_gbc;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface,g_gfx.gbc, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "MD") && !consoleDir) {
-    sysCover = g_gfx.sys_sega;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.sega, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "PS") && !consoleDir) {
-    sysCover = g_gfx.sys_playstation;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface, g_gfx.playstation, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
-    sysCover = g_gfx.sys_snes;
-    if (consoleDir) SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     listItem(surface,g_gfx.snes, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Apps") && !consoleDir) {
     listItem(surface,g_gfx.apps, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Recently Played")) {
     listItem(surface,g_gfx.recents, 1, display_name, row, selected_row);
   } else {
+    // Display system covers images within rom directory
+    // if (!strcmp(emuTag, "FBA") && consoleDir) {
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "FC") && consoleDir) {
+    //   sysCover = g_gfx.sys_nes;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "GB") && consoleDir) {
+    //   sysCover = g_gfx.sys_gb;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "GBA") && consoleDir) {
+    //   sysCover = g_gfx.sys_gba;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "GBC") && consoleDir) {
+    //   sysCover = g_gfx.sys_gbc;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "MD") && consoleDir) {
+    //   sysCover = g_gfx.sys_sega;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "PS") && consoleDir) {
+    //   sysCover = g_gfx.sys_playstation;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // } else if (!strcmp(emuTag, "SFC") && consoleDir) {
+    //   sysCover = g_gfx.sys_snes;
+    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
+    // }
     // Just passing in any dummy icon for non consoles items
     listItem(surface,g_gfx.nes, 0, display_name, row, selected_row);
   }
@@ -508,19 +492,17 @@ void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark) {
   SDL_FreeSurface(text);
 }
 
-int truncateText(TTF_Font *font, const char *in_name, char *out_name,
-                 int max_width, int padding) {
-  int text_width;
-  strcpy(out_name, in_name);
-  TTF_SizeUTF8(font, out_name, &text_width, NULL);
-  text_width += padding;
+int truncateText(TTF_Font *font, char *displayName, int maxWidth, int padding) {
+  int titleWidth;
+  TTF_SizeUTF8(font, displayName, &titleWidth, NULL);
+  titleWidth += padding;
 
-  while (text_width > max_width) {
-    int len = strlen(out_name);
-    strcpy(&out_name[len - 4], "...\0");
-    TTF_SizeUTF8(font, out_name, &text_width, NULL);
-    text_width += padding;
+  while (titleWidth > maxWidth) {
+    int len = strlen(displayName);
+    strcpy(&displayName[len - 4], "...\0");
+    TTF_SizeUTF8(font, displayName, &titleWidth, NULL);
+    titleWidth += padding;
   }
 
-  return text_width;
+  return titleWidth;
 }
