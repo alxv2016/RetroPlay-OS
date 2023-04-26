@@ -73,14 +73,14 @@ void GFX_ready(void);
 void GFX_quit(void);
 void GFX_sync(unsigned long frameStart );
 
-void emptyState(SDL_Surface *surface, TTF_Font *font, char *msg);
+void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);
 void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y);
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
 void hintLabel(SDL_Surface *surface, char *htxt, int x, int y);
-void paragraph(TTF_Font* font, char* msg, SDL_Surface* surface, SDL_Rect* dst_rect);
+void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, SDL_Rect* dst_rect);
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark);
 int getButtonWidth(char *blabel);
 int truncateText(TTF_Font *font, char *displayName,int max_width, int padding);

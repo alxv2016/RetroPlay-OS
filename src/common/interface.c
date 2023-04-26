@@ -366,16 +366,16 @@ void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_FreeSurface(btnLabel);
 }
 
-void emptyState(SDL_Surface *surface, TTF_Font *font, char *msg) {
+void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg) {
   SDL_Surface *emptyStateIcon = g_gfx.empty_state;
   int msgWidth;
-  TTF_SizeUTF8(font, msg, &msgWidth, NULL);
+  int msgHeight;
+  TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);
   int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
-  int msgCX = (SCREEN_WIDTH / 2) - (msgWidth / 2);
   int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
 
-  SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - 96});
-  paragraph(font, msg, surface, &(SDL_Rect){30, cy});
+  SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - emptyStateIcon->h/2});
+  paragraph(font, msg, lineHeight, surface, &(SDL_Rect){0, emptyStateIcon->h/2, surface->w, surface->h});
 }
 
 // nameScroller - Deprecated (opting for truncation instead)
@@ -450,36 +450,74 @@ void hintLabel(SDL_Surface *surface, char *htxt, int x, int y) {
   SDL_FreeSurface(hint_text);
 }
 
-void paragraph(TTF_Font* font, char* msg, SDL_Surface* surface, SDL_Rect* dst_rect) {
-  #define TEXT_BOX_MAX_ROWS 16
-  #define LINE_HEIGHT 24
+static void content(TTF_Font* font, char* copy, int lineHeight, SDL_Surface* surface, SDL_Rect* dst_rect) {
 	if (dst_rect==NULL) dst_rect = &(SDL_Rect){0,0,surface->w,surface->h};
-	SDL_Surface* text;
-	char* rows[TEXT_BOX_MAX_ROWS];
-	int row_count = 0;
+	#define MAX_TEXT_LINES 16
+	char* lines[MAX_TEXT_LINES];
+	int count = 0;
 
 	char* tmp;
-	rows[row_count++] = msg;
-	while ((tmp=strchr(rows[row_count-1], '\n'))!=NULL) {
-		if (row_count+1>=TEXT_BOX_MAX_ROWS) break;
-		rows[row_count++] = tmp+1;
+	lines[count++] = copy;
+	while ((tmp=strchr(lines[count-1], '\n'))!=NULL) {
+		if (count+1>MAX_TEXT_LINES) break;
+		lines[count++] = tmp+1;
 	}
+	int x = dst_rect->x;
+	int y = dst_rect->y;
 	
-	int rendered_height = LINE_HEIGHT * row_count;
+	SDL_Surface* text;
+	char line[256];
+	for (int i=0; i<count; i++) {
+		int len;
+		if (i+1<count) {
+			len = lines[i+1]-lines[i]-1;
+			if (len) strncpy(line, lines[i], len);
+			line[len] = '\0'; 
+		}
+		else {
+			len = strlen(lines[i]);
+			strcpy(line, lines[i]);
+		}
+		
+		if (len) {
+			text = TTF_RenderUTF8_Blended(font, line, COLOR_LIGHT_TEXT);
+			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x+((dst_rect->w-text->w)/2),y+(i*lineHeight)});
+			SDL_FreeSurface(text);
+		}
+	}
+}
+
+void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, SDL_Rect* dst_rect) {
+  // NOTE: if you provide a SDL_Rect for position, you must also include the Height and Width
+  // for correct position placement, the x and y value would be offsets to the center by default.
+  #define TEXT_BOX_MAX_ROWS 16
+	if (dst_rect==NULL) dst_rect = &(SDL_Rect){0,0,surface->w,surface->h};
+	SDL_Surface* text;
+	char* lines[TEXT_BOX_MAX_ROWS];
+	int lineCount = 0;
+
+	char* tmp;
+	lines[lineCount++] = msg;
+	while ((tmp=strchr(lines[lineCount-1], '\n'))!=NULL) {
+		if (lineCount+1>=TEXT_BOX_MAX_ROWS) break;
+		lines[lineCount++] = tmp+1;
+	}
+	int rendered_height = lineHeight * lineCount;
+
 	int y = dst_rect->y;
 	y += (dst_rect->h - rendered_height) / 2;
 	
 	char line[256];
-	for (int i=0; i<row_count; i++) {
+	for (int i=0; i<lineCount; i++) {
 		int len;
-		if (i+1<row_count) {
-			len = rows[i+1]-rows[i]-1;
-			if (len) strncpy(line, rows[i], len);
+		if (i+1<lineCount) {
+			len = lines[i+1]-lines[i]-1;
+			if (len) strncpy(line, lines[i], len);
 			line[len] = '\0';
 		}
 		else {
-			len = strlen(rows[i]);
-			strcpy(line, rows[i]);
+			len = strlen(lines[i]);
+			strcpy(line, lines[i]);
 		}
 		
 		
@@ -490,8 +528,43 @@ void paragraph(TTF_Font* font, char* msg, SDL_Surface* surface, SDL_Rect* dst_re
 			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x,y});
 			SDL_FreeSurface(text);
 		}
-		y += LINE_HEIGHT;
+		y += lineHeight;
 	}
+}
+
+static void getTextSize(TTF_Font* font, char* str, int lineHeight, int* w, int* h) {
+	char* lines[MAX_TEXT_LINES];
+	int count = 0;
+
+	char* tmp;
+	lines[count++] = str;
+	while ((tmp=strchr(lines[count-1], '\n'))!=NULL) {
+		if (count+1>MAX_TEXT_LINES) break; // TODO: bail?
+		lines[count++] = tmp+1;
+	}
+	*h = count * lineHeight;
+	
+	int mw = 0;
+	char line[256];
+	for (int i=0; i<count; i++) {
+		int len;
+		if (i+1<count) {
+			len = lines[i+1]-lines[i]-1;
+			if (len) strncpy(line, lines[i], len);
+			line[len] = '\0';
+		}
+		else {
+			len = strlen(lines[i]);
+			strcpy(line, lines[i]);
+		}
+		
+		if (len) {
+			int lw;
+			TTF_SizeUTF8(font, line, &lw, NULL);
+			if (lw>mw) mw = lw;
+		}
+	}
+	*w = mw;
 }
 
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark) {
