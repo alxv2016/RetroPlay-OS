@@ -46,7 +46,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
                        : SDL_MapRGB(surface->format, GREY500);
   int accent = SDL_MapRGB(surface->format, PRIMARY);
   SDL_Surface *text;
-  text = TTF_RenderUTF8_Blended(font.h3, item, LIGHT_TEXT);
+  text = TTF_RenderUTF8_Blended(font.h3, item, (SDL_Color){LIGHT_TEXT});
   SDL_Surface *powerIcon = gfx.power;
   SDL_Surface *sleepIcon = gfx.sleep;
   SDL_Surface *sleepTimerIcon = gfx.sleep_timer;
@@ -135,7 +135,7 @@ void initSettings(SDL_Surface *surface, int selected, int volValue, int britValu
   SDL_Surface *firmwareInfo;
   char firmware[256];
   sprintf(firmware, "Firmware: %s", getenv("MIYOO_VERSION"));
-  firmwareInfo = TTF_RenderUTF8_Blended(font.footnote, firmware, NEUTRAL_TEXT);
+  firmwareInfo = TTF_RenderUTF8_Blended(font.footnote, firmware, (SDL_Color){NEUTRAL_TEXT});
   SDL_BlitSurface(firmwareInfo, NULL, surface, &(SDL_Rect){32, SCREEN_HEIGHT - ((ICON_SIZE / 2) + 20)});
   SDL_FreeSurface(firmwareInfo);
   for (int i = 0; i < MENU_ITEMS; i++) {

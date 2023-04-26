@@ -8,6 +8,7 @@ typedef struct GFX_Context {
   SDL_Surface *overlay;
   SDL_Surface *button;
   SDL_Surface *button_outline;
+  SDL_Surface *dpad;
   SDL_Surface *corner_radius;
   SDL_Surface *settings_bar_full;
   SDL_Surface *settings_bar_empty;
@@ -52,6 +53,12 @@ typedef struct GFX_Fonts {
   TTF_Font *body;
   TTF_Font *caption;
   TTF_Font *footnote;
+  TTF_Font *h1_500;
+  TTF_Font *h2_500;
+  TTF_Font *h3_500;
+  TTF_Font *body_500;
+  TTF_Font *caption_500;
+  TTF_Font *footnote_500;
 } Font;
 
 enum Console {
@@ -72,20 +79,19 @@ void GFX_init(void);
 void GFX_clear(void);
 void GFX_ready(void);
 void GFX_quit(void);
-void GFX_sync(unsigned long frameStart );
+void GFX_sync(unsigned long frameStart);
 
 void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy);
-
 void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);
-void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y);
+void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
+void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
+void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
+void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int y);
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
-void hintLabel(SDL_Surface *surface, char *htxt, int x, int y);
 void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, SDL_Rect* dst_rect);
-void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark);
-int getButtonWidth(char *blabel);
 int truncateText(TTF_Font *font, char *displayName,int max_width, int padding);
 SDL_Surface *loadImage(char *path);
 SDL_Surface *renderText(char *text);

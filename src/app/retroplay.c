@@ -299,21 +299,21 @@ int main(int argc, char *argv[]) {
       // }
 
       if (showSettingsMenu) {
-        button(gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
+        primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG,
                419);
-        button(gfx.screen, "B", "Close", 1, 1,
+        secondaryBTN(gfx.screen, "B", "Close", 1,
                SCREEN_WIDTH - SPACING_LG - 120, 419);
       } else {
         if (total == 0 && stack->count > 1) {
-          button(gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          primaryBTN(gfx.screen, "B", "Back", 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         } else if (total > 0 && stack->count > 1) {
-          button(gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          primaryBTN(gfx.screen, "A", "Play", 1, SCREEN_WIDTH - SPACING_LG,
                  419);
-          button(gfx.screen, "B", "Back", 1, 1,
+          secondaryBTN(gfx.screen, "B", "Back", 1,
                  SCREEN_WIDTH - SPACING_LG - 101, 419);
         } else {
-          button(gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         }
       }
