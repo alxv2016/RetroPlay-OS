@@ -60,6 +60,7 @@ void GFX_init(void) {
   g_gfx.sys_playstation = loadImage("sys-playstation.png");
   g_gfx.sys_sega = loadImage("sys-sega.png");
   g_gfx.sys_snes = loadImage("sys-snes.png");
+  g_gfx.empty_state = loadImage("empty-folder.png");
 }
 
 void GFX_clear(void) {
@@ -110,6 +111,7 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.sys_playstation);
   SDL_FreeSurface(g_gfx.sys_sega);
   SDL_FreeSurface(g_gfx.sys_snes);
+  SDL_FreeSurface(g_gfx.empty_state);
 
   TTF_CloseFont(g_font.large);
   TTF_CloseFont(g_font.medium);
@@ -317,14 +319,6 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, i
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
 }
 
-int volumnBrightnessWidth(void) {
-  SDL_Surface *sProgressBar = g_gfx.settings_bar_full;
-  int w = sProgressBar->w;
-  int marginLeft = ICON_SIZE + 8;
-  int totalWidth = w + marginLeft;
-  return totalWidth;
-}
-
 // Pill button
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_Surface *btn = g_gfx.button;
@@ -372,56 +366,68 @@ void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_FreeSurface(btnLabel);
 }
 
-// nameScroller
-static int scrollSelected = -1;
-static int scrollTicks = 0;
-static int scrollDelay = 30;
-static int scrollOffset = 0;
-int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,
-                 int maxWidth, int row, int selected, int reset, int force) {
-  // reset is used when changing directories (otherwise returning from the first
-  // row to the first row above wouldn't reset the scroll)
-  if (reset || selected != scrollSelected) {
-    scrollTicks = 0;
-    scrollOffset = 0;
-    scrollSelected = selected;
-  }
+void emptyState(SDL_Surface *surface, TTF_Font *font, char *msg) {
+  SDL_Surface *emptyStateIcon = g_gfx.empty_state;
+  int msgWidth;
+  TTF_SizeUTF8(font, msg, &msgWidth, NULL);
+  int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
+  int msgCX = (SCREEN_WIDTH / 2) - (msgWidth / 2);
+  int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
 
-  scrollTicks += 1;
-  if (scrollTicks < scrollDelay)
-    return 0; // nothing to do yet
-  scrollOffset += 1;
-
-  SDL_Surface *text;
-
-  char *displayName = unique ? unique : name;
-  trimSortingMeta(&displayName);
-
-  if (text->w <= maxWidth) {
-    SDL_FreeSurface(text);
-    return 0;
-  }
-  // prevent overscroll
-  if (scrollOffset > text->w - maxWidth) {
-    scrollOffset = text->w - maxWidth;
-    if (!force) { // nothing to draw unless something outside of this function
-                  // dirtied the screen
-      SDL_FreeSurface(text);
-      return 0;
-    }
-  }
-
-  SDL_FillRect(surface,
-               &(SDL_Rect){0, 0 + (row * ROW_HEIGHT), SCREEN_WIDTH, ROW_HEIGHT},
-               SDL_MapRGB(surface->format, TRIAD_WHITE));
-  text = TTF_RenderUTF8_Blended(g_font.medium, displayName, COLOR_DARK_TEXT);
-
-  int centerY = (ROW_HEIGHT - text->h) / 2;
-  SDL_BlitSurface(text, &(SDL_Rect){0, 0, maxWidth, text->h}, surface,
-                  &(SDL_Rect){PADDING, 0 + (row * ROW_HEIGHT) + centerY});
-  SDL_FreeSurface(text);
-  return 1;
+  SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - 96});
+  paragraph(font, msg, surface, &(SDL_Rect){30, cy});
 }
+
+// nameScroller - Deprecated (opting for truncation instead)
+// static int scrollSelected = -1;
+// static int scrollTicks = 0;
+// static int scrollDelay = 30;
+// static int scrollOffset = 0;
+// int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,
+//                  int maxWidth, int row, int selected, int reset, int force) {
+//   // reset is used when changing directories (otherwise returning from the first
+//   // row to the first row above wouldn't reset the scroll)
+//   if (reset || selected != scrollSelected) {
+//     scrollTicks = 0;
+//     scrollOffset = 0;
+//     scrollSelected = selected;
+//   }
+
+//   scrollTicks += 1;
+//   if (scrollTicks < scrollDelay)
+//     return 0; // nothing to do yet
+//   scrollOffset += 1;
+
+//   SDL_Surface *text;
+
+//   char *displayName = unique ? unique : name;
+//   trimSortingMeta(&displayName);
+
+//   if (text->w <= maxWidth) {
+//     SDL_FreeSurface(text);
+//     return 0;
+//   }
+//   // prevent overscroll
+//   if (scrollOffset > text->w - maxWidth) {
+//     scrollOffset = text->w - maxWidth;
+//     if (!force) { // nothing to draw unless something outside of this function
+//                   // dirtied the screen
+//       SDL_FreeSurface(text);
+//       return 0;
+//     }
+//   }
+
+//   SDL_FillRect(surface,
+//                &(SDL_Rect){0, 0 + (row * ROW_HEIGHT), SCREEN_WIDTH, ROW_HEIGHT},
+//                SDL_MapRGB(surface->format, TRIAD_WHITE));
+//   text = TTF_RenderUTF8_Blended(g_font.medium, displayName, COLOR_DARK_TEXT);
+
+//   int centerY = (ROW_HEIGHT - text->h) / 2;
+//   SDL_BlitSurface(text, &(SDL_Rect){0, 0, maxWidth, text->h}, surface,
+//                   &(SDL_Rect){PADDING, 0 + (row * ROW_HEIGHT) + centerY});
+//   SDL_FreeSurface(text);
+//   return 1;
+// }
 
 SDL_Surface *loadImage(char *path) {
   static char fullPath[256];
@@ -444,44 +450,48 @@ void hintLabel(SDL_Surface *surface, char *htxt, int x, int y) {
   SDL_FreeSurface(hint_text);
 }
 
-void paragraph(SDL_Surface *surface, char *str, int x, int y, int width,
-               int height) {
-  SDL_Surface *text;
-  char *rows[MAX_ROW];
-  int row_count = 0;
+void paragraph(TTF_Font* font, char* msg, SDL_Surface* surface, SDL_Rect* dst_rect) {
+  #define TEXT_BOX_MAX_ROWS 16
+  #define LINE_HEIGHT 24
+	if (dst_rect==NULL) dst_rect = &(SDL_Rect){0,0,surface->w,surface->h};
+	SDL_Surface* text;
+	char* rows[TEXT_BOX_MAX_ROWS];
+	int row_count = 0;
 
-  char *tmp;
-  rows[row_count++] = str;
-  while ((tmp = strchr(rows[row_count - 1], '\n')) != NULL) {
-    if (row_count + 1 >= MAX_ROW)
-      return;
-    rows[row_count++] = tmp + 1;
-  }
-
-  int rendered_height = FONT_LINEHEIGHT * row_count;
-  y += (height - rendered_height) / 2;
-
-  char line[MAX_PATH];
-  for (int i = 0; i < row_count; i++) {
-    int len;
-    if (i + 1 < row_count) {
-      len = rows[i + 1] - rows[i] - 1;
-      if (len)
-        strncpy(line, rows[i], len);
-      line[len] = '\0';
-    } else {
-      len = strlen(rows[i]);
-      strcpy(line, rows[i]);
-    }
-
-    if (len) {
-      text = TTF_RenderUTF8_Blended(g_font.medium, line, COLOR_WHITE);
-      x += (width - text->w) / 2;
-      SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x, y});
-      SDL_FreeSurface(text);
-    }
-    y += FONT_LINEHEIGHT;
-  }
+	char* tmp;
+	rows[row_count++] = msg;
+	while ((tmp=strchr(rows[row_count-1], '\n'))!=NULL) {
+		if (row_count+1>=TEXT_BOX_MAX_ROWS) break;
+		rows[row_count++] = tmp+1;
+	}
+	
+	int rendered_height = LINE_HEIGHT * row_count;
+	int y = dst_rect->y;
+	y += (dst_rect->h - rendered_height) / 2;
+	
+	char line[256];
+	for (int i=0; i<row_count; i++) {
+		int len;
+		if (i+1<row_count) {
+			len = rows[i+1]-rows[i]-1;
+			if (len) strncpy(line, rows[i], len);
+			line[len] = '\0';
+		}
+		else {
+			len = strlen(rows[i]);
+			strcpy(line, rows[i]);
+		}
+		
+		
+		if (len) {
+			text = TTF_RenderUTF8_Blended(font, line, COLOR_LIGHT_TEXT);
+			int x = dst_rect->x;
+			x += (dst_rect->w - text->w) / 2;
+			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x,y});
+			SDL_FreeSurface(text);
+		}
+		y += LINE_HEIGHT;
+	}
 }
 
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark) {
