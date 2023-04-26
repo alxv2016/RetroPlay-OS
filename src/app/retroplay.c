@@ -23,7 +23,6 @@
 #include "../common/settings.h"
 
 ///////////////////////////////////////
-GFX gfx;
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;

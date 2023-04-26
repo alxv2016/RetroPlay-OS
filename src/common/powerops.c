@@ -20,7 +20,6 @@
 /* POWER */
 int can_poweroff = 1;
 char governor[128];
-GFX gfx;
 
 void disablePoweroff(void) { can_poweroff = 0; }
 
