@@ -94,7 +94,6 @@ void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, 
 void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
 void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
 void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int y);
-void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
 
 #endif

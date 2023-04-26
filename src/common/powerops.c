@@ -94,10 +94,9 @@ int preventAutosleep(void) { return isCharging(); }
 void powerOff(void) {
   if (can_poweroff) {
     menuSuperShortPulse();
-    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off"
-                                         : "Powering off";
+    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off" : "Powering off";
     SDL_FillRect(gfx.screen, NULL, 0);
-    paragraph(H3, 1, msg, (SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
+    heading(H1, 1, msg,(SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
     SDL_Flip(gfx.screen);
     sleep(1);
     system("shutdown");

@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 			SDL_BlitSurface(progress_bar_empty, NULL, gfx.screen, &(SDL_Rect){120, 236});
 			SDL_BlitSurface(progress_bar_full, &(SDL_Rect){0, 0, progress * 4, 8}, gfx.screen, &(SDL_Rect){120, 236});
 		}
-		paragraph(H3, 1, msg, (SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
+		heading(H3, 1, msg, (SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
 		SDL_Flip(gfx.screen);
 	}
 
