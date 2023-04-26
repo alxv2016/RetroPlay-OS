@@ -73,6 +73,8 @@ void GFX_ready(void);
 void GFX_quit(void);
 void GFX_sync(unsigned long frameStart );
 
+void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy);
+
 void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);

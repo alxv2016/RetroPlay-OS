@@ -287,7 +287,8 @@ int main(int argc, char *argv[]) {
             listMenu(g_gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
           }
         } else {
-          emptyState(g_gfx.screen, g_font.small, 24, "Couldn't find any games, \n load some games to start playing.");
+          // emptyState(g_gfx.screen, g_font.small, 24, "Couldn't find any games, \n load some games to start playing.");
+          emptyState2(g_gfx.screen, g_font.large, g_font.tiny, "Couldn't find any games. \n Sorry your games didn't load", "Load some games to start playing. \n Get some games put them in and start playing.");
         }
       }
 

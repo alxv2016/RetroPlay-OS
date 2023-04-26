@@ -378,6 +378,30 @@ void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg)
   paragraph(font, msg, lineHeight, surface, &(SDL_Rect){0, emptyStateIcon->h/2, surface->w, surface->h});
 }
 
+static void headingCopyCombo(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy) {
+  int headingLineHeight = 40;
+  int bodyLineHeight = 33;
+  int margin = 24;
+  int headingHeight;
+  int bodyHeight;
+  TTF_SizeUTF8(heading, headingCopy, NULL, &headingHeight);
+  TTF_SizeUTF8(body, bodyCopy, NULL, &bodyHeight);
+  paragraph(heading, headingCopy, headingLineHeight, surface, &(SDL_Rect){0, -(headingHeight + margin / 2), surface->w, surface->h});
+  paragraph(body, bodyCopy, bodyLineHeight, surface, &(SDL_Rect){0, bodyHeight + (margin / 2), surface->w, surface->h});
+}
+
+void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy) {
+  // SDL_Surface *emptyStateIcon = g_gfx.empty_state;
+  // int msgWidth;
+  // int msgHeight;
+  // TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);
+  // int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
+  // int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
+
+  // SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - emptyStateIcon->h/2});
+  headingCopyCombo(surface, heading, body, headingCopy, bodyCopy);
+}
+
 // nameScroller - Deprecated (opting for truncation instead)
 // static int scrollSelected = -1;
 // static int scrollTicks = 0;
