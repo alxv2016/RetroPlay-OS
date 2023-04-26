@@ -17,13 +17,14 @@
 scripts to show messages during installation, updates and other messages.
 A string is pass through the shell script and gets picked up here.
 sys-img and confirm have similar logic */
+float headingLineHeight = H1 * HEADING_LINEHEIGHT;
 
 static void blit(void *_dst, int dst_w, int dst_h, void *_src, int src_w,
                  int src_h, int ox, int oy) {
   uint8_t *dst = (uint8_t *)_dst;
   uint8_t *src = (uint8_t *)_src;
 
-  oy += FONT_LINEHEIGHT - src_h;
+  oy += headingLineHeight - src_h;
 
   for (int y = 0; y < src_h; y++) {
     uint8_t *dst_row = dst + (((((dst_h - 1 - oy) - y) * dst_w) - 1 - ox) * 4);
@@ -70,11 +71,11 @@ int main(int argc, char *argv[]) {
   memset(fb0_map, 0, map_size);
   // INIT TEXT MESSAGE
   TTF_Init();
-  TTF_Font *font = TTF_OpenFont(path, FONT_LARGE);
+  TTF_Font *font = TTF_OpenFont(path, H1);
 
   int width = SCREEN_WIDTH;
   int height = SCREEN_HEIGHT;
-  SDL_Color font_color = {TRIAD_WHITE};
+  SDL_Color font_color = {WHITE};
   SDL_Surface *text;
   char *rows[MAX_ROW];
   int row_count = 0;
@@ -87,7 +88,7 @@ int main(int argc, char *argv[]) {
     rows[row_count++] = tmp + 1;
   }
 
-  int rendered_height = FONT_LINEHEIGHT * row_count;
+  int rendered_height = headingLineHeight * row_count;
   int y = (height - rendered_height) / 2;
 
   char line[MAX_PATH];
@@ -110,7 +111,7 @@ int main(int argc, char *argv[]) {
       blit(fb0_map, width, height, text->pixels, text->w, text->h, x, y);
       SDL_FreeSurface(text);
     }
-    y += FONT_LINEHEIGHT;
+    y += headingLineHeight;
   }
 
   TTF_CloseFont(font);

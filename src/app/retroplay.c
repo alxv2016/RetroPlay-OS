@@ -287,8 +287,8 @@ int main(int argc, char *argv[]) {
             listMenu(g_gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
           }
         } else {
-          // emptyState(g_gfx.screen, g_font.small, 24, "Couldn't find any games, \n load some games to start playing.");
-          emptyState2(g_gfx.screen, g_font.large, g_font.tiny, "Couldn't find any games. \n Sorry your games didn't load", "Load some games to start playing. \n Get some games put them in and start playing.");
+          // emptyState(g_gfx.screen, font.h3, 24, "Couldn't find any games, \n load some games to start playing.");
+          emptyState2(g_gfx.screen, font.h1, font.body, "Couldn't find any games. \n Sorry your games didn't load", "Load some games to start playing. \n Get some games put them in and start playing.");
         }
       }
 
@@ -300,29 +300,29 @@ int main(int argc, char *argv[]) {
       // }
 
       if (showSettingsMenu) {
-        button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR,
+        button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
                419);
         button(g_gfx.screen, "B", "Close", 1, 1,
-               SCREEN_WIDTH - PADDING_LR - 120, 419);
+               SCREEN_WIDTH - SPACING_LG - 120, 419);
       } else {
         if (total == 0 && stack->count > 1) {
-          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - PADDING_LR,
+          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         } else if (total > 0 && stack->count > 1) {
-          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - PADDING_LR,
+          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
           button(g_gfx.screen, "B", "Back", 1, 1,
-                 SCREEN_WIDTH - PADDING_LR - 101, 419);
+                 SCREEN_WIDTH - SPACING_LG - 101, 419);
         } else {
-          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - PADDING_LR,
+          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         }
       }
 
-      batteryStatus(g_gfx.screen, SCREEN_WIDTH - PADDING_LR, 12);
+      batteryStatus(g_gfx.screen, SCREEN_WIDTH - SPACING_LG, 12);
 
       if (volumeAdjustTime && !showSettingsMenu) {
-        volumnBrightness(g_gfx.screen, PADDING_LR, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
+        volumnBrightness(g_gfx.screen, SPACING_LG, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
       }
       SDL_Flip(g_gfx.screen);
       dirty = 0;

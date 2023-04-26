@@ -15,15 +15,17 @@
 /* USER INTERFACE AND COMPONENTS */
 
 GFX g_gfx;
-Font g_font;
+Font font;
 
 void GFX_init(void) {
   TTF_Init();
-  g_font.large = TTF_OpenFont(FONT_PATH, FONT_LARGE);
-  g_font.medium = TTF_OpenFont(FONT_PATH, FONT_MEDIUM);
-  g_font.small = TTF_OpenFont(FONT_PATH, FONT_SMALL);
-  g_font.tiny = TTF_OpenFont(FONT_PATH, FONT_TINY);
-  g_font.footnote = TTF_OpenFont(FONT_PATH, FONT_FOOTNOTE);
+
+  font.h1 = TTF_OpenFont(FONT_PATH, H1);
+  font.h2 = TTF_OpenFont(FONT_PATH, H2);
+  font.h3 = TTF_OpenFont(FONT_PATH, H3);
+  font.body = TTF_OpenFont(FONT_PATH, BODY);
+  font.caption = TTF_OpenFont(FONT_PATH, CAPTION);
+  font.footnote = TTF_OpenFont(FONT_PATH, FOOTNOTE);
 
   g_gfx.button = loadImage("btn.png");
   g_gfx.button_outline = loadImage("btn-outline.png");
@@ -113,11 +115,12 @@ void GFX_quit(void) {
   SDL_FreeSurface(g_gfx.sys_snes);
   SDL_FreeSurface(g_gfx.empty_state);
 
-  TTF_CloseFont(g_font.large);
-  TTF_CloseFont(g_font.medium);
-  TTF_CloseFont(g_font.small);
-  TTF_CloseFont(g_font.tiny);
-  TTF_CloseFont(g_font.footnote);
+  TTF_CloseFont(font.h1);
+  TTF_CloseFont(font.h2);
+  TTF_CloseFont(font.h3);
+  TTF_CloseFont(font.body);
+  TTF_CloseFont(font.caption);
+  TTF_CloseFont(font.footnote);
 
   if (g_gfx.screen)
     SDL_FreeSurface(g_gfx.screen);
@@ -131,10 +134,10 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
   int marginLeft = 32;
   int titleMarginLeft = showIcon? marginLeft + CONSOLE_ICON_SIZE + 18: marginLeft;
   int availableWidth = SCREEN_WIDTH - marginLeft * 2;
-  int titleWidth = truncateText(g_font.small, displayName, availableWidth, marginLeft * 2);
-  SDL_Surface *title = TTF_RenderUTF8_Blended(g_font.small, displayName, COLOR_LIGHT_TEXT);
-  int accent = SDL_MapRGB(surface->format, TRIAD_ACCENT);
-  int background = SDL_MapRGB(surface->format, TRIAD_ACTIVE);
+  int titleWidth = truncateText(font.h3, displayName, availableWidth, marginLeft * 2);
+  SDL_Surface *title = TTF_RenderUTF8_Blended(font.h3, displayName, LIGHT_TEXT);
+  int accent = SDL_MapRGB(surface->format, PRIMARY);
+  int background = SDL_MapRGB(surface->format, GREY500);
 
   int rowWidth = showIcon? marginLeft + CONSOLE_ICON_SIZE + 18 + title->w + marginLeft: marginLeft + title->w + marginLeft;
   // if (!showIcon) rowWidth = marginLeft + title->w + marginLeft;
@@ -162,7 +165,7 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
   trimSortingMeta(&display_name);
   sysCover = g_gfx.sys_arcade;
   int w = sysCover->w;
-  int x = SCREEN_WIDTH - (w + PADDING_LR);
+  int x = SCREEN_WIDTH - (w + SPACING_LG);
   int cy = (SCREEN_HEIGHT / 2) - (sysCover->h / 2);
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
@@ -226,7 +229,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
 
   char percentStr[5];
   sprintf(percentStr, "%i%%", charge);
-  batLabel = TTF_RenderUTF8_Blended(g_font.tiny, percentStr, COLOR_LIGHT_TEXT);
+  batLabel = TTF_RenderUTF8_Blended(font.body, percentStr, LIGHT_TEXT);
   
   int margin = 8;
   int batteryRightAlign = x - batIcon->w;
@@ -235,7 +238,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
 
   if (isCharging()) {
     // NOTE: Not sure how we can get battery percent during charging.
-    batLabel = TTF_RenderUTF8_Blended(g_font.tiny, "Charging", COLOR_LIGHT_TEXT);
+    batLabel = TTF_RenderUTF8_Blended(font.body, "Charging", LIGHT_TEXT);
     labelRightAlign = x - (batLabel->w + batIcon->w + margin);
     SDL_BlitSurface(g_gfx.battery_charge, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
     SDL_BlitSurface(batLabel, NULL, surface, &(SDL_Rect){labelRightAlign, y + batLabelCY});
@@ -267,7 +270,7 @@ int getButtonWidth(char *blabel) {
   SDL_Surface* TextSurface;
   int margin = 6;
   int btnWidth = BUTTON_SIZE + margin;
-  TextSurface = TTF_RenderUTF8_Solid(g_font.small, blabel, COLOR_LIGHT_TEXT);
+  TextSurface = TTF_RenderUTF8_Solid(font.h3, blabel, LIGHT_TEXT);
   SDL_FreeSurface(TextSurface);
   btnWidth += TextSurface->w;
   return btnWidth;
@@ -277,9 +280,9 @@ int getButtonWidth(char *blabel) {
 void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y) {
   SDL_Surface *btn = outline? g_gfx.button_outline : g_gfx.button;
   SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(g_font.tiny, bkey, outline?COLOR_LIGHT_TEXT:COLOR_DARK_TEXT);
+      TTF_RenderUTF8_Blended(font.body, bkey, outline?LIGHT_TEXT:DARK_TEXT);
   SDL_Surface *btnLabel =
-      TTF_RenderUTF8_Blended(g_font.tiny, blabel, COLOR_LIGHT_TEXT);
+      TTF_RenderUTF8_Blended(font.body, blabel, LIGHT_TEXT);
 
   int margin = 6;
   int btnCX = (btn->w / 2) - (btnKey->w / 2);
@@ -311,8 +314,8 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, i
   int h = 4;
   int pw = w * ((float)(value - minValue) / (maxValue - minValue));
   int cy = (displayIcon->h / 2) - (h / 2);
-  int progress = SDL_MapRGB(surface->format, TRIAD_WHITE);
-  int background = SDL_MapRGB(surface->format, TRIAD_GRAY200);
+  int progress = SDL_MapRGB(surface->format, WHITE);
+  int background = SDL_MapRGB(surface->format, GREY400);
 
   SDL_BlitSurface(displayIcon, NULL, surface, &(SDL_Rect){x, y});
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
@@ -323,9 +326,9 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, i
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
   SDL_Surface *btn = g_gfx.button;
   SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(g_font.tiny, bkey, COLOR_DARK_TEXT);
+      TTF_RenderUTF8_Blended(font.body, bkey, DARK_TEXT);
   SDL_Surface *btnLabel =
-      TTF_RenderUTF8_Blended(g_font.tiny, blabel, COLOR_LIGHT_TEXT);
+      TTF_RenderUTF8_Blended(font.body, blabel, LIGHT_TEXT);
 
   // Pill's left radius
   SDL_Rect rectL;
@@ -355,7 +358,7 @@ void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
 
   SDL_BlitSurface(btn, &rectL, surface, &(SDL_Rect){x, y});
   // Pill's fill container
-  SDL_FillRect(surface, &rectFill, SDL_MapRGB(btn->format, TRIAD_WHITE));
+  SDL_FillRect(surface, &rectFill, SDL_MapRGB(btn->format, WHITE));
   SDL_BlitSurface(btn, &rectR, surface,
                   &(SDL_Rect){x + btn->w / 2 + btnKey->w, y});
   SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){x + btnCX, y + btnCY});
@@ -443,8 +446,8 @@ void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *
 
 //   SDL_FillRect(surface,
 //                &(SDL_Rect){0, 0 + (row * ROW_HEIGHT), SCREEN_WIDTH, ROW_HEIGHT},
-//                SDL_MapRGB(surface->format, TRIAD_WHITE));
-//   text = TTF_RenderUTF8_Blended(g_font.medium, displayName, COLOR_DARK_TEXT);
+//                SDL_MapRGB(surface->format, WHITE));
+//   text = TTF_RenderUTF8_Blended(g_font.medium, displayName, DARK_TEXT);
 
 //   int centerY = (ROW_HEIGHT - text->h) / 2;
 //   SDL_BlitSurface(text, &(SDL_Rect){0, 0, maxWidth, text->h}, surface,
@@ -463,13 +466,13 @@ SDL_Surface *loadImage(char *path) {
 }
 
 SDL_Surface *renderText(char *text) {
-  SDL_Color color = COLOR_LIGHT_TEXT;
-  return TTF_RenderUTF8_Blended(g_font.medium, text, color);
+  SDL_Color color = LIGHT_TEXT;
+  return TTF_RenderUTF8_Blended(font.h2, text, color);
 }
 
 void hintLabel(SDL_Surface *surface, char *htxt, int x, int y) {
   SDL_Surface *hint_text =
-      TTF_RenderUTF8_Blended(g_font.small, htxt, COLOR_LIGHT_TEXT);
+      TTF_RenderUTF8_Blended(font.h3, htxt, LIGHT_TEXT);
   SDL_BlitSurface(hint_text, NULL, surface, &(SDL_Rect){x, y});
   SDL_FreeSurface(hint_text);
 }
@@ -504,7 +507,7 @@ static void content(TTF_Font* font, char* copy, int lineHeight, SDL_Surface* sur
 		}
 		
 		if (len) {
-			text = TTF_RenderUTF8_Blended(font, line, COLOR_LIGHT_TEXT);
+			text = TTF_RenderUTF8_Blended(font, line, LIGHT_TEXT);
 			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x+((dst_rect->w-text->w)/2),y+(i*lineHeight)});
 			SDL_FreeSurface(text);
 		}
@@ -546,7 +549,7 @@ void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, 
 		
 		
 		if (len) {
-			text = TTF_RenderUTF8_Blended(font, line, COLOR_LIGHT_TEXT);
+			text = TTF_RenderUTF8_Blended(font, line, LIGHT_TEXT);
 			int x = dst_rect->x;
 			x += (dst_rect->w - text->w) / 2;
 			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x,y});
@@ -593,8 +596,8 @@ static void getTextSize(TTF_Font* font, char* str, int lineHeight, int* w, int* 
 
 void inlineText(SDL_Surface *surface, char *str, int x, int y, int dark) {
   SDL_Surface *text;
-  SDL_Color font_color = dark ? COLOR_DARK_TEXT : COLOR_LIGHT_TEXT;
-  text = TTF_RenderUTF8_Blended(g_font.medium, str, font_color);
+  SDL_Color font_color = dark ? DARK_TEXT : LIGHT_TEXT;
+  text = TTF_RenderUTF8_Blended(font.body, str, font_color);
   SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x, y});
   SDL_FreeSurface(text);
 }

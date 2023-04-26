@@ -1,59 +1,70 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
-// Raw Hex Colors
-#define TRIAD_WHITE 0xff, 0xff, 0xff
-#define TRIAD_BLACK 0x00, 0x00, 0x00
-#define TRIAD_LIGHT_GRAY 0x7f, 0x7f, 0x7f
-#define TRIAD_GRAY 0x99, 0x99, 0x99
-#define TRIAD_DARK_GRAY 0x26, 0x26, 0x26
-#define TRIAD_LIGHT_TEXT 0xcc, 0xcc, 0xcc
-#define TRIAD_DARK_TEXT 0x00, 0x00, 0x00
-#define TRIAD_ACTIVE 0x23, 0x23, 0x23
-#define TRIAD_ACCENT 0xDB, 0xFF, 0x4D
-#define TRIAD_GRAY200 0x51, 0x51, 0x51
-// Colors
-#define COLOR_WHITE (SDL_Color){TRIAD_WHITE}
-#define COLOR_GRAY (SDL_Color){TRIAD_GRAY}
-#define COLOR_BLACK (SDL_Color){TRIAD_BLACK}
-#define COLOR_LIGHT_TEXT (SDL_Color){TRIAD_LIGHT_TEXT}
-#define COLOR_DARK_TEXT (SDL_Color){TRIAD_DARK_TEXT}
-#define COLOR_GRAY_TEXT (SDL_Color){TRIAD_GRAY}
-#define COLOR_BUTTON_TEXT (SDL_Color){TRIAD_GRAY}
-#define COLOR_ACTIVE (SDL_Color){TRIAD_ACTIVE}
-#define COLOR_ACCENT (SDL_Color){TRIAD_ACCENT}
-#define COLOR_GRAY200 (SDL_Color){TRIAD_GRAY200}
+/* STYLE GUIDE */
 
-// Screen size
+// Typography 
+#define H1 31
+#define H2 28
+#define H3 25
+#define BODY 22
+#define CAPTION 20
+#define FOOTNOTE 17
+#define HEADING_LINEHEIGHT 1.25
+#define BODY_LINEHEIGHT 1.5
+
+// Nuetral Colors
+#define WHITE 0xff, 0xff, 0xff
+#define BLACK 0x00, 0x00, 0x00
+#define GREY100 0xe8, 0xe8, 0xe8
+#define GREY200 0xb5, 0xb5, 0xb5
+#define GREY300 0x81, 0x81, 0x81
+#define GREY400 0x4e, 0x4e, 0x4e
+#define GREY500 0x1a, 0x1a, 0x1a
+
+// Brand Colors
+#define PRIMARY 0xdb, 0xff, 0x4d
+#define SECONDARY 0x23, 0xff, 0xe5
+#define PRIMARY100 0xf4, 0xff, 0xca
+#define PRIMARY200 0xe8, 0xff, 0x8b
+#define SECONDARY100 0xbd, 0xff, 0xf7
+#define SECONDARY200 0x70, 0xff, 0xee
+
+// Color tokens
+#define SURFACE_LIGHT (SDL_Color){WHITE}
+#define SURFACE_DARK (SDL_Color){BLACK}
+#define SURFACE_ACTIVE (SDL_Color){GREY500}
+#define PRIMARY_ACCENT (SDL_Color){PRIMARY}
+#define SECONDARY_ACCENT (SDL_Color){SECONDARY}
+#define LIGHT_TEXT (SDL_Color){GREY100}
+#define DARK_TEXT (SDL_Color){GREY500}
+#define NEUTRAL_TEXT (SDL_Color){GREY400}
+
+// Spacing scale
+#define SPACING_XS 8
+#define SPACING_SM 12
+#define SPACING_MD 16
+#define SPACING_LG 24
+#define SPACING_XL 32
+#define SPACING_XXL 48
+
+// Viewport size
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
-// UI Dimensions
+// Component sizes
 #define ICON_SIZE 28
 #define CONSOLE_ICON_SIZE 48
 #define BUTTON_SIZE 32
 #define RADIUS 16
 
-// Screen spacing
-#define PADDING 20
-#define PADDING_TOP 12
-#define PADDING_LR 20
-
-/// MENU
+/// List elements
 #define ROW_COUNT 5
 #define ROW_HEIGHT 64
 #define MAX_SIZE 16
 #define MAX_ROW 16
 
-// Font size
-#define FONT_LARGE 32
-#define FONT_MEDIUM 28
-#define FONT_SMALL 24
-#define FONT_TINY 22
-#define FONT_FOOTNOTE 16
-#define FONT_LINEHEIGHT 32
-
-// Paths
+// System paths
 #define MAX_PATH 512
 #define TEMP_PATH "/tmp/"
 #define BATTERY_INFO "/tmp/battery"

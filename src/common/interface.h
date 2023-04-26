@@ -46,10 +46,11 @@ typedef struct GFX_Context {
 } GFX;
 // Fonts
 typedef struct GFX_Fonts {
-  TTF_Font *large;
-  TTF_Font *medium;
-  TTF_Font *small;
-  TTF_Font *tiny;
+  TTF_Font *h1;
+  TTF_Font *h2;
+  TTF_Font *h3;
+  TTF_Font *body;
+  TTF_Font *caption;
   TTF_Font *footnote;
 } Font;
 
@@ -65,7 +66,7 @@ enum Console {
 };
 
 extern GFX g_gfx;
-extern Font g_font;
+extern Font font;
 
 void GFX_init(void);
 void GFX_clear(void);
