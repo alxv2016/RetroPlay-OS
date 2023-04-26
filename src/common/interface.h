@@ -65,7 +65,7 @@ enum Console {
   SNES,
 };
 
-extern GFX g_gfx;
+extern GFX gfx;
 extern Font font;
 
 void GFX_init(void);

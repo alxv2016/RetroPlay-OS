@@ -20,10 +20,10 @@
 #include "../common/interface.h"
 #include "../common/powerops.h"
 #include "../common/rumble.h"
-#include "../settings/settings.h"
+#include "../common/settings.h"
 
 ///////////////////////////////////////
-GFX g_gfx;
+GFX gfx;
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   SDL_ShowCursor(0);
   SDL_EnableKeyRepeat(300, 100);
   InitSettings();
-  g_gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
   if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
   GFX_init();
   GFX_ready();
@@ -276,63 +276,63 @@ int main(int argc, char *argv[]) {
     }
 
     if (dirty) {
-      SDL_FillRect(g_gfx.screen, NULL, 0);
+      SDL_FillRect(gfx.screen, NULL, 0);
       if (showSettingsMenu) {
-        initSettings(g_gfx.screen, settingItemSelected, currentVolume, currentBrightness, currentSleepTime);
+        initSettings(gfx.screen, settingItemSelected, currentVolume, currentBrightness, currentSleepTime);
       } else {
         if (total > 0) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            listMenu(g_gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
+            listMenu(gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
           }
         } else {
-          // emptyState(g_gfx.screen, font.h3, 24, "Couldn't find any games, \n load some games to start playing.");
-          emptyState2(g_gfx.screen, font.h1, font.body, "Couldn't find any games. \n Sorry your games didn't load", "Load some games to start playing. \n Get some games put them in and start playing.");
+          // emptyState(gfx.screen, font.h3, 24, "Couldn't find any games, \n load some games to start playing.");
+          emptyState2(gfx.screen, font.h1, font.body, "Couldn't find any games. \n Sorry your games didn't load", "Load some games to start playing. \n Get some games put them in and start playing.");
         }
       }
 
       // if (can_resume && !show_version) {
       //   if (strlen("X") > 1)
-      //     button(g_gfx.screen, "X", "Resume", 0, 20, 419);
+      //     button(gfx.screen, "X", "Resume", 0, 20, 419);
       //   else
-      //     button(g_gfx.screen, "X", "Resume", 0, 557, 419);
+      //     button(gfx.screen, "X", "Resume", 0, 557, 419);
       // }
 
       if (showSettingsMenu) {
-        button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
+        button(gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
                419);
-        button(g_gfx.screen, "B", "Close", 1, 1,
+        button(gfx.screen, "B", "Close", 1, 1,
                SCREEN_WIDTH - SPACING_LG - 120, 419);
       } else {
         if (total == 0 && stack->count > 1) {
-          button(g_gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          button(gfx.screen, "B", "Back", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         } else if (total > 0 && stack->count > 1) {
-          button(g_gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          button(gfx.screen, "A", "Play", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
-          button(g_gfx.screen, "B", "Back", 1, 1,
+          button(gfx.screen, "B", "Back", 1, 1,
                  SCREEN_WIDTH - SPACING_LG - 101, 419);
         } else {
-          button(g_gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
+          button(gfx.screen, "A", "Select", 0, 1, SCREEN_WIDTH - SPACING_LG,
                  419);
         }
       }
 
-      batteryStatus(g_gfx.screen, SCREEN_WIDTH - SPACING_LG, 12);
+      batteryStatus(gfx.screen, SCREEN_WIDTH - SPACING_LG, 12);
 
       if (volumeAdjustTime && !showSettingsMenu) {
-        volumnBrightness(g_gfx.screen, SPACING_LG, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
+        volumnBrightness(gfx.screen, SPACING_LG, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
       }
-      SDL_Flip(g_gfx.screen);
+      SDL_Flip(gfx.screen);
       dirty = 0;
     }
     // slow down to 60fps
     GFX_sync(frameStart);
   }
 
-  SDL_FillRect(g_gfx.screen, NULL, 0);
-  SDL_Flip(g_gfx.screen);
+  SDL_FillRect(gfx.screen, NULL, 0);
+  SDL_Flip(gfx.screen);
 
   Menu_quit();
   GFX_quit();

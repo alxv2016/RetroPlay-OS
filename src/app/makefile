@@ -17,7 +17,7 @@ CFLAGS = -I$(INCLUDE_DIR) -I. -I../common -DPLATFORM_$(shell echo $(PLATFORM) | 
 LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lSDL_mixer -lmsettings -lrt -lz -lm
 OPTM=-O3
 
-OBJS = ../common/utils.c ../common/api.c ../common/interface.c ../common/controls.c ../common/powerops.c ../common/rumble.c ../settings/settings.c
+OBJS = ../common/utils.c ../common/api.c ../common/interface.c ../common/controls.c ../common/powerops.c ../common/rumble.c ../common/settings.c
 
 all:
 	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(CFLAGS) $(LDFLAGS) $(OPTM) -ldl -rdynamic

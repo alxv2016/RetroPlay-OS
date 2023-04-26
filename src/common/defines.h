@@ -80,6 +80,7 @@
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"
 #define COLLECTIONS_PATH "/mnt/SDCARD/Collections"
 #define FONT_PATH "/mnt/SDCARD/.system/res/Roboto-Regular.ttf"
+#define FONT_PATH_MEDIUM "/mnt/SDCARD/.system/res/Roboto-Medium.ttf"
 #define DEBUG_PATH "/mnt/SDCARD/debug.txt"
 
 #define LAST_PATH "/tmp/last.txt"

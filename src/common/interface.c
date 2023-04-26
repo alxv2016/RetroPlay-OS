@@ -14,7 +14,7 @@
 
 /* USER INTERFACE AND COMPONENTS */
 
-GFX g_gfx;
+GFX gfx;
 Font font;
 
 void GFX_init(void) {
@@ -27,51 +27,51 @@ void GFX_init(void) {
   font.caption = TTF_OpenFont(FONT_PATH, CAPTION);
   font.footnote = TTF_OpenFont(FONT_PATH, FOOTNOTE);
 
-  g_gfx.button = loadImage("btn.png");
-  g_gfx.button_outline = loadImage("btn-outline.png");
-  g_gfx.corner_radius = loadImage("radius-black.png");
-  g_gfx.settings_bar_full = loadImage("progress-full.png");
-  g_gfx.settings_bar_empty = loadImage("progress-empty.png");
-  g_gfx.brightness = loadImage("brightness.png");
-  g_gfx.volume = loadImage("volume.png");
-  g_gfx.mute = loadImage("mute.png");
-  g_gfx.battery_charge = loadImage("battery-charge.png");
-  g_gfx.battery_power = loadImage("battery-power.png");
-  g_gfx.battery = loadImage("battery.png");
-  g_gfx.battery_low_power = loadImage("battery-low-power.png");
-  g_gfx.battery_low = loadImage("battery-low.png");
-  g_gfx.power = loadImage("power.png");
-  g_gfx.sleep = loadImage("sleep.png");
-  g_gfx.recents = loadImage("recents.png");
-  g_gfx.apps = loadImage("apps.png");
-  g_gfx.sleep_timer = loadImage("sleep-timer.png");
-  g_gfx.arcade = loadImage("arcade.png");
-  g_gfx.nes = loadImage("nes.png");
-  g_gfx.gameboy = loadImage("gameboy.png");
-  g_gfx.gba = loadImage("gba.png");
-  g_gfx.gbc = loadImage("gbc.png");
-  g_gfx.sega = loadImage("sega.png");
-  g_gfx.playstation = loadImage("playstation.png");
-  g_gfx.snes = loadImage("snes.png");
-  g_gfx.sys_arcade = loadImage("sys-arcade.png");
-  g_gfx.sys_gb = loadImage("sys-gb.png");
-  g_gfx.sys_gba = loadImage("sys-gba.png");
-  g_gfx.sys_gbc = loadImage("sys-gbc.png");
-  g_gfx.sys_gg = loadImage("sys-gg.png");
-  g_gfx.sys_nes = loadImage("sys-nes.png");
-  g_gfx.sys_playstation = loadImage("sys-playstation.png");
-  g_gfx.sys_sega = loadImage("sys-sega.png");
-  g_gfx.sys_snes = loadImage("sys-snes.png");
-  g_gfx.empty_state = loadImage("empty-folder.png");
+  gfx.button = loadImage("btn.png");
+  gfx.button_outline = loadImage("btn-outline.png");
+  gfx.corner_radius = loadImage("radius-black.png");
+  gfx.settings_bar_full = loadImage("progress-full.png");
+  gfx.settings_bar_empty = loadImage("progress-empty.png");
+  gfx.brightness = loadImage("brightness.png");
+  gfx.volume = loadImage("volume.png");
+  gfx.mute = loadImage("mute.png");
+  gfx.battery_charge = loadImage("battery-charge.png");
+  gfx.battery_power = loadImage("battery-power.png");
+  gfx.battery = loadImage("battery.png");
+  gfx.battery_low_power = loadImage("battery-low-power.png");
+  gfx.battery_low = loadImage("battery-low.png");
+  gfx.power = loadImage("power.png");
+  gfx.sleep = loadImage("sleep.png");
+  gfx.recents = loadImage("recents.png");
+  gfx.apps = loadImage("apps.png");
+  gfx.sleep_timer = loadImage("sleep-timer.png");
+  gfx.arcade = loadImage("arcade.png");
+  gfx.nes = loadImage("nes.png");
+  gfx.gameboy = loadImage("gameboy.png");
+  gfx.gba = loadImage("gba.png");
+  gfx.gbc = loadImage("gbc.png");
+  gfx.sega = loadImage("sega.png");
+  gfx.playstation = loadImage("playstation.png");
+  gfx.snes = loadImage("snes.png");
+  gfx.sys_arcade = loadImage("sys-arcade.png");
+  gfx.sys_gb = loadImage("sys-gb.png");
+  gfx.sys_gba = loadImage("sys-gba.png");
+  gfx.sys_gbc = loadImage("sys-gbc.png");
+  gfx.sys_gg = loadImage("sys-gg.png");
+  gfx.sys_nes = loadImage("sys-nes.png");
+  gfx.sys_playstation = loadImage("sys-playstation.png");
+  gfx.sys_sega = loadImage("sys-sega.png");
+  gfx.sys_snes = loadImage("sys-snes.png");
+  gfx.empty_state = loadImage("empty-folder.png");
 }
 
 void GFX_clear(void) {
-  SDL_FillRect(g_gfx.screen, NULL, 0);
-  SDL_Flip(g_gfx.screen);
+  SDL_FillRect(gfx.screen, NULL, 0);
+  SDL_Flip(gfx.screen);
 }
 
 void GFX_ready(void) {
-  g_gfx.screen = SDL_GetVideoSurface(); // :cold_sweat:
+  gfx.screen = SDL_GetVideoSurface(); // :cold_sweat:
 }
 
 void GFX_sync(unsigned long frameStart) {
@@ -82,38 +82,38 @@ void GFX_sync(unsigned long frameStart) {
 }
 
 void GFX_quit(void) {
-  SDL_FreeSurface(g_gfx.button);
-  SDL_FreeSurface(g_gfx.corner_radius);
-  SDL_FreeSurface(g_gfx.settings_bar_full);
-  SDL_FreeSurface(g_gfx.settings_bar_empty);
-  SDL_FreeSurface(g_gfx.brightness);
-  SDL_FreeSurface(g_gfx.volume);
-  SDL_FreeSurface(g_gfx.mute);
-  SDL_FreeSurface(g_gfx.battery_charge);
-  SDL_FreeSurface(g_gfx.battery_power);
-  SDL_FreeSurface(g_gfx.battery);
-  SDL_FreeSurface(g_gfx.battery_low_power);
-  SDL_FreeSurface(g_gfx.battery_low);
-  SDL_FreeSurface(g_gfx.recents);
-  SDL_FreeSurface(g_gfx.apps);
-  SDL_FreeSurface(g_gfx.arcade);
-  SDL_FreeSurface(g_gfx.nes);
-  SDL_FreeSurface(g_gfx.gameboy);
-  SDL_FreeSurface(g_gfx.gba);
-  SDL_FreeSurface(g_gfx.gbc);
-  SDL_FreeSurface(g_gfx.sega);
-  SDL_FreeSurface(g_gfx.playstation);
-  SDL_FreeSurface(g_gfx.snes);
-  SDL_FreeSurface(g_gfx.sys_arcade);
-  SDL_FreeSurface(g_gfx.sys_gb);
-  SDL_FreeSurface(g_gfx.sys_gba);
-  SDL_FreeSurface(g_gfx.sys_gbc);
-  SDL_FreeSurface(g_gfx.sys_gg);
-  SDL_FreeSurface(g_gfx.sys_nes);
-  SDL_FreeSurface(g_gfx.sys_playstation);
-  SDL_FreeSurface(g_gfx.sys_sega);
-  SDL_FreeSurface(g_gfx.sys_snes);
-  SDL_FreeSurface(g_gfx.empty_state);
+  SDL_FreeSurface(gfx.button);
+  SDL_FreeSurface(gfx.corner_radius);
+  SDL_FreeSurface(gfx.settings_bar_full);
+  SDL_FreeSurface(gfx.settings_bar_empty);
+  SDL_FreeSurface(gfx.brightness);
+  SDL_FreeSurface(gfx.volume);
+  SDL_FreeSurface(gfx.mute);
+  SDL_FreeSurface(gfx.battery_charge);
+  SDL_FreeSurface(gfx.battery_power);
+  SDL_FreeSurface(gfx.battery);
+  SDL_FreeSurface(gfx.battery_low_power);
+  SDL_FreeSurface(gfx.battery_low);
+  SDL_FreeSurface(gfx.recents);
+  SDL_FreeSurface(gfx.apps);
+  SDL_FreeSurface(gfx.arcade);
+  SDL_FreeSurface(gfx.nes);
+  SDL_FreeSurface(gfx.gameboy);
+  SDL_FreeSurface(gfx.gba);
+  SDL_FreeSurface(gfx.gbc);
+  SDL_FreeSurface(gfx.sega);
+  SDL_FreeSurface(gfx.playstation);
+  SDL_FreeSurface(gfx.snes);
+  SDL_FreeSurface(gfx.sys_arcade);
+  SDL_FreeSurface(gfx.sys_gb);
+  SDL_FreeSurface(gfx.sys_gba);
+  SDL_FreeSurface(gfx.sys_gbc);
+  SDL_FreeSurface(gfx.sys_gg);
+  SDL_FreeSurface(gfx.sys_nes);
+  SDL_FreeSurface(gfx.sys_playstation);
+  SDL_FreeSurface(gfx.sys_sega);
+  SDL_FreeSurface(gfx.sys_snes);
+  SDL_FreeSurface(gfx.empty_state);
 
   TTF_CloseFont(font.h1);
   TTF_CloseFont(font.h2);
@@ -122,8 +122,8 @@ void GFX_quit(void) {
   TTF_CloseFont(font.caption);
   TTF_CloseFont(font.footnote);
 
-  if (g_gfx.screen)
-    SDL_FreeSurface(g_gfx.screen);
+  if (gfx.screen)
+    SDL_FreeSurface(gfx.screen);
   TTF_Quit();
 }
 
@@ -163,59 +163,59 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
   SDL_Surface *sysCover;
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
-  sysCover = g_gfx.sys_arcade;
+  sysCover = gfx.sys_arcade;
   int w = sysCover->w;
   int x = SCREEN_WIDTH - (w + SPACING_LG);
   int cy = (SCREEN_HEIGHT / 2) - (sysCover->h / 2);
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
-    listItem(surface, g_gfx.arcade, 1, display_name, row, selected_row);
+    listItem(surface, gfx.arcade, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "FC") && !consoleDir) {
-    listItem(surface, g_gfx.nes, 1, display_name, row, selected_row);
+    listItem(surface, gfx.nes, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GB") && !consoleDir) {
-    listItem(surface, g_gfx.gameboy, 1, display_name, row, selected_row);
+    listItem(surface, gfx.gameboy, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
-    listItem(surface, g_gfx.gba, 1, display_name, row, selected_row);
+    listItem(surface, gfx.gba, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
-    listItem(surface,g_gfx.gbc, 1, display_name, row, selected_row);
+    listItem(surface,gfx.gbc, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "MD") && !consoleDir) {
-    listItem(surface, g_gfx.sega, 1, display_name, row, selected_row);
+    listItem(surface, gfx.sega, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "PS") && !consoleDir) {
-    listItem(surface, g_gfx.playstation, 1, display_name, row, selected_row);
+    listItem(surface, gfx.playstation, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
-    listItem(surface,g_gfx.snes, 1, display_name, row, selected_row);
+    listItem(surface,gfx.snes, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Apps") && !consoleDir) {
-    listItem(surface,g_gfx.apps, 1, display_name, row, selected_row);
+    listItem(surface,gfx.apps, 1, display_name, row, selected_row);
   } else if (!strcmp(name, "Recently Played")) {
-    listItem(surface,g_gfx.recents, 1, display_name, row, selected_row);
+    listItem(surface,gfx.recents, 1, display_name, row, selected_row);
   } else {
     // Display system covers images within rom directory
     // if (!strcmp(emuTag, "FBA") && consoleDir) {
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "FC") && consoleDir) {
-    //   sysCover = g_gfx.sys_nes;
+    //   sysCover = gfx.sys_nes;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "GB") && consoleDir) {
-    //   sysCover = g_gfx.sys_gb;
+    //   sysCover = gfx.sys_gb;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "GBA") && consoleDir) {
-    //   sysCover = g_gfx.sys_gba;
+    //   sysCover = gfx.sys_gba;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "GBC") && consoleDir) {
-    //   sysCover = g_gfx.sys_gbc;
+    //   sysCover = gfx.sys_gbc;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "MD") && consoleDir) {
-    //   sysCover = g_gfx.sys_sega;
+    //   sysCover = gfx.sys_sega;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "PS") && consoleDir) {
-    //   sysCover = g_gfx.sys_playstation;
+    //   sysCover = gfx.sys_playstation;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // } else if (!strcmp(emuTag, "SFC") && consoleDir) {
-    //   sysCover = g_gfx.sys_snes;
+    //   sysCover = gfx.sys_snes;
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // }
     // Just passing in any dummy icon for non consoles items
-    listItem(surface,g_gfx.nes, 0, display_name, row, selected_row);
+    listItem(surface,gfx.nes, 0, display_name, row, selected_row);
   }
 
 }
@@ -223,8 +223,8 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
 // Battery
 void batteryStatus(SDL_Surface *surface, int x, int y) {
   int charge = getInt(BATTERY_INFO);
-  SDL_Surface *batPower = charge < 40 ? g_gfx.battery_low_power : g_gfx.battery_power;
-  SDL_Surface *batIcon = g_gfx.battery;
+  SDL_Surface *batPower = charge < 40 ? gfx.battery_low_power : gfx.battery_power;
+  SDL_Surface *batIcon = gfx.battery;
   SDL_Surface *batLabel;
 
   char percentStr[5];
@@ -240,7 +240,7 @@ void batteryStatus(SDL_Surface *surface, int x, int y) {
     // NOTE: Not sure how we can get battery percent during charging.
     batLabel = TTF_RenderUTF8_Blended(font.body, "Charging", LIGHT_TEXT);
     labelRightAlign = x - (batLabel->w + batIcon->w + margin);
-    SDL_BlitSurface(g_gfx.battery_charge, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
+    SDL_BlitSurface(gfx.battery_charge, NULL, surface, &(SDL_Rect){batteryRightAlign, y});
     SDL_BlitSurface(batLabel, NULL, surface, &(SDL_Rect){labelRightAlign, y + batLabelCY});
     SDL_FreeSurface(batLabel);
   } else {
@@ -278,7 +278,7 @@ int getButtonWidth(char *blabel) {
 
 // Button
 void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rightAlign, int x, int y) {
-  SDL_Surface *btn = outline? g_gfx.button_outline : g_gfx.button;
+  SDL_Surface *btn = outline? gfx.button_outline : gfx.button;
   SDL_Surface *btnKey =
       TTF_RenderUTF8_Blended(font.body, bkey, outline?LIGHT_TEXT:DARK_TEXT);
   SDL_Surface *btnLabel =
@@ -308,7 +308,7 @@ void button(SDL_Surface *surface, char *bkey, char *blabel, int outline, int rig
 
 // Volumn settings component
 void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, int minValue, int maxValue) {
-  SDL_Surface *displayIcon = icon == 0 ? g_gfx.brightness : (icon == 1 ? g_gfx.volume : g_gfx.mute);
+  SDL_Surface *displayIcon = icon == 0 ? gfx.brightness : (icon == 1 ? gfx.volume : gfx.mute);
   int marginLeft = ICON_SIZE + 8;
   int w = SCREEN_WIDTH / 2 - marginLeft;
   int h = 4;
@@ -324,7 +324,7 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, i
 
 // Pill button
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
-  SDL_Surface *btn = g_gfx.button;
+  SDL_Surface *btn = gfx.button;
   SDL_Surface *btnKey =
       TTF_RenderUTF8_Blended(font.body, bkey, DARK_TEXT);
   SDL_Surface *btnLabel =
@@ -370,7 +370,7 @@ void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
 }
 
 void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg) {
-  SDL_Surface *emptyStateIcon = g_gfx.empty_state;
+  SDL_Surface *emptyStateIcon = gfx.empty_state;
   int msgWidth;
   int msgHeight;
   TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);
@@ -394,7 +394,7 @@ static void headingCopyCombo(SDL_Surface *surface, TTF_Font *heading, TTF_Font *
 }
 
 void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy) {
-  // SDL_Surface *emptyStateIcon = g_gfx.empty_state;
+  // SDL_Surface *emptyStateIcon = gfx.empty_state;
   // int msgWidth;
   // int msgHeight;
   // TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);

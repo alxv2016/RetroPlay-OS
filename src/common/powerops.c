@@ -20,7 +20,7 @@
 /* POWER */
 int can_poweroff = 1;
 char governor[128];
-GFX g_gfx;
+GFX gfx;
 
 void disablePoweroff(void) { can_poweroff = 0; }
 
@@ -97,9 +97,9 @@ void powerOff(void) {
     menuSuperShortPulse();
     char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off"
                                          : "Powering off";
-    SDL_FillRect(g_gfx.screen, NULL, 0);
-    paragraph(font.h3, msg, 24, g_gfx.screen, NULL);
-    SDL_Flip(g_gfx.screen);
+    SDL_FillRect(gfx.screen, NULL, 0);
+    paragraph(font.h3, msg, 24, gfx.screen, NULL);
+    SDL_Flip(gfx.screen);
     sleep(1);
     system("shutdown");
     while (1)

@@ -47,14 +47,14 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int accent = SDL_MapRGB(surface->format, PRIMARY);
   SDL_Surface *text;
   text = TTF_RenderUTF8_Blended(font.h3, item, LIGHT_TEXT);
-  SDL_Surface *powerIcon = g_gfx.power;
-  SDL_Surface *sleepIcon = g_gfx.sleep;
-  SDL_Surface *sleepTimerIcon = g_gfx.sleep_timer;
-  SDL_Surface *britIcon = g_gfx.brightness;
-  SDL_Surface *volIcon = volValue == 0? g_gfx.mute: g_gfx.volume;
-  SDL_Surface *progressEmptyBar = g_gfx.settings_bar_empty;
-  SDL_Surface *progressVolBar = g_gfx.settings_bar_full;
-  SDL_Surface *progressBritBar = g_gfx.settings_bar_full;
+  SDL_Surface *powerIcon = gfx.power;
+  SDL_Surface *sleepIcon = gfx.sleep;
+  SDL_Surface *sleepTimerIcon = gfx.sleep_timer;
+  SDL_Surface *britIcon = gfx.brightness;
+  SDL_Surface *volIcon = volValue == 0? gfx.mute: gfx.volume;
+  SDL_Surface *progressEmptyBar = gfx.settings_bar_empty;
+  SDL_Surface *progressVolBar = gfx.settings_bar_full;
+  SDL_Surface *progressBritBar = gfx.settings_bar_full;
 
   int iconTotalWidth = ICON_SIZE + 24;
   int progressTotalWidth = iconTotalWidth + progressEmptyBar->w + marginLeft;
