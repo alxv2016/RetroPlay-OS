@@ -81,8 +81,13 @@ void GFX_ready(void);
 void GFX_quit(void);
 void GFX_sync(unsigned long frameStart);
 
-void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy);
-void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg);
+void heading(int fontSize, int bold, char* copy, SDL_Color color, SDL_Surface *surface, SDL_Rect *offset);
+void paragraph(int fontSize, int bold, char* copy, SDL_Color color, SDL_Surface *surface, SDL_Rect *offset);
+int truncateText(TTF_Font *font, char *displayName,int max_width, int padding);
+SDL_Surface *loadImage(char *path);
+SDL_Surface *renderText(char *text);
+
+void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headingCopy, char *bodyCopy);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
 void batteryStatus(SDL_Surface *surface, int x, int y);
 void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
@@ -91,9 +96,5 @@ void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, 
 void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int y);
 void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y);
 void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
-void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, SDL_Rect* dst_rect);
-int truncateText(TTF_Font *font, char *displayName,int max_width, int padding);
-SDL_Surface *loadImage(char *path);
-SDL_Surface *renderText(char *text);
 
 #endif

@@ -16,7 +16,6 @@
 GFX gfx;
 Font font;
 
-
 void GFX_init(void) {
   TTF_Init();
 
@@ -359,7 +358,7 @@ void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int 
 // Volumn settings component
 void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, int minValue, int maxValue) {
   SDL_Surface *displayIcon = icon == 0 ? gfx.brightness : (icon == 1 ? gfx.volume : gfx.mute);
-  int marginLeft = ICON_SIZE + 8;
+  int marginLeft = ICON_SIZE + SPACING_XS;
   int w = SCREEN_WIDTH / 2 - marginLeft;
   int h = 4;
   int pw = w * ((float)(value - minValue) / (maxValue - minValue));
@@ -371,140 +370,6 @@ void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, i
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
 }
-
-// Pill button
-void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
-  SDL_Surface *btn = gfx.button;
-  SDL_Surface *btnKey =
-      TTF_RenderUTF8_Blended(font.body, bkey, (SDL_Color){DARK_TEXT});
-  SDL_Surface *btnLabel =
-      TTF_RenderUTF8_Blended(font.body, blabel, (SDL_Color){LIGHT_TEXT});
-
-  // Pill's left radius
-  SDL_Rect rectL;
-  rectL.x = 0;
-  rectL.y = 0;
-  rectL.w = BUTTON_SIZE / 2;
-  rectL.h = BUTTON_SIZE;
-
-  SDL_Rect rectFill;
-  rectFill.x = x + BUTTON_SIZE / 2;
-  rectFill.y = y;
-  rectFill.w = btnKey->w;
-  rectFill.h = BUTTON_SIZE;
-
-  SDL_Rect rectR;
-  rectR.x = BUTTON_SIZE / 2;
-  rectR.y = 0;
-  rectR.w = BUTTON_SIZE / 2;
-  rectR.h = BUTTON_SIZE;
-
-  int margin = 6;
-  int btnCX = ((btn->w / 2) + (btnKey->w / 2)) - (btnKey->w / 2);
-  // Bump 2px up to visually center letter in btn
-  int btnCY = (btn->h / 2) - (btnKey->h / 2) - 2;
-  int btnLabelCY = (btn->h / 2) - (btnLabel->h / 2);
-  int btnX = btn->w / 2 + btnKey->w + btn->w / 2 + margin;
-
-  SDL_BlitSurface(btn, &rectL, surface, &(SDL_Rect){x, y});
-  // Pill's fill container
-  SDL_FillRect(surface, &rectFill, SDL_MapRGB(btn->format, WHITE));
-  SDL_BlitSurface(btn, &rectR, surface,
-                  &(SDL_Rect){x + btn->w / 2 + btnKey->w, y});
-  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){x + btnCX, y + btnCY});
-  SDL_FreeSurface(btnKey);
-
-  SDL_BlitSurface(btnLabel, NULL, surface,
-                  &(SDL_Rect){x + btnX, y + btnLabelCY});
-  SDL_FreeSurface(btnLabel);
-}
-
-void emptyState(SDL_Surface *surface, TTF_Font *font, int lineHeight, char *msg) {
-  SDL_Surface *emptyStateIcon = gfx.empty_state;
-  int msgWidth;
-  int msgHeight;
-  TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);
-  int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
-  int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
-
-  SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - emptyStateIcon->h/2});
-  paragraph(font, msg, lineHeight, surface, &(SDL_Rect){0, emptyStateIcon->h/2, surface->w, surface->h});
-}
-
-static void headingCopyCombo(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy) {
-  int headingLineHeight = 40;
-  int bodyLineHeight = 33;
-  int margin = 24;
-  int headingHeight;
-  int bodyHeight;
-  TTF_SizeUTF8(heading, headingCopy, NULL, &headingHeight);
-  TTF_SizeUTF8(body, bodyCopy, NULL, &bodyHeight);
-  paragraph(heading, headingCopy, headingLineHeight, surface, &(SDL_Rect){0, -(headingHeight + margin / 2), surface->w, surface->h});
-  paragraph(body, bodyCopy, bodyLineHeight, surface, &(SDL_Rect){0, bodyHeight + (margin / 2), surface->w, surface->h});
-}
-
-void emptyState2(SDL_Surface *surface, TTF_Font *heading, TTF_Font *body, char *headingCopy, char *bodyCopy) {
-  // SDL_Surface *emptyStateIcon = gfx.empty_state;
-  // int msgWidth;
-  // int msgHeight;
-  // TTF_SizeUTF8(font, msg, &msgWidth, &msgHeight);
-  // int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
-  // int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
-
-  // SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - emptyStateIcon->h/2});
-  headingCopyCombo(surface, heading, body, headingCopy, bodyCopy);
-}
-
-// nameScroller - Deprecated (opting for truncation instead)
-// static int scrollSelected = -1;
-// static int scrollTicks = 0;
-// static int scrollDelay = 30;
-// static int scrollOffset = 0;
-// int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,
-//                  int maxWidth, int row, int selected, int reset, int force) {
-//   // reset is used when changing directories (otherwise returning from the first
-//   // row to the first row above wouldn't reset the scroll)
-//   if (reset || selected != scrollSelected) {
-//     scrollTicks = 0;
-//     scrollOffset = 0;
-//     scrollSelected = selected;
-//   }
-
-//   scrollTicks += 1;
-//   if (scrollTicks < scrollDelay)
-//     return 0; // nothing to do yet
-//   scrollOffset += 1;
-
-//   SDL_Surface *text;
-
-//   char *displayName = unique ? unique : name;
-//   trimSortingMeta(&displayName);
-
-//   if (text->w <= maxWidth) {
-//     SDL_FreeSurface(text);
-//     return 0;
-//   }
-//   // prevent overscroll
-//   if (scrollOffset > text->w - maxWidth) {
-//     scrollOffset = text->w - maxWidth;
-//     if (!force) { // nothing to draw unless something outside of this function
-//                   // dirtied the screen
-//       SDL_FreeSurface(text);
-//       return 0;
-//     }
-//   }
-
-//   SDL_FillRect(surface,
-//                &(SDL_Rect){0, 0 + (row * ROW_HEIGHT), SCREEN_WIDTH, ROW_HEIGHT},
-//                SDL_MapRGB(surface->format, WHITE));
-//   text = TTF_RenderUTF8_Blended(g_font.medium, displayName, DARK_TEXT);
-
-//   int centerY = (ROW_HEIGHT - text->h) / 2;
-//   SDL_BlitSurface(text, &(SDL_Rect){0, 0, maxWidth, text->h}, surface,
-//                   &(SDL_Rect){PADDING, 0 + (row * ROW_HEIGHT) + centerY});
-//   SDL_FreeSurface(text);
-//   return 1;
-// }
 
 SDL_Surface *loadImage(char *path) {
   static char fullPath[256];
@@ -519,19 +384,34 @@ SDL_Surface *renderText(char *text) {
   return TTF_RenderUTF8_Blended(font.h2, text, (SDL_Color){LIGHT_TEXT});
 }
 
-void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, SDL_Rect* offset) {
+void heading(int fontSize, int bold, char* copy, SDL_Color color, SDL_Surface *surface, SDL_Rect *offset) {
   // NOTE: if you provide a SDL_Rect for position, you must also include the Height and Width
   // for correct position placement, the x and y value would be offsets to the center.
-  #define TEXT_BOX_MAX_ROWS 16
+  TTF_Font *headingStyle;
+  int maxLines = 16;
+  int lineHeight = fontSize * HEADING_LINEHEIGHT;
 	if (offset==NULL) offset = &(SDL_Rect){0,0,surface->w,surface->h};
+
+  switch(fontSize) {
+    case H1:
+    headingStyle = bold? font.h1_500 : font.h1;
+    break;
+    case H2:
+    headingStyle = bold? font.h2_500 : font.h2;
+    break;
+    case H3:
+    headingStyle = bold? font.h3_500 : font.h3;
+    break;
+  }
+
 	SDL_Surface* text;
-	char* lines[TEXT_BOX_MAX_ROWS];
+	char* lines[maxLines];
 	int lineCount = 0;
 
 	char* tmp;
-	lines[lineCount++] = msg;
+	lines[lineCount++] = copy;
 	while ((tmp=strchr(lines[lineCount-1], '\n'))!=NULL) {
-		if (lineCount+1>=TEXT_BOX_MAX_ROWS) break;
+		if (lineCount+1>=maxLines) break;
 		lines[lineCount++] = tmp+1;
 	}
 	int rendered_height = lineHeight * lineCount;
@@ -554,7 +434,7 @@ void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, 
 		
 		
 		if (len) {
-			text = TTF_RenderUTF8_Blended(font, line, (SDL_Color){LIGHT_TEXT});
+			text = TTF_RenderUTF8_Blended(headingStyle, line, color);
 			int x = offset->x;
 			x += (offset->w - text->w) / 2;
 			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x,y});
@@ -562,6 +442,92 @@ void paragraph(TTF_Font* font, char* msg, int lineHeight, SDL_Surface* surface, 
 		}
 		y += lineHeight;
 	}
+}
+
+void paragraph(int fontSize, int bold, char* copy, SDL_Color color, SDL_Surface *surface, SDL_Rect *offset) {
+  // NOTE: if you provide a SDL_Rect for position, you must also include the Height and Width
+  // for correct position placement, the x and y value would be offsets to the center.
+  TTF_Font *paragraphStyle;
+  int maxLines = 16;
+  int lineHeight = fontSize * BODY_LINEHEIGHT;
+	if (offset==NULL) offset = &(SDL_Rect){0,0,surface->w,surface->h};
+
+  switch(fontSize) {
+    case BODY:
+    paragraphStyle = bold? font.body_500: font.body;
+    break;
+    case CAPTION:
+    paragraphStyle = bold? font.caption_500: font.caption;
+    break;
+    case FOOTNOTE:
+    paragraphStyle = bold? font.footnote_500: font.footnote;
+    break;
+  }
+
+	SDL_Surface* text;
+	char* lines[maxLines];
+	int lineCount = 0;
+
+	char* tmp;
+	lines[lineCount++] = copy;
+	while ((tmp=strchr(lines[lineCount-1], '\n'))!=NULL) {
+		if (lineCount+1>=maxLines) break;
+		lines[lineCount++] = tmp+1;
+	}
+	int rendered_height = lineHeight * lineCount;
+
+	int y = offset->y;
+	y += (offset->h - rendered_height) / 2;
+	
+	char line[256];
+	for (int i=0; i<lineCount; i++) {
+		int len;
+		if (i+1<lineCount) {
+			len = lines[i+1]-lines[i]-1;
+			if (len) strncpy(line, lines[i], len);
+			line[len] = '\0';
+		}
+		else {
+			len = strlen(lines[i]);
+			strcpy(line, lines[i]);
+		}
+		
+		
+		if (len) {
+			text = TTF_RenderUTF8_Blended(paragraphStyle, line, color);
+			int x = offset->x;
+			x += (offset->w - text->w) / 2;
+			SDL_BlitSurface(text, NULL, surface, &(SDL_Rect){x,y});
+			SDL_FreeSurface(text);
+		}
+		y += lineHeight;
+	}
+}
+
+void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headingCopy, char *bodyCopy) {
+  SDL_Surface *emptyStateIcon = gfx.empty_state;
+  TTF_Font *headingStyle;
+  int margin = SPACING_SM;
+  int headingHeight;
+  switch(headingSize) {
+    case H1:
+    headingStyle = font.h1;
+    break;
+    case H2:
+    headingStyle = font.h2;
+    break;
+    case H3:
+    headingStyle = font.h3;
+    break;
+  }
+
+  TTF_SizeUTF8(headingStyle, headingCopy, NULL, &headingHeight);
+  int cx = (SCREEN_WIDTH / 2) - (emptyStateIcon->w / 2);
+  int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
+
+  SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - (emptyStateIcon->h / 2)});
+  heading(headingSize, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, 0, surface->w, surface->h});
+  paragraph(bodySize, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + margin, surface->w, surface->h});
 }
 
 static void getTextSize(TTF_Font* font, char* str, int lineHeight, int* w, int* h) {
@@ -613,3 +579,103 @@ int truncateText(TTF_Font *font, char *displayName, int maxWidth, int padding) {
 
   return titleWidth;
 }
+
+/* DEPRECATED COMPONENTS */
+
+// Pill button deprecated
+// void pillButton(SDL_Surface *surface, char *bkey, char *blabel, int x, int y) {
+//   SDL_Surface *btn = gfx.button;
+//   SDL_Surface *btnKey =
+//       TTF_RenderUTF8_Blended(font.body, bkey, (SDL_Color){DARK_TEXT});
+//   SDL_Surface *btnLabel =
+//       TTF_RenderUTF8_Blended(font.body, blabel, (SDL_Color){LIGHT_TEXT});
+
+//   // Pill's left radius
+//   SDL_Rect rectL;
+//   rectL.x = 0;
+//   rectL.y = 0;
+//   rectL.w = BUTTON_SIZE / 2;
+//   rectL.h = BUTTON_SIZE;
+
+//   SDL_Rect rectFill;
+//   rectFill.x = x + BUTTON_SIZE / 2;
+//   rectFill.y = y;
+//   rectFill.w = btnKey->w;
+//   rectFill.h = BUTTON_SIZE;
+
+//   SDL_Rect rectR;
+//   rectR.x = BUTTON_SIZE / 2;
+//   rectR.y = 0;
+//   rectR.w = BUTTON_SIZE / 2;
+//   rectR.h = BUTTON_SIZE;
+
+//   int margin = 6;
+//   int btnCX = ((btn->w / 2) + (btnKey->w / 2)) - (btnKey->w / 2);
+//   // Bump 2px up to visually center letter in btn
+//   int btnCY = (btn->h / 2) - (btnKey->h / 2) - 2;
+//   int btnLabelCY = (btn->h / 2) - (btnLabel->h / 2);
+//   int btnX = btn->w / 2 + btnKey->w + btn->w / 2 + margin;
+
+//   SDL_BlitSurface(btn, &rectL, surface, &(SDL_Rect){x, y});
+//   // Pill's fill container
+//   SDL_FillRect(surface, &rectFill, SDL_MapRGB(btn->format, WHITE));
+//   SDL_BlitSurface(btn, &rectR, surface,
+//                   &(SDL_Rect){x + btn->w / 2 + btnKey->w, y});
+//   SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){x + btnCX, y + btnCY});
+//   SDL_FreeSurface(btnKey);
+
+//   SDL_BlitSurface(btnLabel, NULL, surface,
+//                   &(SDL_Rect){x + btnX, y + btnLabelCY});
+//   SDL_FreeSurface(btnLabel);
+// }
+
+// nameScroller - Deprecated (opting for truncation instead)
+// static int scrollSelected = -1;
+// static int scrollTicks = 0;
+// static int scrollDelay = 30;
+// static int scrollOffset = 0;
+// int nameScroller(SDL_Surface *surface, char *path, char *name, char *unique,
+//                  int maxWidth, int row, int selected, int reset, int force) {
+//   // reset is used when changing directories (otherwise returning from the first
+//   // row to the first row above wouldn't reset the scroll)
+//   if (reset || selected != scrollSelected) {
+//     scrollTicks = 0;
+//     scrollOffset = 0;
+//     scrollSelected = selected;
+//   }
+
+//   scrollTicks += 1;
+//   if (scrollTicks < scrollDelay)
+//     return 0; // nothing to do yet
+//   scrollOffset += 1;
+
+//   SDL_Surface *text;
+
+//   char *displayName = unique ? unique : name;
+//   trimSortingMeta(&displayName);
+
+//   if (text->w <= maxWidth) {
+//     SDL_FreeSurface(text);
+//     return 0;
+//   }
+//   // prevent overscroll
+//   if (scrollOffset > text->w - maxWidth) {
+//     scrollOffset = text->w - maxWidth;
+//     if (!force) { // nothing to draw unless something outside of this function
+//                   // dirtied the screen
+//       SDL_FreeSurface(text);
+//       return 0;
+//     }
+//   }
+
+//   SDL_FillRect(surface,
+//                &(SDL_Rect){0, 0 + (row * ROW_HEIGHT), SCREEN_WIDTH, ROW_HEIGHT},
+//                SDL_MapRGB(surface->format, WHITE));
+//   text = TTF_RenderUTF8_Blended(g_font.medium, displayName, DARK_TEXT);
+
+//   int centerY = (ROW_HEIGHT - text->h) / 2;
+//   SDL_BlitSurface(text, &(SDL_Rect){0, 0, maxWidth, text->h}, surface,
+//                   &(SDL_Rect){PADDING, 0 + (row * ROW_HEIGHT) + centerY});
+//   SDL_FreeSurface(text);
+//   return 1;
+// }

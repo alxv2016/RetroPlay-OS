@@ -97,7 +97,7 @@ void powerOff(void) {
     char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off"
                                          : "Powering off";
     SDL_FillRect(gfx.screen, NULL, 0);
-    paragraph(font.h3, msg, 24, gfx.screen, NULL);
+    paragraph(H3, 1, msg, (SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
     SDL_Flip(gfx.screen);
     sleep(1);
     system("shutdown");
