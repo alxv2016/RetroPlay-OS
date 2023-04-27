@@ -41,6 +41,7 @@
 #define NEUTRAL_TEXT GREY300
 
 // Spacing scale
+#define SPACING_XXS 4
 #define SPACING_XS 8
 #define SPACING_SM 12
 #define SPACING_MD 16

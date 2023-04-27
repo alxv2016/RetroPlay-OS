@@ -40,6 +40,7 @@ void GFX_init(void) {
   gfx.settings_bar_full = loadImage("progress-full.png");
   gfx.settings_bar_empty = loadImage("progress-empty.png");
   gfx.brightness = loadImage("brightness.png");
+  gfx.brightness_low = loadImage("brightness-low.png");
   gfx.volume = loadImage("volume.png");
   gfx.mute = loadImage("mute.png");
   gfx.battery_charge = loadImage("battery-charge.png");
@@ -96,6 +97,7 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.settings_bar_full);
   SDL_FreeSurface(gfx.settings_bar_empty);
   SDL_FreeSurface(gfx.brightness);
+  SDL_FreeSurface(gfx.brightness_low);
   SDL_FreeSurface(gfx.volume);
   SDL_FreeSurface(gfx.mute);
   SDL_FreeSurface(gfx.battery_charge);
@@ -507,7 +509,7 @@ void paragraph(int fontSize, int bold, char* copy, SDL_Color color, SDL_Surface 
 void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headingCopy, char *bodyCopy) {
   SDL_Surface *emptyStateIcon = gfx.empty_state;
   TTF_Font *headingStyle;
-  int margin = SPACING_SM;
+  int margin = SPACING_XXS;
   int headingHeight;
   switch(headingSize) {
     case H1:
@@ -526,8 +528,8 @@ void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headi
   int cy = (SCREEN_HEIGHT / 2) - (emptyStateIcon->h / 2);
 
   SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - (emptyStateIcon->h / 2)});
-  heading(headingSize, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, 0, surface->w, surface->h});
-  paragraph(bodySize, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + margin, surface->w, surface->h});
+  heading(headingSize, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, SPACING_XL, surface->w, surface->h});
+  paragraph(bodySize, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + SPACING_XL + margin, surface->w, surface->h});
 }
 
 static void getTextSize(TTF_Font* font, char* str, int lineHeight, int* w, int* h) {

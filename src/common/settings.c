@@ -50,37 +50,47 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   SDL_Surface *powerIcon = gfx.power;
   SDL_Surface *sleepIcon = gfx.sleep;
   SDL_Surface *sleepTimerIcon = gfx.sleep_timer;
-  SDL_Surface *britIcon = gfx.brightness;
+  SDL_Surface *britIcon = britValue < 5? gfx.brightness_low: gfx.brightness;
   SDL_Surface *volIcon = volValue == 0? gfx.mute: gfx.volume;
-  SDL_Surface *progressEmptyBar = gfx.settings_bar_empty;
-  SDL_Surface *progressVolBar = gfx.settings_bar_full;
-  SDL_Surface *progressBritBar = gfx.settings_bar_full;
+  // SDL_Surface *progressEmptyBar = gfx.settings_bar_empty;
+  // SDL_Surface *progressVolBar = gfx.settings_bar_full;
+  // SDL_Surface *progressBritBar = gfx.settings_bar_full;
+  int w = SCREEN_WIDTH / 2 - marginLeft;
+  int h = 4;
+  int pwV = calcProgress(w, volValue, volMin, volMax);
+  int pwB = calcProgress(w, britValue, britMin, britMax);
+  int progress = SDL_MapRGB(surface->format, WHITE);
+  int pbackground = SDL_MapRGB(surface->format, GREY400);
 
-  int iconTotalWidth = ICON_SIZE + 24;
-  int progressTotalWidth = iconTotalWidth + progressEmptyBar->w + marginLeft;
+  int iconTotalWidth = ICON_SIZE + SPACING_MD;
+  int progressTotalWidth = iconTotalWidth + w + marginLeft;
   int rowWidth = text->w + marginLeft * 2;
   int maxLabelWidth = MIN(rowWidth, 580);
   int rowCY = (ROW_HEIGHT / 2) - (text->h / 2);
   int screenCenter = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * rowCount) / 2);
-  int cy = (ROW_HEIGHT / 2) - (progressEmptyBar->h / 2);
-  int h = progressEmptyBar->h;
+  int cy = (ROW_HEIGHT / 2) - (h / 2);
 
-  int progressVol = calcProgress(progressVolBar->w, volValue, volMin, volMax);
-  int progressBrit = calcProgress(progressBritBar->w, britValue, britMin, britMax);
+  // int progressVol = calcProgress(progressVolBar->w, volValue, volMin, volMax);
+  // int progressBrit = calcProgress(progressBritBar->w, britValue, britMin, britMax);
 
   if (i == selected) {
      if (selected == SETTINGS_VOLUMN) {
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(volIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
-        SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
-        SDL_BlitSurface(progressVolBar, &(SDL_Rect){0, 0, progressVol, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressVol, h});
+        SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, w, h}, pbackground);
+        SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, pwV, h}, progress);
+
+        // SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
+        // SDL_BlitSurface(progressVolBar, &(SDL_Rect){0, 0, progressVol, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressVol, h});
      } else if (selected == SETTINGS_SCREEN) {
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + progressTotalWidth, ROW_HEIGHT},background);
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
         SDL_BlitSurface(britIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
-        SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
-        SDL_BlitSurface(progressBritBar, &(SDL_Rect){0, 0, progressBrit, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressBrit, h}); 
+        SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, w, h}, pbackground);
+        SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, pwB, h}, progress);
+        // SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
+        // SDL_BlitSurface(progressBritBar, &(SDL_Rect){0, 0, progressBrit, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressBrit, h}); 
      } else if (selected == SETTINGS_POWER) {
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, iconTotalWidth + maxLabelWidth, ROW_HEIGHT},background);
         SDL_FillRect(surface,&(SDL_Rect){0, screenCenter + i * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
@@ -100,12 +110,12 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
     SDL_FreeSurface(text);
   } else if (i == SETTINGS_VOLUMN) {
     SDL_BlitSurface(volIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
-    SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
-    SDL_BlitSurface(progressVolBar, &(SDL_Rect){0, 0, progressVol, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressVol, h});
+    SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, w, h}, pbackground);
+    SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, pwV, h}, progress);
   } else if (i == SETTINGS_SCREEN) {
     SDL_BlitSurface(britIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
-    SDL_BlitSurface(progressEmptyBar, NULL, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy});
-    SDL_BlitSurface(progressBritBar, &(SDL_Rect){0, 0, progressBrit, h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, progressBrit, h}); 
+    SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, w, h}, pbackground);
+    SDL_FillRect(surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + cy, pwB, h}, progress);
   } else if (i == SETTINGS_POWER) {
     SDL_BlitSurface(powerIcon, NULL, surface, &(SDL_Rect){marginLeft, screenCenter + (i * ROW_HEIGHT) + rowCY});
     SDL_BlitSurface(text, &(SDL_Rect){0, 0, iconTotalWidth + maxLabelWidth, text->h}, surface, &(SDL_Rect){marginLeft + iconTotalWidth, screenCenter + (i * ROW_HEIGHT) + rowCY});

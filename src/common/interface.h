@@ -13,6 +13,7 @@ typedef struct GFX_Context {
   SDL_Surface *settings_bar_full;
   SDL_Surface *settings_bar_empty;
   SDL_Surface *brightness;
+  SDL_Surface *brightness_low;
   SDL_Surface *volume;
   SDL_Surface *mute;
   SDL_Surface *battery_charge;
