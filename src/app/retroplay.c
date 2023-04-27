@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
   // Settings menu current values
   int showSettingsMenu = 0;
   int settingItemSelected = 0;
-  int currentSleepTime = getSleepTime() ? getSleepTime(): 1;
+  int currentSleepTime = getSleepTime();
   int currentVolume = GetVolume();
   int currentBrightness = GetBrightness();
 
@@ -250,13 +250,23 @@ int main(int argc, char *argv[]) {
     if (powerStartTime && currentTime - powerStartTime >= 1000) powerOff();
     if (Input_justPressed(BTN_POWER)) powerStartTime = currentTime;
     if (Input_anyPressed()) deviceSleepTime = currentTime;
-    if (currentTime - deviceSleepTime >= SLEEP_DELAY && preventAutosleep()) deviceSleepTime = currentTime;
-    if (currentTime - deviceSleepTime >= SLEEP_DELAY || Input_justReleased(BTN_POWER)) {
-      fauxSleep();
-      deviceSleepTime = SDL_GetTicks();
-      powerStartTime = 0;
-      dirty = 1;
-    } 
+
+    if (getSleepDelay == 0) {
+      if (Input_justReleased(BTN_POWER)) {
+        fauxSleep();
+        powerStartTime = 0;
+        dirty = 1;
+      }
+    } else {
+      if (currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
+      if (currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
+        fauxSleep();
+        deviceSleepTime = SDL_GetTicks();
+        powerStartTime = 0;
+        dirty = 1;
+      } 
+    }
+
 
     // dirty list (not including settings/battery)
     int was_dirty = dirty;

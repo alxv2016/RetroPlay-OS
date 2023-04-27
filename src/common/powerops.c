@@ -14,6 +14,7 @@
 #include "interface.h"
 #include "controls.h"
 #include "rumble.h"
+#include "settings.h"
 
 #include "powerops.h"
 
@@ -22,6 +23,19 @@ int can_poweroff = 1;
 char governor[128];
 
 void disablePoweroff(void) { can_poweroff = 0; }
+
+int getSleepDelay(void) {
+  int sleepTime = getSleepTime();
+  // Raw unitless values to represent in minutes
+  int time = timerItems[sleepTime];
+  if (sleepTime == 0) {
+    disablePoweroff();
+    return 0;
+  } else {
+    // return minutes in milliseconds
+    return time * 60000;
+  }
+}
 
 void waitForWake(void) {
   SDL_Event event;
@@ -38,10 +52,8 @@ void waitForWake(void) {
       }
     }
     SDL_Delay(200);
-    if (can_poweroff &&
-        SDL_GetTicks() - sleep_ticks >= 120000) { // increased to two minutes
-      if (isCharging())
-        sleep_ticks += 60000; // check again in a minute
+    if (can_poweroff && SDL_GetTicks() - sleep_ticks >= 60000) {
+      if (isCharging()) sleep_ticks += 60000; // check again in a minute
       else
         powerOff();
     }

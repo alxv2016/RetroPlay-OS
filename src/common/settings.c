@@ -50,17 +50,17 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   SDL_Surface *powerIcon = gfx.power;
   SDL_Surface *sleepIcon = gfx.sleep;
   SDL_Surface *sleepTimerIcon = gfx.sleep_timer;
-  char *item = menuItems[i];
   int marginLeft = SPACING_XL;
+  char *item = menuItems[i];
+  SDL_Surface *label = TTF_RenderUTF8_Blended(font.h3, item, (SDL_Color){LIGHT_TEXT});
   int labelMarginLeft = marginLeft + ICON_SIZE + SPACING_MD;
-  SDL_Surface *text = TTF_RenderUTF8_Blended(font.h3, item, (SDL_Color){LIGHT_TEXT});
-  int labelWidth = labelMarginLeft + text->w + marginLeft;
+  int labelWidth = labelMarginLeft + label->w + marginLeft;
   int background = SDL_MapRGB(surface->format, GREY500);
   int accent = SDL_MapRGB(surface->format, PRIMARY);
-  int w = SCREEN_WIDTH / 2 - marginLeft;
-  int cy = (ROW_HEIGHT / 2) - (text->h / 2);
+  int availableWidth = SCREEN_WIDTH / 2 - marginLeft;
+  int cy = (ROW_HEIGHT / 2) - (label->h / 2);
 
-  int rowWidth = i == SETTINGS_VOLUMN || i == SETTINGS_SCREEN? labelMarginLeft + w + marginLeft : labelWidth;
+  int rowWidth = i == SETTINGS_VOLUMN || i == SETTINGS_SCREEN? labelMarginLeft + availableWidth + marginLeft : labelWidth;
   int maxLabelWidth = MIN(rowWidth, labelWidth);
   int screenCenter = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * MENU_ITEMS) / 2);
 
@@ -74,32 +74,34 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
         brightnessControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, britValue, britMin, britMax);
      } else if (selected == SETTINGS_POWER) {
         settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
-        settingItem(surface, powerIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+        settingItem(surface, powerIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
      } else if (selected == SETTINGS_SLEEP) {
         settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
-        settingItem(surface, sleepIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+        settingItem(surface, sleepIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
      } else if (selected == SETTINGS_SLEEPTIME) {
         settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
-        settingItem(surface, sleepTimerIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+        settingItem(surface, sleepTimerIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
      } 
   } else if (i == SETTINGS_VOLUMN) {
     volumeControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, volValue, volMin, volMax);
   } else if (i == SETTINGS_SCREEN) {
     brightnessControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, britValue, britMin, britMax);
   } else if (i == SETTINGS_POWER) {
-    settingItem(surface, powerIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+    settingItem(surface, powerIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
   } else if (i == SETTINGS_SLEEP) {
-    settingItem(surface, sleepIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+    settingItem(surface, sleepIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
   } else if (i == SETTINGS_SLEEPTIME) {
-    settingItem(surface, sleepTimerIcon, text, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
+    settingItem(surface, sleepTimerIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
   }
 
 }
 
 void initSettings(SDL_Surface *surface, int selected, int volValue, int britValue, int sleepValue) {
   setSleepTime(sleepValue);
+  int currentTimer = getSleepTime();
+  char sleepLabel[14] = "Sleep timer:";
   char sleepTimer[256];
-  sprintf(sleepTimer, "Sleep timer: %imin", timerItems[sleepValue]);
+  currentTimer > 0 ? sprintf(sleepTimer, "%s %imins",sleepLabel, timerItems[sleepValue]) : sprintf(sleepTimer, "%s Never", sleepLabel);
   menuItems[SETTINGS_SLEEP] = "Sleep mode";
   menuItems[SETTINGS_POWER] = "Power off";
   menuItems[SETTINGS_SLEEPTIME] = sleepTimer;
