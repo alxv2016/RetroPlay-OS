@@ -252,14 +252,15 @@ int main(int argc, char *argv[]) {
     if (Input_anyPressed()) deviceSleepTime = currentTime;
 
     if (getSleepDelay == 0) {
+      deviceSleepTime = currentTime;
       if (Input_justReleased(BTN_POWER)) {
         fauxSleep();
         powerStartTime = 0;
         dirty = 1;
       }
     } else {
-      if (currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
-      if (currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
+      if (getSleepDelay() > 0 && currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
+      if (getSleepDelay() > 0 && currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
         fauxSleep();
         deviceSleepTime = SDL_GetTicks();
         powerStartTime = 0;

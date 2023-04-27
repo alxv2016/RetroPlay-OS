@@ -16,7 +16,7 @@
 
 /* SETTINGS */
 char *menuItems[MENU_ITEMS];
-int timerItems[TIMER_ITEMS] = {0, 15, 25, 30};
+int timerItems[TIMER_ITEMS] = {0, 1, 25, 30};
 static int volMin = MIN_VOLUME;
 static int volMax = MAX_VOLUME;
 static int britMin = MIN_BRIGHTNESS;
