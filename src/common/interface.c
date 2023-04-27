@@ -364,7 +364,7 @@ static int calcProgress(int width, int value, int minValue, int maxValue) {
 // Volumn control component
 void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {
   SDL_Surface *icon = value == 0? gfx.mute: gfx.volume;
-  int marginLeft = ICON_SIZE + SPACING_XS;
+  int marginLeft = ICON_SIZE + SPACING_MD;
   int w = SCREEN_WIDTH / 2 - marginLeft;
   int h = 4;
   int pw = calcProgress(w, value, minValue, maxValue);
@@ -379,7 +379,7 @@ void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, 
 // Brightness control component
 void brightnessControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {
   SDL_Surface *icon = value < 5? gfx.brightness_low: gfx.brightness;
-  int marginLeft = ICON_SIZE + SPACING_XS;
+  int marginLeft = ICON_SIZE + SPACING_MD;
   int w = SCREEN_WIDTH / 2 - marginLeft;
   int h = 4;
   int pw = calcProgress(w, value, minValue, maxValue);

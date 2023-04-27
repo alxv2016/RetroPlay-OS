@@ -299,10 +299,8 @@ int main(int argc, char *argv[]) {
       // }
 
       if (showSettingsMenu) {
-        primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG,
-               419);
-        secondaryBTN(gfx.screen, "B", "Close", 1,
-               SCREEN_WIDTH - SPACING_LG - 120, 419);
+        settingItemSelected == SETTINGS_SCREEN || settingItemSelected == SETTINGS_VOLUMN || settingItemSelected == SETTINGS_SLEEPTIME? tertiaryBTN(gfx.screen, "Adjust", 1, SCREEN_WIDTH - SPACING_LG, 419) : primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG, 419);
+        secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 120, 419);
       } else {
         if (total == 0 && stack->count > 1) {
           primaryBTN(gfx.screen, "B", "Back", 1, SCREEN_WIDTH - SPACING_LG,
