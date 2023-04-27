@@ -251,23 +251,13 @@ int main(int argc, char *argv[]) {
     if (Input_justPressed(BTN_POWER)) powerStartTime = currentTime;
     if (Input_anyPressed()) deviceSleepTime = currentTime;
 
-    if (getSleepDelay == 0) {
-      deviceSleepTime = currentTime;
-      if (Input_justReleased(BTN_POWER)) {
-        fauxSleep();
-        powerStartTime = 0;
-        dirty = 1;
-      }
-    } else {
-      if (getSleepDelay() > 0 && currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
-      if (getSleepDelay() > 0 && currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
-        fauxSleep();
-        deviceSleepTime = SDL_GetTicks();
-        powerStartTime = 0;
-        dirty = 1;
-      } 
-    }
-
+    if (getSleepDelay() != 0 && currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
+    if (getSleepDelay() != 0 && currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
+      fauxSleep();
+      deviceSleepTime = SDL_GetTicks();
+      powerStartTime = 0;
+      dirty = 1;
+    } 
 
     // dirty list (not including settings/battery)
     int was_dirty = dirty;

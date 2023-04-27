@@ -26,12 +26,11 @@ void disablePoweroff(void) { can_poweroff = 0; }
 
 int getSleepDelay(void) {
   int sleepTime = getSleepTime();
-  // Raw unitless values to represent in minutes
-  int time = timerItems[sleepTime];
   if (sleepTime == 0) {
-    disablePoweroff();
     return 0;
   } else {
+    // Raw unitless values to represent in minutes
+    int time = timerItems[sleepTime];
     // return minutes in milliseconds
     return time * 60000;
   }
