@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
       batteryStatus(gfx.screen, SCREEN_WIDTH - SPACING_LG, 12);
 
       if (volumeAdjustTime && !showSettingsMenu) {
-        volumnBrightness(gfx.screen, SPACING_LG, 419, currentVolume > volMin ? 1 : 2, currentVolume, volMin, volMax);
+        volumeControl(gfx.screen, SPACING_LG, 419, currentVolume, volMin, volMax);
       }
       SDL_Flip(gfx.screen);
       dirty = 0;

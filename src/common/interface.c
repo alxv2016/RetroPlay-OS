@@ -357,18 +357,37 @@ void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int 
   SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
 }
 
-// Volumn settings component
-void volumnBrightness(SDL_Surface *surface, int x, int y, int icon, int value, int minValue, int maxValue) {
-  SDL_Surface *displayIcon = icon == 0 ? gfx.brightness : (icon == 1 ? gfx.volume : gfx.mute);
+static int calcProgress(int width, int value, int minValue, int maxValue) {
+  int progress = width * ((float)(value - minValue) / (maxValue - minValue));
+  return progress;
+};
+// Volumn control component
+void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {
+  SDL_Surface *icon = value == 0? gfx.mute: gfx.volume;
   int marginLeft = ICON_SIZE + SPACING_XS;
   int w = SCREEN_WIDTH / 2 - marginLeft;
   int h = 4;
-  int pw = w * ((float)(value - minValue) / (maxValue - minValue));
-  int cy = (displayIcon->h / 2) - (h / 2);
+  int pw = calcProgress(w, value, minValue, maxValue);
+  int cy = (icon->h / 2) - (h / 2);
   int progress = SDL_MapRGB(surface->format, WHITE);
   int background = SDL_MapRGB(surface->format, GREY400);
 
-  SDL_BlitSurface(displayIcon, NULL, surface, &(SDL_Rect){x, y});
+  SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){x, y});
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
+}
+// Brightness control component
+void brightnessControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {
+  SDL_Surface *icon = value < 5? gfx.brightness_low: gfx.brightness;
+  int marginLeft = ICON_SIZE + SPACING_XS;
+  int w = SCREEN_WIDTH / 2 - marginLeft;
+  int h = 4;
+  int pw = calcProgress(w, value, minValue, maxValue);
+  int cy = (icon->h / 2) - (h / 2);
+  int progress = SDL_MapRGB(surface->format, WHITE);
+  int background = SDL_MapRGB(surface->format, GREY400);
+
+  SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){x, y});
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
   SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
 }
