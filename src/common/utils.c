@@ -259,6 +259,8 @@ char *Hash_get(Hash *self, char *key) {
   return self->values->items[i];
 }
 
+/*****/
+
 int isCharging(void) {
   // Code adapted from OnionOS
   char *cmd = "cd /customer/app/ ; ./axp_test";
