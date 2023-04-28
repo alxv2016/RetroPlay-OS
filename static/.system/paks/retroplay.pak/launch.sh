@@ -53,9 +53,8 @@ if [ "$CHARGING" == "3" ]; then
 else
 	# Show welcome boot image unless device is charging
 	/mnt/SDCARD/.system/bin/sys-img "boot.png"
-	sleep 2
+	sleep 1
 fi
-
 
 keymon &
 
@@ -80,7 +79,7 @@ fi
 cd $(dirname "$0")
 
 EXEC_PATH=/tmp/retroplay_exec
-touch "$EXEC_PATH"  && sync
+touch "$EXEC_PATH" && sync
 
 MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
 export MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
@@ -114,5 +113,4 @@ while [ -f "$EXEC_PATH" ]; do
 	fi
 done
 
-# just in case
 shutdown

@@ -39,6 +39,7 @@ int getSleepDelay(void) {
 void waitForWake(void) {
   SDL_Event event;
   int wake = 0;
+  int sleepTime = getSleepDelay();
   unsigned long sleep_ticks = SDL_GetTicks();
   while (!wake) {
     while (SDL_PollEvent(&event)) {
@@ -51,7 +52,7 @@ void waitForWake(void) {
       }
     }
     SDL_Delay(200);
-    if (can_poweroff && SDL_GetTicks() - sleep_ticks >= 60000) {
+    if (sleepTime != 0 && can_poweroff && SDL_GetTicks() - sleep_ticks >= sleepTime) {
       if (isCharging()) sleep_ticks += 60000; // check again in a minute
       else
         powerOff();
@@ -62,6 +63,11 @@ void waitForWake(void) {
 
 void fauxSleep(void) {
   menuSuperShortPulse();
+  SDL_FillRect(gfx.screen, NULL, 0);
+  sleepState(gfx.screen, "Entering sleep!", "Your device may auto power off to save battery.");
+  SDL_Flip(gfx.screen);
+  sleep(1);
+
   GFX_clear();
   Input_reset();
 
@@ -105,13 +111,13 @@ int preventAutosleep(void) { return isCharging(); }
 void powerOff(void) {
   if (can_poweroff) {
     menuSuperShortPulse();
-    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off" : "Powering off";
+    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off your device." : "Powering off your device.";
     SDL_FillRect(gfx.screen, NULL, 0);
-    heading(H1, 1, msg,(SDL_Color){LIGHT_TEXT}, gfx.screen, NULL);
+    powerOffState(gfx.screen, "Goodbye!", msg);
     SDL_Flip(gfx.screen);
-    sleep(1);
+    sleep(2);
     system("shutdown");
-    while (1)
+    while (2)
       pause();
   }
 }

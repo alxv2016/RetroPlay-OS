@@ -7,26 +7,26 @@ cd "$DIR"
 
 export LD_LIBRARY_PATH=/lib:/config/lib:/customer/lib
 
-# update bootcmd if necessary
-contains() { [ -z "${2##*$1*}" ]; }
-MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
-MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
-# date after latest known version
-SUPPORTED_VERSION="202205010000"
+# Don't think this is relating to Miyoo Mini Plus, seems like legacy stuff regarding Miyoo Mini V1s etc.
+# # update bootcmd if necessary
+# contains() { [ -z "${2##*$1*}" ]; }
+# MIYOO_VERSION=`/etc/fw_printenv miyoo_version`
+# MIYOO_VERSION=${MIYOO_VERSION#miyoo_version=}
+# # date after latest known version
+# SUPPORTED_VERSION="202205010000"
 
-if [ $MIYOO_VERSION -lt $SUPPORTED_VERSION ]; then
-	OLD_CMD=`/etc/fw_printenv bootcmd`
-	NEW_CMD="gpio output 85 1; bootlogo 0 0 0 0 0; mw 1f001cc0 11; gpio out 8 0; sf probe 0;sf read 0x22000000 \${sf_kernel_start} \${sf_kernel_size}; gpio out 8 1; gpio output 4 1; bootm 0x22000000"
-	if contains "sleepms" "$OLD_CMD"; then
-		./sys-msg "Updating bootcmd"
-		/etc/fw_setenv bootcmd $NEW_CMD
-		sleep 1
-	fi
-fi
+# if [ $MIYOO_VERSION -lt $SUPPORTED_VERSION ]; then
+# 	OLD_CMD=`/etc/fw_printenv bootcmd`
+# 	NEW_CMD="gpio output 85 1; bootlogo 0 0 0 0 0; mw 1f001cc0 11; gpio out 8 0; sf probe 0;sf read 0x22000000 \${sf_kernel_start} \${sf_kernel_size}; gpio out 8 1; gpio output 4 1; bootm 0x22000000"
+# 	if contains "sleepms" "$OLD_CMD"; then
+# 		./sys-msg "Updating bootcmd"
+# 		/etc/fw_setenv bootcmd $NEW_CMD
+# 		sleep 1
+# 	fi
+# fi
 
 SYSTEM_PATH=/mnt/SDCARD/.system
 OLD_SYSTEM_PATH=/mnt/SDCARD/.system_old
-
 # figure out what we're doing here
 if [ -d "$SYSTEM_PATH" ]; then
 	rm -rf "/mnt/SDCARD/.tmp_update"
@@ -45,22 +45,22 @@ fi
 unzip -o "/mnt/SDCARD/miyoo354/app/retroplay.zip" -d "/mnt/SDCARD"
 
 # post-install
-POST_INSTALL=/mnt/SDCARD/.system/bin/post-install.sh
-if [ -f "$POST_INSTALL" ]; then
-	if [ -n "$JUST_INSTALLED" ]; then
-		"$POST_INSTALL"
-	fi
-	rm -f "$POST_INSTALL"
-fi
+# POST_INSTALL=/mnt/SDCARD/.system/bin/post-install.sh
+# if [ -f "$POST_INSTALL" ]; then
+# 	if [ -n "$JUST_INSTALLED" ]; then
+# 		"$POST_INSTALL"
+# 	fi
+# 	rm -f "$POST_INSTALL"
+# fi
 
-# post-update
-POST_UPDATE=/mnt/SDCARD/.system/bin/post-update.sh
-if [ -f "$POST_UPDATE" ]; then
-	if [ -n "$JUST_UPDATED" ]; then
-		"$POST_UPDATE"
-	fi
-	rm -f "$POST_UPDATE"
-fi
+# # post-update
+# POST_UPDATE=/mnt/SDCARD/.system/bin/post-update.sh
+# if [ -f "$POST_UPDATE" ]; then
+# 	if [ -n "$JUST_UPDATED" ]; then
+# 		"$POST_UPDATE"
+# 	fi
+# 	rm -f "$POST_UPDATE"
+# fi
 
 # we're done here
 ./sys-msg "$NOUN complete, enjoy!"

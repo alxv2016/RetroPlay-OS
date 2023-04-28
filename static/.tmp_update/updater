@@ -1,15 +1,12 @@
 #!/bin/sh
-
 # install
 if [ -d "/mnt/SDCARD/miyoo354" ] ; then
 	exit 0
 fi
-
 # or launch (and keep launched)
 LAUNCH_PATH="/mnt/SDCARD/.system/paks/retroplay.pak/launch.sh"
 while [ -f "$LAUNCH_PATH" ] ; do
 	"$LAUNCH_PATH"
 done
-
 # under no circumstances should stock be allowed to touch this card
 reboot

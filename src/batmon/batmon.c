@@ -13,6 +13,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include "batmon.h"
+
 static int is_charging = 1;
 static int screen_on = 0;
 static unsigned long screen_start;

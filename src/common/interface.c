@@ -71,6 +71,8 @@ void GFX_init(void) {
   gfx.sys_sega = loadImage("sys-sega.png");
   gfx.sys_snes = loadImage("sys-snes.png");
   gfx.empty_state = loadImage("empty-folder.png");
+  gfx.poweroff_state = loadImage("wave.png");
+  gfx.sleep_state = loadImage("sleep-mode.png");
 }
 
 void GFX_clear(void) {
@@ -125,6 +127,8 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.sys_sega);
   SDL_FreeSurface(gfx.sys_snes);
   SDL_FreeSurface(gfx.empty_state);
+  SDL_FreeSurface(gfx.poweroff_state);
+  SDL_FreeSurface(gfx.sleep_state);
 
   TTF_CloseFont(font.h1);
   TTF_CloseFont(font.h2);
@@ -549,6 +553,34 @@ void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headi
   SDL_BlitSurface(emptyStateIcon, NULL, surface, &(SDL_Rect){cx, cy - (emptyStateIcon->h / 2)});
   heading(headingSize, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, SPACING_XL, surface->w, surface->h});
   paragraph(bodySize, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + SPACING_XL + margin, surface->w, surface->h});
+}
+
+void powerOffState(SDL_Surface *surface, char *headingCopy, char *bodyCopy) {
+  SDL_Surface *powerOffStateIcon = gfx.poweroff_state;
+  int margin = SPACING_XXS;
+  int headingHeight;
+
+  TTF_SizeUTF8(font.h1, headingCopy, NULL, &headingHeight);
+  int cx = (SCREEN_WIDTH / 2) - (powerOffStateIcon->w / 2);
+  int cy = (SCREEN_HEIGHT / 2) - (powerOffStateIcon->h / 2);
+
+  SDL_BlitSurface(powerOffStateIcon, NULL, surface, &(SDL_Rect){cx, cy - (powerOffStateIcon->h / 2)});
+  heading(H1, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, SPACING_XL, surface->w, surface->h});
+  paragraph(BODY, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + SPACING_XL + margin, surface->w, surface->h});
+}
+
+void sleepState(SDL_Surface *surface, char *headingCopy, char *bodyCopy) {
+  SDL_Surface *icon = gfx.sleep_state;
+  int margin = SPACING_XXS;
+  int headingHeight;
+
+  TTF_SizeUTF8(font.h1, headingCopy, NULL, &headingHeight);
+  int cx = (SCREEN_WIDTH / 2) - (icon->w / 2);
+  int cy = (SCREEN_HEIGHT / 2) - (icon->h / 2);
+
+  SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){cx, cy - (icon->h / 2)});
+  heading(H1, 1, headingCopy, (SDL_Color){LIGHT_TEXT}, surface, &(SDL_Rect){0, SPACING_XL, surface->w, surface->h});
+  paragraph(BODY, 0, bodyCopy, (SDL_Color){NEUTRAL_TEXT}, surface, &(SDL_Rect){0, headingHeight + SPACING_XL + margin, surface->w, surface->h});
 }
 
 static void getTextSize(TTF_Font* font, char* str, int lineHeight, int* w, int* h) {
