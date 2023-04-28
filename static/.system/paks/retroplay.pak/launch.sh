@@ -8,18 +8,18 @@
 cat /proc/ls
 sleep 0.25
 
-# init charger detection
-if [ ! -f /sys/devices/gpiochip0/gpio/gpio59/direction ]; then
-	echo 59 > /sys/class/gpio/export
-	echo in > /sys/devices/gpiochip0/gpio/gpio59/direction
-fi
-
 # init backlight
 pwmdir=/sys/class/pwm/pwmchip0
 echo 0 > $pwmdir/export
 echo 800 > $pwmdir/pwm0/period
 echo 80 > $pwmdir/pwm0/duty_cycle
 echo 1 > $pwmdir/pwm0/enable
+
+# init charger detection
+if [ ! -f /sys/devices/gpiochip0/gpio/gpio59/direction ]; then
+	echo 59 > /sys/class/gpio/export
+	echo in > /sys/devices/gpiochip0/gpio/gpio59/direction
+fi
 
 export SDCARD_PATH=/mnt/SDCARD
 export BIOS_PATH=/mnt/SDCARD/Bios

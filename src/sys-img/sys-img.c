@@ -10,9 +10,29 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include "../common/defines.h"
+
 /* System images, this module is used by launch.sh script to show and display
 an image during boot. It can be launched via shell script by passing a
 string of the image name */
+
+static void blitImage(void *_dst, void *_src, int w, int h, int x, int y) {
+  uint8_t *dst = (uint8_t *)_dst;
+  uint8_t *src = (uint8_t *)_src;
+
+  src += ((h * w) - 1) * 3;
+
+  for (int y = 0; y < h; y++) {
+    for (int x = 0; x < w; x++) {
+      *(dst + 0) = *(src + 2); // r
+      *(dst + 1) = *(src + 1); // g
+      *(dst + 2) = *(src + 0); // b
+      *(dst + 3) = 0xf;        // alpha
+      dst += 4;
+      src -= 3;
+    }
+  }
+}
 
 int main(int argc, char *argv[]) {
 
@@ -21,11 +41,11 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  char path[256];
+  char path[MAX_PATH];
   if (strchr(argv[1], '/') == NULL)
     sprintf(path, "/mnt/SDCARD/.system/res/%s", argv[1]);
   else
-    strncpy(path, argv[1], 256);
+    strncpy(path, argv[1], MAX_PATH);
 
   if (access(path, F_OK) != 0)
     return 0; // nothing to show :(

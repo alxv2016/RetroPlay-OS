@@ -63,19 +63,15 @@ int main(int argc, char *argv[]) {
   int fb0_fd = open("/dev/fb0", O_RDWR);
   struct fb_var_screeninfo vinfo;
   ioctl(fb0_fd, FBIOGET_VSCREENINFO, &vinfo);
-  int map_size =
-      vinfo.xres * vinfo.yres * (vinfo.bits_per_pixel / 8); // 640x480x4
-  char *fb0_map =
-      (char *)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb0_fd, 0);
+  int map_size = vinfo.xres * vinfo.yres * (vinfo.bits_per_pixel / 8); // 640x480x4
+  char *fb0_map = (char *)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, fb0_fd, 0);
   // clear screen
   memset(fb0_map, 0, map_size);
-  // INIT TEXT MESSAGE
   TTF_Init();
   TTF_Font *font = TTF_OpenFont(path, H1);
 
   int width = SCREEN_WIDTH;
   int height = SCREEN_HEIGHT;
-  SDL_Color font_color = {WHITE};
   SDL_Surface *text;
   char *rows[MAX_ROW];
   int row_count = 0;
@@ -106,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (len) {
-      text = TTF_RenderUTF8_Blended(font, line, font_color);
+      text = TTF_RenderUTF8_Blended(font, line, (SDL_Color){WHITE});
       int x = (width - text->w) / 2;
       blit(fb0_map, width, height, text->pixels, text->w, text->h, x, y);
       SDL_FreeSurface(text);
