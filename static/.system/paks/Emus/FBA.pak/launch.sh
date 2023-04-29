@@ -1,6 +1,6 @@
 #!/bin/sh
 
-EMU_EXE=fbalpha
+EMU_EXE=fbalpha2012
 
 ###############################
 

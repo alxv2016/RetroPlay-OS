@@ -29,6 +29,8 @@ static int britMin = MIN_BRIGHTNESS;
 static int britMax = MAX_BRIGHTNESS;
 
 int main(int argc, char *argv[]) {
+  // Hides an embeded low battery icon that's provided by system.
+  putenv("SDL_HIDE_BATTERY=1");
   rumble(OFF);
   menuSuperShortPulse();
   if (autoResume()) return 0;

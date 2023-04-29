@@ -82,16 +82,24 @@ build: dirs
 
 # NOTE: Saved build time with pre-build cores
 	cp $(ROOT_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
-	cp $(ROOT_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/fbalpha_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/cores/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/snes9x2010_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/smsplus-gx_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(ROOT_DIR)/new-cores/fbalpha2012_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/fbalpha_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# cp $(ROOT_DIR)/cores/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
 
 bundle:
 # NOTE: only bundles if GCC_VER_GTE9_0 is detected? not sure if these are dependencies for device
