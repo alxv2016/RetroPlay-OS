@@ -30,6 +30,7 @@ typedef struct GFX_Context {
   SDL_Surface *arcade;
   SDL_Surface *nes;
   SDL_Surface *gameboy;
+  SDL_Surface *gamegear;
   SDL_Surface *gba;
   SDL_Surface *gbc;
   SDL_Surface *sega;

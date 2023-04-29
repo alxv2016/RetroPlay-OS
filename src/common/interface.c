@@ -59,6 +59,7 @@ void GFX_init(void) {
   gfx.gba = loadImage("gba.png");
   gfx.gbc = loadImage("gbc.png");
   gfx.sega = loadImage("sega.png");
+  gfx.gamegear = loadImage("gamegear.png");
   gfx.playstation = loadImage("playstation.png");
   gfx.snes = loadImage("snes.png");
   gfx.sys_arcade = loadImage("sys-arcade.png");
@@ -112,6 +113,7 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.arcade);
   SDL_FreeSurface(gfx.nes);
   SDL_FreeSurface(gfx.gameboy);
+  SDL_FreeSurface(gfx.gamegear);
   SDL_FreeSurface(gfx.gba);
   SDL_FreeSurface(gfx.gbc);
   SDL_FreeSurface(gfx.sega);
@@ -201,6 +203,8 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
     listItem(surface,gfx.gbc, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "MD") && !consoleDir) {
     listItem(surface, gfx.sega, 1, display_name, row, selected_row);
+  } else if (!strcmp(emuTag, "GG") && !consoleDir) {
+    listItem(surface, gfx.gamegear, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "PS") && !consoleDir) {
     listItem(surface, gfx.playstation, 1, display_name, row, selected_row);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {

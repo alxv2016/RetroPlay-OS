@@ -15,8 +15,7 @@ THIRD_PARTY_DIR := $(ROOT_DIR)/third-party
 BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
 STATIC_DIR := $(ROOT_DIR)/static
-EXTRAS_DIR := $(ROOT_DIR)/extras
-# CACHE := $(ROOT_DIR)/cache
+CORES_DIR := $(ROOT_DIR)/cores
 BUNDLE_LIBS =
 #
 ECHO:= @echo "\n::$(TARGET) V$(VERSION) build complete, enjoy!"
@@ -42,7 +41,6 @@ libs:
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
-	cd $(SRC_DIR)/progress && make
 	cd $(SRC_DIR)/app && make
 	cd $(SRC_DIR)/sys-img && make
 	cd $(SRC_DIR)/sys-msg && make
@@ -66,8 +64,6 @@ build: dirs
 	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progress/progress $(BUILD_DIR)/dist/.system/bin/
-	cp $(SRC_DIR)/progress/progress.sh $(BUILD_DIR)/dist/.system/bin/progress
 	cp $(SRC_DIR)/app/retroplay $(BUILD_DIR)/dist/.system/paks/retroplay.pak/
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/.system/bin/
@@ -80,26 +76,27 @@ build: dirs
 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Apps/Files.pak/
 	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshots.pak/
 
-# NOTE: Saved build time with pre-build cores
-	cp $(ROOT_DIR)/cores/picoarch $(BUILD_DIR)/dist/.system/bin/
-	cp $(ROOT_DIR)/new-cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/snes9x2010_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/smsplus-gx_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-	cp $(ROOT_DIR)/new-cores/fbalpha2012_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/fbalpha_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
-# cp $(ROOT_DIR)/cores/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
+# NOTE: Save build time with pre-build cores
+	cp $(CORES_DIR)/picoarch $(BUILD_DIR)/dist/.system/bin/
+#Arcade
+	cp $(CORES_DIR)/fbalpha_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/fbalpha2012_cps1_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/fbalpha2012_cps2_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/fbalpha2012_cps3_libretro.so $(BUILD_DIR)/dist/.system/cores/
+#Nintendo
+	cp $(CORES_DIR)/fceumm_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/gambatte_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/gpsp_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/mgba_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/snes9x2005_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/snes9x2005_plus_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/mednafen_supafaust_libretro.so $(BUILD_DIR)/dist/.system/cores/
+#SEGA
+	cp $(CORES_DIR)/picodrive_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/genesis-plus-gx_libretro.so $(BUILD_DIR)/dist/.system/cores/
+	cp $(CORES_DIR)/smsplus-gx_libretro.so $(BUILD_DIR)/dist/.system/cores/
+#Playstation
+	cp $(CORES_DIR)/pcsx_rearmed_libretro.so $(BUILD_DIR)/dist/.system/cores/
 
 bundle:
 # NOTE: only bundles if GCC_VER_GTE9_0 is detected? not sure if these are dependencies for device
@@ -140,7 +137,6 @@ clean-all: clean
 	cd $(SRC_DIR)/batmon && make clean
 	cd $(SRC_DIR)/keymon && make clean
 	cd $(SRC_DIR)/lumon && make clean
-	cd $(SRC_DIR)/progress && make clean
 	cd $(SRC_DIR)/app && make clean
 	cd $(SRC_DIR)/sys-img && make clean
 	cd $(SRC_DIR)/sys-msg && make clean
@@ -171,19 +167,18 @@ build-libs: third-party/SDL-1.2/.patched
 
 build-cores: third-party/picoarch/.patched
 # NOTE: run commands to re-build cores
+# Fbalpha2012 cores provided else where
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
-	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/beetle-pce-fast_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(ROOT_DIR)/cores/
-	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(ROOT_DIR)/cores/
+	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(CORES_DIR)
+	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(CORES_DIR)
 
 # Init git submodules
 git-submodules:

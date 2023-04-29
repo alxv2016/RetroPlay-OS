@@ -1,6 +1,6 @@
 #!/bin/sh
 
-EMU_EXE=smsplus-gx
+EMU_EXE=picodrive
 
 #//////////////////////////////
 

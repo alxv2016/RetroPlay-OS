@@ -1,6 +1,6 @@
 #!/bin/sh
 
-EMU_EXE=snes9x2010
+EMU_EXE=mednafen_supafaust
 
 ###############################
 
