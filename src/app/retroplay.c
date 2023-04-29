@@ -29,8 +29,6 @@ static int britMin = MIN_BRIGHTNESS;
 static int britMax = MAX_BRIGHTNESS;
 
 int main(int argc, char *argv[]) {
-  // Hides an embeded low battery icon that's provided by system.
-  putenv("SDL_HIDE_BATTERY=1");
   rumble(OFF);
   menuSuperShortPulse();
   if (autoResume()) return 0;
@@ -301,27 +299,28 @@ int main(int argc, char *argv[]) {
       // }
 
       if (showSettingsMenu) {
-        settingItemSelected == SETTINGS_SCREEN || settingItemSelected == SETTINGS_VOLUMN || settingItemSelected == SETTINGS_SLEEPTIME? tertiaryBTN(gfx.screen, "Adjust", 1, SCREEN_WIDTH - SPACING_LG, 419) : primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG, 419);
-        secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 120, 419);
+        settingItemSelected == SETTINGS_SCREEN || settingItemSelected == SETTINGS_VOLUMN || settingItemSelected == SETTINGS_SLEEPTIME? tertiaryBTN(gfx.screen, "Adjust", 1, 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG) : primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
+        secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 120, SCREEN_HEIGHT - SPACING_LG);
       } else {
         if (total == 0 && stack->count > 1) {
           primaryBTN(gfx.screen, "B", "Back", 1, SCREEN_WIDTH - SPACING_LG,
-                 419);
+                 SCREEN_HEIGHT - SPACING_LG);
         } else if (total > 0 && stack->count > 1) {
           primaryBTN(gfx.screen, "A", "Play", 1, SCREEN_WIDTH - SPACING_LG,
-                 419);
+                 SCREEN_HEIGHT - SPACING_LG);
           secondaryBTN(gfx.screen, "B", "Back", 1,
-                 SCREEN_WIDTH - SPACING_LG - 101, 419);
+                 SCREEN_WIDTH - SPACING_LG - 101, SCREEN_HEIGHT - SPACING_LG);
         } else {
-          primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG,
-                 419);
+          primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
+          tertiaryBTN(gfx.screen, "Settings", 0, 1, SCREEN_WIDTH - SPACING_LG - 120, SCREEN_HEIGHT - SPACING_LG);
         }
       }
 
       batteryStatus(gfx.screen, SCREEN_WIDTH - SPACING_LG, 12);
 
       if (volumeAdjustTime && !showSettingsMenu) {
-        volumeControl(gfx.screen, SPACING_LG, 419, currentVolume, volMin, volMax);
+        // Y Position: battery->h / 2 - volumn-> / 2 + 12
+        volumeControl(gfx.screen, SPACING_LG, 15, 1, currentVolume, volMin, volMax);
       }
       SDL_Flip(gfx.screen);
       dirty = 0;

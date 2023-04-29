@@ -35,7 +35,8 @@ void GFX_init(void) {
 
   gfx.button = loadImage("btn.png");
   gfx.button_outline = loadImage("btn-outline.png");
-  gfx.dpad = loadImage("d-pad.png");
+  gfx.dpad = loadImage("menu-btn.png");
+  gfx.button_menu = loadImage("d-pad.png");
   gfx.corner_radius = loadImage("radius-black.png");
   gfx.settings_bar_full = loadImage("progress-full.png");
   gfx.settings_bar_empty = loadImage("progress-empty.png");
@@ -95,6 +96,7 @@ void GFX_sync(unsigned long frameStart) {
 void GFX_quit(void) {
   SDL_FreeSurface(gfx.button);
   SDL_FreeSurface(gfx.button_outline);
+  SDL_FreeSurface(gfx.button_menu);
   SDL_FreeSurface(gfx.dpad);
   SDL_FreeSurface(gfx.corner_radius);
   SDL_FreeSurface(gfx.settings_bar_full);
@@ -247,6 +249,8 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
 
 // Battery
 void batteryStatus(SDL_Surface *surface, int x, int y) {
+  // Hides an embeded low battery icon that's provided somewhere...
+  putenv("SDL_HIDE_BATTERY=1");
   int threshold = 40;
   int charge = getInt(BATTERY_INFO);
   char percentStr[5];
@@ -308,10 +312,10 @@ void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, 
   rect.w = BUTTON_SIZE;
   rect.h = BUTTON_SIZE;
 
-  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY});
+  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY - btn->h});
   SDL_FreeSurface(btnLabel);
-  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
-  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY});
+  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y - btn->h});
+  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY - btn->h});
   SDL_FreeSurface(btnKey);
 }
 // Secondary button
@@ -334,15 +338,15 @@ void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign
   rect.w = BUTTON_SIZE;
   rect.h = BUTTON_SIZE;
 
-  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY});
+  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY - btn->h});
   SDL_FreeSurface(btnLabel);
-  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
-  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY});
+  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y - btn->h});
+  SDL_BlitSurface(btnKey, NULL, surface, &(SDL_Rect){rightAlign? btnRightAlign + btnCX :x + btnCX - btnX, y + btnCY - btn->h});
   SDL_FreeSurface(btnKey);
 }
 // Tertiary button
-void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int y) {
-  SDL_Surface *btn = gfx.dpad;
+void tertiaryBTN(SDL_Surface *surface, char *blabel, int altUI, int rightAlign, int x, int y) {
+  SDL_Surface *btn = altUI? gfx.button_menu : gfx.dpad;
   SDL_Surface *btnLabel = TTF_RenderUTF8_Blended(font.body, blabel, (SDL_Color){LIGHT_TEXT});
 
   int margin = SPACING_XS;
@@ -360,9 +364,9 @@ void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int 
   rect.w = BUTTON_SIZE;
   rect.h = BUTTON_SIZE;
 
-  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY});
+  SDL_BlitSurface(btnLabel, NULL, surface, &(SDL_Rect){rightAlign? labelRightAlign : x, y + btnLabelCY - btn->h});
   SDL_FreeSurface(btnLabel);
-  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y});
+  SDL_BlitSurface(btn, &rect, surface, &(SDL_Rect){rightAlign? btnRightAlign : x - btnX, y - btn->h});
 }
 
 static int calcProgress(int width, int value, int minValue, int maxValue) {
@@ -370,7 +374,7 @@ static int calcProgress(int width, int value, int minValue, int maxValue) {
   return progress;
 };
 // Volumn control component
-void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {
+void volumeControl(SDL_Surface *surface, int x, int y, int bottomAlign, int value, int minValue, int maxValue) {
   SDL_Surface *icon = value == 0? gfx.mute: gfx.volume;
   int marginLeft = ICON_SIZE + SPACING_MD;
   int w = SCREEN_WIDTH / 2 - marginLeft;
@@ -380,9 +384,9 @@ void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, 
   int progress = SDL_MapRGB(surface->format, WHITE);
   int background = SDL_MapRGB(surface->format, GREY400);
 
-  SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){x, y});
-  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, w, h}, background);
-  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, y + cy, pw, h}, progress);
+  SDL_BlitSurface(icon, NULL, surface, &(SDL_Rect){x, bottomAlign? y - icon->h: y});
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, bottomAlign? y + cy - icon->h: y + cy, w, h}, background);
+  SDL_FillRect(surface, &(SDL_Rect){x + marginLeft, bottomAlign? y + cy - icon->h: y+ cy, pw, h}, progress);
 }
 // Brightness control component
 void brightnessControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue) {

@@ -9,6 +9,7 @@ typedef struct GFX_Context {
   SDL_Surface *button;
   SDL_Surface *button_outline;
   SDL_Surface *dpad;
+  SDL_Surface *button_menu;
   SDL_Surface *corner_radius;
   SDL_Surface *settings_bar_full;
   SDL_Surface *settings_bar_empty;
@@ -99,9 +100,8 @@ void batteryStatus(SDL_Surface *surface, int x, int y);
 void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
 void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
 void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
-void tertiaryBTN(SDL_Surface *surface, char *blabel, int rightAlign, int x, int y);
-void volumnBrightness(SDL_Surface *surface, int x, int y,int icon, int value, int minValue,int maxValue);
-void volumeControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue);
+void tertiaryBTN(SDL_Surface *surface, char *blabel, int altUI, int rightAlign, int x, int y);
+void volumeControl(SDL_Surface *surface, int x, int y, int bottomAlign, int value, int minValue, int maxValue);
 void brightnessControl(SDL_Surface *surface, int x, int y, int value, int minValue, int maxValue);
 
 #endif

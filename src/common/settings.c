@@ -55,8 +55,6 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   SDL_Surface *label = TTF_RenderUTF8_Blended(font.h3, item, (SDL_Color){LIGHT_TEXT});
   int labelMarginLeft = marginLeft + ICON_SIZE + SPACING_MD;
   int labelWidth = labelMarginLeft + label->w + marginLeft;
-  int background = SDL_MapRGB(surface->format, GREY500);
-  int accent = SDL_MapRGB(surface->format, PRIMARY);
   int availableWidth = SCREEN_WIDTH / 2 - marginLeft;
   int cy = (ROW_HEIGHT / 2) - (label->h / 2);
 
@@ -64,11 +62,10 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
   int maxLabelWidth = MIN(rowWidth, labelWidth);
   int screenCenter = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * MENU_ITEMS) / 2);
 
-
   if (i == selected) {
      if (selected == SETTINGS_VOLUMN) {
         settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
-        volumeControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, volValue, volMin, volMax);
+        volumeControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, 0, volValue, volMin, volMax);
      } else if (selected == SETTINGS_SCREEN) {
         settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
         brightnessControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, britValue, britMin, britMax);
@@ -83,7 +80,7 @@ void settingsMenu(SDL_Surface *surface, int selected, int volValue, int britValu
         settingItem(surface, sleepTimerIcon, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT), marginLeft, maxLabelWidth);
      } 
   } else if (i == SETTINGS_VOLUMN) {
-    volumeControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, volValue, volMin, volMax);
+    volumeControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, 0, volValue, volMin, volMax);
   } else if (i == SETTINGS_SCREEN) {
     brightnessControl(surface, marginLeft, screenCenter + (i * ROW_HEIGHT) + cy, britValue, britMin, britMax);
   } else if (i == SETTINGS_POWER) {
@@ -112,7 +109,8 @@ void initSettings(SDL_Surface *surface, int selected, int volValue, int britValu
   char firmware[256];
   sprintf(firmware, "Firmware: %s", getenv("MIYOO_VERSION"));
   firmwareInfo = TTF_RenderUTF8_Blended(font.footnote, firmware, (SDL_Color){NEUTRAL_TEXT});
-  SDL_BlitSurface(firmwareInfo, NULL, surface, &(SDL_Rect){32, SCREEN_HEIGHT - ((ICON_SIZE / 2) + 20)});
+  int cy = (ICON_SIZE / 2) - (firmwareInfo->h / 2);
+  SDL_BlitSurface(firmwareInfo, NULL, surface, &(SDL_Rect){SPACING_XL, SCREEN_HEIGHT - SPACING_LG + cy - ICON_SIZE});
   SDL_FreeSurface(firmwareInfo);
   for (int i = 0; i < MENU_ITEMS; i++) {
     settingsMenu(surface, selected, volValue, britValue, i);
