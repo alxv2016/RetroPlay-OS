@@ -95,7 +95,7 @@ SDL_Surface *renderText(char *text);
 void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headingCopy, char *bodyCopy);
 void powerOffState(SDL_Surface *surface, char *headingCopy, char *bodyCopy);
 void sleepState(SDL_Surface *surface, char *headingCopy, char *bodyCopy);
-void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected);
+void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected, int total);
 void batteryStatus(SDL_Surface *surface, int x, int y);
 void primaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);
 void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign, int x, int y);

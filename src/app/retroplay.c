@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            listMenu(gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row);
+            listMenu(gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row, total);
           }
         } else {
           emptyState(gfx.screen, H2, CAPTION, "Couldn't find any games.", "Load some games to start playing.");
