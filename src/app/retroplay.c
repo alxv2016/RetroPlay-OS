@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
 
       if (volumeAdjustTime && !showSettingsMenu) {
         // Y Position: battery->h / 2 - volumn-> / 2 + 12
-        volumeControl(gfx.screen, SPACING_LG, 15, 1, currentVolume, volMin, volMax);
+        volumeControl(gfx.screen, SPACING_LG, 15, 0, currentVolume, volMin, volMax);
       }
       SDL_Flip(gfx.screen);
       dirty = 0;
