@@ -251,8 +251,6 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
 
 // Battery
 void batteryStatus(SDL_Surface *surface, int x, int y) {
-  // Hides an embeded low battery icon that's provided somewhere...
-  putenv("SDL_HIDE_BATTERY=1");
   int threshold = 40;
   int charge = getInt(BATTERY_INFO);
   char percentStr[5];

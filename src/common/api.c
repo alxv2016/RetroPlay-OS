@@ -408,11 +408,13 @@ Array *getRoot(Array *recents) {
         continue;
       if (hasRoms(dp->d_name)) {
         strcpy(tmp, dp->d_name);
-        Array_push(emus, Entry_new(full_path, ENTRY_DIR));
+        int type = suffixMatch(".pak", full_path) ? ENTRY_PAK : ENTRY_DIR;
+        Array_push(emus, Entry_new(full_path, type));
       } else {
-        // Show Emulators
+        // Show Emulators regardless
         strcpy(tmp, dp->d_name);
-        Array_push(emus, Entry_new(full_path, ENTRY_DIR));
+        int type = suffixMatch(".pak", full_path) ? ENTRY_PAK : ENTRY_DIR;
+        Array_push(emus, Entry_new(full_path, type));
       }
     }
     EntryArray_sort(emus);
@@ -617,6 +619,7 @@ Directory *Directory_new(char *path, int selected, Array *recents) {
   self->path = strdup(path);
   self->name = strdup(display_name);
   self->emuTag = hasEmu(emu_tag)? strdup(emu_tag): "NA";
+
   if (exactMatch(path, SDCARD_PATH)) {
     self->entries = getRoot(recents);
   } else if (exactMatch(path, FAUX_RECENT_PATH)) {
@@ -1014,6 +1017,7 @@ void openRom(char *path, char *last) {
   queueNext(cmd);
 }
 
+// ROOT Director when menu list inits, shows all emulators
 void openDirectory(char *path, int auto_launch) {
   char auto_path[256];
   if (hasCue(path, auto_path) && auto_launch) {
@@ -1050,7 +1054,7 @@ void openDirectory(char *path, int auto_launch) {
   top->end = end ? end
                  : ((top->entries->count < ROW_COUNT) ? top->entries->count
                                                       : ROW_COUNT);
-
+                                                      
   Array_push(stack, top);
 }
 

@@ -177,6 +177,8 @@ static int renderDigits(SDL_Surface *digits, int value, int x, int y) {
 }
 
 int main(int argc, char *argv[]) {
+  // Hides an embeded low battery icon that's provided somewhere...
+  putenv("SDL_HIDE_BATTERY=1");
   int quit = 0;
   SDL_Event event;
   SDL_Init(SDL_INIT_VIDEO);

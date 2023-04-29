@@ -31,6 +31,8 @@ static int britMax = MAX_BRIGHTNESS;
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
+  // Hides an embeded low battery icon that's provided in SDL_Video.c
+  putenv("SDL_HIDE_BATTERY=1");
   if (autoResume()) return 0;
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();
@@ -222,8 +224,13 @@ int main(int argc, char *argv[]) {
           dirty = 1;
         }
       } else if (total > 0 && Input_justPressed(BTN_A)) {
-        Entry_open(top->entries->items[top->selected]);
-        total = top->entries->count;
+        Entry *entry = top->entries->items[top->selected];
+        if (entry->type == ENTRY_PAK) {
+          openPak(entry->path);
+        } else {
+          Entry_open(entry);
+          total = top->entries->count;
+        }
         dirty = 1;
 
         if (total > 0)
