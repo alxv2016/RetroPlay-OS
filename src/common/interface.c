@@ -161,8 +161,10 @@ void GFX_quit(void) {
 
 /* COMPONENTS */
 
-static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char *displayName, int row, int selected_row, int total) {
+static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIcon, int showSysIcon, int showIcon, char *displayName, int row, int selected_row, int total) {
   #define MIN(min, max) (min) < (max) ? (min) : (max)
+  if (sysIcon == NULL) sysIcon = gfx.sys_arcade;
+  if (icon == NULL) icon = gfx.nes;
   int marginLeft = SPACING_XL;
   int titleMarginLeft = showIcon? marginLeft + CONSOLE_ICON_SIZE + SPACING_MD: marginLeft;
   int availableWidth = SCREEN_WIDTH - marginLeft * 2;
@@ -179,7 +181,12 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
   int rows = total < ROW_COUNT? total: ROW_COUNT;
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * rows) / 2);
 
+  int sw = sysIcon->w;
+  int sx = SCREEN_WIDTH - sw;
+  int scy = (SCREEN_HEIGHT / 2) - (sysIcon->h / 2);
+
   if (row == selected_row) {
+    if (showSysIcon && showIcon) SDL_BlitSurface(sysIcon, NULL, surface, &(SDL_Rect){sx, scy});
     SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, rowWidth, ROW_HEIGHT}, background);
     SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
   }
@@ -193,42 +200,37 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char
 
 // Menu list component
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected_row, int total) {
-  SDL_Surface *sysCover;
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
-  sysCover = gfx.sys_arcade;
-  int w = sysCover->w;
-  int x = SCREEN_WIDTH - (w + SPACING_LG);
-  int cy = (SCREEN_HEIGHT / 2) - (sysCover->h / 2);
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && !consoleDir) {
-    listItem(surface, gfx.arcade, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.arcade, gfx.sys_arcade, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "FC") && !consoleDir) {
-    listItem(surface, gfx.nes, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.nes, gfx.sys_nes, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "GB") && !consoleDir) {
-    listItem(surface, gfx.gameboy, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.gameboy, gfx.sys_gb, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
-    listItem(surface, gfx.gba, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.gba, gfx.sys_gba, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
-    listItem(surface,gfx.gbc, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.gbc, gfx.sys_gbc, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "MD") && !consoleDir) {
-    listItem(surface, gfx.sega, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.sega, gfx.sys_sega, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "GG") && !consoleDir) {
-    listItem(surface, gfx.gamegear, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.gamegear, gfx.sys_gg, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "PS") && !consoleDir) {
-    listItem(surface, gfx.playstation, 1, display_name, row, selected_row, total);
+    listItem(surface, gfx.playstation, gfx.sys_playstation, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
-    listItem(surface,gfx.snes, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.snes, gfx.sys_snes, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Apps") && !consoleDir) {
-    listItem(surface,gfx.apps, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.apps, NULL, 0,  1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Recently Played")) {
-    listItem(surface,gfx.recents, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.recents, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Clock")) {
-    listItem(surface,gfx.clock, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.clock, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Files")) {
-    listItem(surface,gfx.files, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.files, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Screenshots")) {
-    listItem(surface,gfx.screenshot, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, row, selected_row, total);
   } else {
     // Display system covers images within rom directory
     // if (!strcmp(emuTag, "FBA") && consoleDir) {
@@ -256,7 +258,7 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
     //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
     // }
     // Just passing in any dummy icon for non consoles items
-    listItem(surface,gfx.nes, 0, display_name, row, selected_row, total);
+    listItem(surface, NULL, NULL, 0, 0, display_name, row, selected_row, total);
   }
 
 }
