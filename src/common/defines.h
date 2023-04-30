@@ -76,6 +76,7 @@
 #define PAKS_PATH "/mnt/SDCARD/.system/paks"
 #define USERDATA_PATH "/mnt/SDCARD/.userdata"
 #define ROMS_PATH "/mnt/SDCARD/Roms"
+#define APPS_PATH "/mnt/SDCARD/Apps"
 #define RECENT_PATH "/mnt/SDCARD/.userdata/.retroplay/recent.txt"
 #define CONFIG_PATH "/mnt/SDCARD/.userdata/.retroplay/sleeptime.txt"
 #define FAUX_RECENT_PATH "/mnt/SDCARD/Recently Played"

@@ -53,6 +53,9 @@ void GFX_init(void) {
   gfx.sleep = loadImage("sleep.png");
   gfx.recents = loadImage("recents.png");
   gfx.apps = loadImage("apps.png");
+  gfx.clock = loadImage("time.png");
+  gfx.screenshot = loadImage("photos.png");
+  gfx.files = loadImage("files.png");
   gfx.sleep_timer = loadImage("sleep-timer.png");
   gfx.arcade = loadImage("arcade.png");
   gfx.nes = loadImage("nes.png");
@@ -112,6 +115,9 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.battery_low);
   SDL_FreeSurface(gfx.recents);
   SDL_FreeSurface(gfx.apps);
+  SDL_FreeSurface(gfx.clock);
+  SDL_FreeSurface(gfx.screenshot);
+  SDL_FreeSurface(gfx.files);
   SDL_FreeSurface(gfx.arcade);
   SDL_FreeSurface(gfx.nes);
   SDL_FreeSurface(gfx.gameboy);
@@ -217,6 +223,12 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
     listItem(surface,gfx.apps, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Recently Played")) {
     listItem(surface,gfx.recents, 1, display_name, row, selected_row, total);
+  } else if (!strcmp(name, "Clock")) {
+    listItem(surface,gfx.clock, 1, display_name, row, selected_row, total);
+  } else if (!strcmp(name, "Files")) {
+    listItem(surface,gfx.files, 1, display_name, row, selected_row, total);
+  } else if (!strcmp(name, "Screenshots")) {
+    listItem(surface,gfx.screenshot, 1, display_name, row, selected_row, total);
   } else {
     // Display system covers images within rom directory
     // if (!strcmp(emuTag, "FBA") && consoleDir) {

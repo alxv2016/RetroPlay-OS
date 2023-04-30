@@ -466,16 +466,36 @@ Array *getRoot(Array *recents) {
     }
   }
 
+  // Look for Apps folder and pull into root entries
+  // Showing apps together with the list of consoles
+  if (exists(APPS_PATH)) {
+    dh = opendir(APPS_PATH);
+    if (dh != NULL) {
+      struct dirent *dp;
+      char *tmp;
+      char full_path[256];
+      sprintf(full_path, "%s/", APPS_PATH);
+      tmp = full_path + strlen(full_path);
+      Array *paks = Array_new();
+      while ((dp = readdir(dh)) != NULL) {
+        if (hide(dp->d_name))
+        continue;
+        strcpy(tmp, dp->d_name);
+        Array_push(paks, Entry_new(full_path, ENTRY_PAK));
+      }
+      for (int i = 0; i < paks->count; i++) {
+        Array_push(entries, paks->items[i]);
+      }
+      Array_free(paks);
+      closedir(dh);
+    }
+  }
   // add systems to root
   for (int i = 0; i < entries->count; i++) {
     Array_push(root, entries->items[i]);
   }
-  Array_free(entries); // root now owns entries' entries
-
-  char tools_path[256];
-  sprintf(tools_path, "%s/Apps", SDCARD_PATH);
-  if (exists(tools_path))
-    Array_push(root, Entry_new(tools_path, ENTRY_DIR));
+  // root now owns entries' entries
+  Array_free(entries);
   return root;
 }
 
