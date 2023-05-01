@@ -221,43 +221,15 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
     listItem(surface, gfx.playstation, gfx.sys_playstation, 1, 1, display_name, row, selected_row, total);
   } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
     listItem(surface,gfx.snes, gfx.sys_snes, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(name, "Apps") && !consoleDir) {
-    listItem(surface,gfx.apps, NULL, 0,  1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Recently Played")) {
     listItem(surface,gfx.recents, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Clock")) {
     listItem(surface,gfx.clock, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Files")) {
     listItem(surface,gfx.files, NULL, 0, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(name, "Screenshots")) {
+  } else if (!strcmp(name, "Screenshot")) {
     listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, row, selected_row, total);
   } else {
-    // Display system covers images within rom directory
-    // if (!strcmp(emuTag, "FBA") && consoleDir) {
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "FC") && consoleDir) {
-    //   sysCover = gfx.sys_nes;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "GB") && consoleDir) {
-    //   sysCover = gfx.sys_gb;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "GBA") && consoleDir) {
-    //   sysCover = gfx.sys_gba;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "GBC") && consoleDir) {
-    //   sysCover = gfx.sys_gbc;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "MD") && consoleDir) {
-    //   sysCover = gfx.sys_sega;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "PS") && consoleDir) {
-    //   sysCover = gfx.sys_playstation;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // } else if (!strcmp(emuTag, "SFC") && consoleDir) {
-    //   sysCover = gfx.sys_snes;
-    //   SDL_BlitSurface(sysCover, NULL, surface, &(SDL_Rect){x, cy});
-    // }
-    // Just passing in any dummy icon for non consoles items
     listItem(surface, NULL, NULL, 0, 0, display_name, row, selected_row, total);
   }
 

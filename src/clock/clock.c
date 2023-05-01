@@ -25,7 +25,7 @@
 #define MAX_HOUR 23
 #define FRAME_DURATION 17
 
-SDL_Surface *screen, *digits;
+SDL_Surface *screen, *digits, *surface;
 int select_cursor = 0;
 char tmp_str[64];
 char final_long_string[512];
@@ -152,8 +152,8 @@ void selector(int x, int y, int len) {
 	int width = 22;
 	int height = 32;
 	int totalWidth = len * width;
-	uint32_t white = SDL_MapRGB(screen->format, 255,255,255);
-	SDL_FillRect(screen, &(SDL_Rect){x,y + height,totalWidth,4}, white);
+	uint32_t accent = SDL_MapRGB(screen->format, 219, 255, 77);
+	SDL_FillRect(screen, &(SDL_Rect){x,y + height,totalWidth,4}, accent);
 }
 
 static int renderDigits(SDL_Surface *digits, int value, int x, int y) {
@@ -177,11 +177,10 @@ static int renderDigits(SDL_Surface *digits, int value, int x, int y) {
 }
 
 int main(int argc, char *argv[]) {
-  // Hides an embeded low battery icon that's provided somewhere...
-  putenv("SDL_HIDE_BATTERY=1");
   int quit = 0;
   SDL_Event event;
   SDL_Init(SDL_INIT_VIDEO);
+  TTF_Init();
   SDL_ShowCursor(0);
 
   screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
@@ -302,9 +301,7 @@ int main(int argc, char *argv[]) {
 
 
     SDL_FillRect(screen, NULL, 0);
-
 		// datetime
-
 		int dw = 22;
 		int dh = 32;
     // Width of a single digit's with * the total amount of digits including seperators and spaces
@@ -338,6 +335,7 @@ int main(int argc, char *argv[]) {
 			x += (select_cursor - 1) * dateWith;
 		}
 		selector(x,y, (select_cursor>0 ? 2 : 4));
+
     SDL_Flip(screen);
 		// slow down to 60fps
 		unsigned long frame_duration = SDL_GetTicks() - frame_start;
@@ -351,6 +349,7 @@ int main(int argc, char *argv[]) {
   }
 
   SDL_Quit();
+  TTF_Quit();
 
   if (update_clock == 1) {
     snprintf(final_long_string, sizeof(final_long_string),

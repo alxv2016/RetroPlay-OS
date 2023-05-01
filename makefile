@@ -74,7 +74,7 @@ build: dirs
 	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Apps/Files.pak/
 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Apps/Clock.pak/
 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Apps/Files.pak/
-	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshots.pak/
+	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshot.pak/
 
 # NOTE: Save build time with pre-build cores
 	cp $(CORES_DIR)/picoarch $(BUILD_DIR)/dist/.system/bin/
