@@ -8,9 +8,9 @@ TARGET = clock
 
 CC = $(CROSS_COMPILE)gcc
 CFLAGS   = -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve 
-LDFLAGS	 = -lSDL -lSDL_image -lSDL_ttf
+LDFLAGS	 = -lSDL -lSDL_image -lSDL_ttf -lmsettings
 
-OBJS = ../common/utils.c ../common/interface.c
+OBJS = ../common/utils.c ../common/interface.c ../common/controls.c
 
 all:
 	$(CC) $(TARGET).c $(OBJS) -o $(TARGET) $(CFLAGS) $(LDFLAGS)

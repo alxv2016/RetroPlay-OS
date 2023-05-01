@@ -31,8 +31,7 @@ static int britMax = MAX_BRIGHTNESS;
 int main(int argc, char *argv[]) {
   rumble(OFF);
   menuSuperShortPulse();
-  // Hides an embeded low battery icon that's provided in SDL_Video.c
-  putenv("SDL_HIDE_BATTERY=1");
+
   if (autoResume()) return 0;
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   TTF_Init();

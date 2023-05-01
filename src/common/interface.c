@@ -78,6 +78,7 @@ void GFX_init(void) {
   gfx.empty_state = loadImage("empty-folder.png");
   gfx.poweroff_state = loadImage("wave.png");
   gfx.sleep_state = loadImage("sleep-mode.png");
+  gfx.digits = loadImage("digits.png");
 }
 
 void GFX_clear(void) {
@@ -139,6 +140,7 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.empty_state);
   SDL_FreeSurface(gfx.poweroff_state);
   SDL_FreeSurface(gfx.sleep_state);
+  SDL_FreeSurface(gfx.digits);
 
   TTF_CloseFont(font.h1);
   TTF_CloseFont(font.h2);

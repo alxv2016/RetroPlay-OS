@@ -47,7 +47,7 @@ extern Directory *top;
 extern Array *stack;
 // RecentArray
 extern Array *recents;
-
+// global quit linked to mainui
 extern int quit;
 extern int can_resume;
 // set to 1 on BTN_R1esume but only if can_resume==1
