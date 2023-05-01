@@ -71,9 +71,13 @@ int main(int argc, char *argv[]) {
 
     if (showSettingsMenu) {
       if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU))) {
+        playClickSound();
+        SDL_Delay(200);
         showSettingsMenu = 0;
         dirty = 1;
       } else if (Input_justPressed(BTN_A)) {
+        playClickSound();
+        SDL_Delay(200);
         switch (settingItemSelected) {
         case SETTINGS_SLEEP:
           fauxSleep();
@@ -88,6 +92,7 @@ int main(int argc, char *argv[]) {
       } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
         currentVolume = GetVolume();
       } else if (Input_justRepeated(BTN_LEFT)) {
+        playArrowSound();
         switch (settingItemSelected) {
         case SETTINGS_SCREEN:
           currentBrightness = GetBrightness();
@@ -113,6 +118,7 @@ int main(int argc, char *argv[]) {
           break;
         }
       } else if (Input_justRepeated(BTN_RIGHT)) {
+        playArrowSound();
         switch (settingItemSelected) {
         case SETTINGS_SCREEN:
           currentBrightness = GetBrightness();
@@ -138,12 +144,14 @@ int main(int argc, char *argv[]) {
       }
 
       if (Input_justPressed(BTN_UP)) {
+        playArrowSound();
         settingItemSelected -= 1;
         if (settingItemSelected < 0) {
           settingItemSelected += MENU_ITEMS;
         }
         dirty = 1;
       } else if (Input_justPressed(BTN_DOWN)) {
+        playArrowSound();
         settingItemSelected += 1;
         if (settingItemSelected >= MENU_ITEMS) {
           settingItemSelected -= MENU_ITEMS;
@@ -152,11 +160,14 @@ int main(int argc, char *argv[]) {
       }
 
     } else if (Input_justReleased(BTN_MENU)) {
+      playClickSound();
+      SDL_Delay(200);
       showSettingsMenu = 1;
       dirty = 1;
     } else {
       if (total > 0) {
         if (Input_justRepeated(BTN_UP)) {
+          playArrowSound();
           selected -= 1;
           if (selected < 0) {
             selected = total - 1;
@@ -168,6 +179,7 @@ int main(int argc, char *argv[]) {
             top->end -= 1;
           }
         } else if (Input_justRepeated(BTN_DOWN)) {
+          playArrowSound();
           selected += 1;
           if (selected >= total) {
             selected = 0;
@@ -180,6 +192,7 @@ int main(int argc, char *argv[]) {
         }
         if (Input_justRepeated(BTN_LEFT)) {
           // Scan games alphabetically
+          playArrowSound();
           Entry *entry = top->entries->items[selected];
           int i = entry->alpha - 1;
           if (i >= 0) {
@@ -193,6 +206,7 @@ int main(int argc, char *argv[]) {
             }
           }
         } else if (Input_justRepeated(BTN_RIGHT)) {
+          playArrowSound();
           Entry *entry = top->entries->items[selected];
           int i = entry->alpha + 1;
           if (i < top->alphas->count) {
@@ -223,6 +237,8 @@ int main(int argc, char *argv[]) {
           dirty = 1;
         }
       } else if (total > 0 && Input_justPressed(BTN_A)) {
+        playClickSound();
+        SDL_Delay(200);
         Entry *entry = top->entries->items[top->selected];
         if (entry->type == ENTRY_PAK) {
           openPak(entry->path);
@@ -235,6 +251,8 @@ int main(int argc, char *argv[]) {
         if (total > 0)
           readyResume(top->entries->items[top->selected]);
       } else if (Input_justPressed(BTN_B) && stack->count > 1) {
+        playClickSound();
+        SDL_Delay(200);
         closeDirectory();
         total = top->entries->count;
         dirty = 1;

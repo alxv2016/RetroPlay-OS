@@ -70,6 +70,8 @@
 #define TEMP_PATH "/tmp/"
 #define BATTERY_INFO "/tmp/battery"
 #define SOUND_PATH "/customer/app/sound/change.wav"
+#define SOUND_ARROWS "/mnt/SDCARD/.system/res/arrows.wav"
+#define SOUND_CLICKS "/mnt/SDCARD/.system/res/clicks.wav"
 
 #define SDCARD_PATH "/mnt/SDCARD"
 #define RES_PATH "/mnt/SDCARD/.system/res"

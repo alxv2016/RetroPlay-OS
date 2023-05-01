@@ -5,6 +5,7 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
 #include <SDL/SDL_ttf.h>
 #include <msettings.h>
 
@@ -14,13 +15,13 @@
 #include "../common/utils.h"
 #include "../common/controls.h"
 #include "../common/interface.h"
+#include "../common/rumble.h"
 #include "clock.h"
 ///////////////////////////////////////
 uint32_t date_selected = MIN_DAY, month_selected = MIN_DAY, year_selected = MIN_YEAR;
 uint32_t hour_selected = 0, minute_selected = 0, seconds_selected = 0;
 uint32_t february_days = 28;
 
-/* I could probably make this smaller */
 static void Dont_go_over_days() {
 
   if (year_selected > MAX_YEAR) {
@@ -162,11 +163,13 @@ static int renderDigits(SDL_Surface *surface, SDL_Surface *digits, int value, in
 }
 
 int main(int argc, char *argv[]) {
-  SDL_Init(SDL_INIT_VIDEO);
+  rumble(OFF);
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
   SDL_ShowCursor(0);
   SDL_EnableKeyRepeat(500, 50);
   InitSettings();
   gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
+  if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
   GFX_init();
   GFX_ready();
   Input_reset();
@@ -192,7 +195,8 @@ int main(int argc, char *argv[]) {
 		unsigned long frameStart = SDL_GetTicks();
     Input_poll();
 
-    if (Input_justPressed(BTN_UP)) {
+    if (Input_justRepeated(BTN_UP)) {
+      playArrowSound();
       dirty = 1;
       switch (select_cursor) {
       case CURSOR_YEAR:
@@ -214,7 +218,8 @@ int main(int argc, char *argv[]) {
         seconds_selected++;
         break;
       }
-    } else if (Input_justPressed(BTN_DOWN)) {
+    } else if (Input_justRepeated(BTN_DOWN)) {
+      playArrowSound();
       dirty = 1;
       switch (select_cursor) {
       case CURSOR_YEAR:
@@ -236,20 +241,27 @@ int main(int argc, char *argv[]) {
         DecreaseTimeElement(&seconds_selected, MAX_SECOND);
         break;
       }
-    } else if (Input_justPressed(BTN_LEFT)) {
+    } else if (Input_justRepeated(BTN_LEFT)) {
+      playArrowSound();
       dirty = 1;
       select_cursor--;
       if (select_cursor < 0)
         select_cursor += 6;
-    } else if (Input_justPressed(BTN_RIGHT)) {
+    } else if (Input_justRepeated(BTN_RIGHT)) {
+      playArrowSound();
       dirty = 1;
       select_cursor++;
       if (select_cursor > 5)
         select_cursor -= 6;
     } else if (Input_justPressed(BTN_A)) {
+      playClickSound();
+      SDL_Delay(200);
       quit = 1;
       update_clock = 1;
+      superShortPulse();
     } else if (Input_justPressed(BTN_B)) {
+      playClickSound();
+      SDL_Delay(200);
       quit = 1;
     }
 
@@ -300,6 +312,7 @@ int main(int argc, char *argv[]) {
 
   GFX_quit();
   SDL_Quit();
+  freeSound();
   QuitSettings();
 
   if (update_clock) {
