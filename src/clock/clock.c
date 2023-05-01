@@ -303,6 +303,11 @@ int main(int argc, char *argv[]) {
         x += (select_cursor - 1) * dateWith;
       }
       selector(gfx.screen, x, y, (select_cursor > 0 ? 2 : 4));
+      // Button ui
+      paragraph(BODY, 0, "Setup system time for games that\nsupport ingame time events.", (SDL_Color){NEUTRAL_TEXT}, gfx.screen, &(SDL_Rect){0, gfx.digits->h + SPACING_XL, gfx.screen->w, gfx.screen->h});
+      primaryBTN(gfx.screen, "A", "Apply", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
+      secondaryBTN(gfx.screen, "B", "Cancel", 1, SCREEN_WIDTH - SPACING_LG - 113, SCREEN_HEIGHT - SPACING_LG);
+
       SDL_Flip(gfx.screen);
       dirty = 0;
     }
