@@ -15,9 +15,14 @@
 #include "../common/utils.h"
 #include "../common/controls.h"
 #include "../common/interface.h"
+#include "../common/powerops.h"
 #include "../common/rumble.h"
+#include "../common/settings.h"
+
 #include "clock.h"
 ///////////////////////////////////////
+static int volMin = MIN_VOLUME;
+static int volMax = MAX_VOLUME;
 uint32_t date_selected = MIN_DAY, month_selected = MIN_DAY, year_selected = MIN_YEAR;
 uint32_t hour_selected = 0, minute_selected = 0, seconds_selected = 0;
 uint32_t february_days = 28;
@@ -139,7 +144,7 @@ void selector(SDL_Surface *surface, int x, int y, int len) {
   int height = 32;
   int totalWidth = len * width;
   uint32_t accent = SDL_MapRGB(surface->format, 219, 255, 77);
-  SDL_FillRect(surface, &(SDL_Rect){x, y + height, totalWidth, 4}, accent);
+  SDL_FillRect(surface, &(SDL_Rect){x, y + height + SPACING_XXS, totalWidth, 4}, accent);
 }
 
 static int renderDigits(SDL_Surface *surface, SDL_Surface *digits, int value, int x, int y) {
@@ -178,6 +183,12 @@ int main(int argc, char *argv[]) {
   int quit = 0;
   int update_clock = 0;
   int select_cursor = 0;
+  int chargeStatus = isCharging();
+  unsigned long chargeStartTime = SDL_GetTicks();
+  unsigned long powerStartTime = 0;
+  unsigned long deviceSleepTime = SDL_GetTicks();
+  unsigned long volumeAdjustTime = 0;
+  int currentVolume = GetVolume();
 
   time_t t = time(NULL);
   struct tm tm = *localtime(&t);
@@ -193,6 +204,8 @@ int main(int argc, char *argv[]) {
 
   while (!quit) {
 		unsigned long frameStart = SDL_GetTicks();
+    unsigned long currentTime = SDL_GetTicks();
+    int oldVolume = currentVolume;
     Input_poll();
 
     if (Input_justRepeated(BTN_UP)) {
@@ -263,7 +276,40 @@ int main(int argc, char *argv[]) {
       playClickSound();
       SDL_Delay(200);
       quit = 1;
+    } else if (Input_justPressed(BTN_MINUS) || Input_justPressed(BTN_PLUS)) {
+      currentVolume = GetVolume();
     }
+
+    // Device Charge, Sleep, Power logic
+    if (dirty || currentTime - chargeStartTime >= CHARGE_DELAY) {
+      int nowcharging = isCharging();
+      if (chargeStatus != nowcharging) {
+        chargeStatus = nowcharging;
+        dirty = 1;
+      }
+      chargeStartTime = currentTime;
+    }
+    if (powerStartTime && currentTime - powerStartTime >= 1000) powerOff();
+    if (Input_justPressed(BTN_POWER)) powerStartTime = currentTime;
+    if (Input_anyPressed()) deviceSleepTime = currentTime;
+
+    if (getSleepDelay() != 0 && currentTime - deviceSleepTime >= getSleepDelay() && preventAutosleep()) deviceSleepTime = currentTime;
+    if (getSleepDelay() != 0 && currentTime - deviceSleepTime >= getSleepDelay() || Input_justReleased(BTN_POWER)) {
+      fauxSleep();
+      deviceSleepTime = SDL_GetTicks();
+      powerStartTime = 0;
+      dirty = 1;
+    } 
+
+    if (oldVolume != currentVolume) {
+      dirty = 1;
+      volumeAdjustTime = SDL_GetTicks();
+    }
+    else if (volumeAdjustTime > 0 && SDL_GetTicks() - volumeAdjustTime > 500) {
+      dirty = 1;
+      volumeAdjustTime = 0;
+    }
+
 
     if (dirty) {
       Check_leap_year();
@@ -303,8 +349,12 @@ int main(int argc, char *argv[]) {
         x += (select_cursor - 1) * dateWith;
       }
       selector(gfx.screen, x, y, (select_cursor > 0 ? 2 : 4));
-      // Button ui
-      paragraph(BODY, 0, "Setup system time for games that\nsupport ingame time events.", (SDL_Color){NEUTRAL_TEXT}, gfx.screen, &(SDL_Rect){0, gfx.digits->h, gfx.screen->w, gfx.screen->h});
+      // UI Elements
+      if (volumeAdjustTime) {
+        // Y Position: battery->h / 2 - volumn-> / 2 + 12
+        volumeControl(gfx.screen, SPACING_LG, 15, 0, currentVolume, volMin, volMax);
+      }
+      paragraph(BODY, 0, "Setup system time for games that\nsupport ingame time events.", (SDL_Color){NEUTRAL_TEXT}, gfx.screen, &(SDL_Rect){0, gfx.digits->h + SPACING_LG, gfx.screen->w, gfx.screen->h});
       primaryBTN(gfx.screen, "A", "Apply", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
       secondaryBTN(gfx.screen, "B", "Cancel", 1, SCREEN_WIDTH - SPACING_LG - 113, SCREEN_HEIGHT - SPACING_LG);
 
