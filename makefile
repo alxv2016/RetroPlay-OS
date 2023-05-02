@@ -47,8 +47,8 @@ libs:
 	cd $(SRC_DIR)/confirm && make
 # Tools
 	cd $(SRC_DIR)/clock && make
+	cd $(SRC_DIR)/screenshot && make
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
-	cd $(THIRD_PARTY_DIR)/screenshot && make
 
 dirs: clean
 	@echo "\n::$(TARGET) -- Making Directories"
@@ -71,10 +71,10 @@ build: dirs
 	cp $(SRC_DIR)/sys-img/sys-img $(BUILD_DIR)/dist/miyoo354/app/
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/miyoo354/app/
 
-	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Apps/Files.pak/
 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Apps/Clock.pak/
+	cp $(SRC_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshot.pak/
+	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Apps/Files.pak/
 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Apps/Files.pak/
-	cp $(THIRD_PARTY_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshot.pak/
 
 # NOTE: Save build time with pre-build cores
 	cp $(CORES_DIR)/picoarch $(BUILD_DIR)/dist/.system/bin/
