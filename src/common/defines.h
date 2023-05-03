@@ -86,6 +86,7 @@
 #define FONT_PATH "/mnt/SDCARD/.system/res/Roboto-Regular.ttf"
 #define FONT_PATH_MEDIUM "/mnt/SDCARD/.system/res/Roboto-Medium.ttf"
 #define DEBUG_PATH "/mnt/SDCARD/debug.txt"
+#define SCREENSHOT_PATH "/mnt/SDCARD/Screenshots"
 
 #define LAST_PATH "/tmp/last.txt"
 #define CHANGE_DISC_PATH "/tmp/change_disc.txt"

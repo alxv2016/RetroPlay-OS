@@ -18,18 +18,11 @@
 #include <sys/types.h>
 
 #include "../common/keycontext.h"
+#include "../common/screencapture.h"
 
 #include "keymon.h"
 
-// for DEBUG
-// #define	DEBUG
-#ifdef DEBUG
-#define ERROR(str)                                                             \
-  fprintf(stderr, str "\n");                                                   \
-  quit(EXIT_FAILURE)
-#else
 #define ERROR(str) quit(EXIT_FAILURE)
-#endif
 
 static SAR_ADC_CONFIG_READ adc_config = {0, 0};
 static int is_charging = 0;
@@ -84,16 +77,17 @@ static void *runAXP(void *arg) {
 
 int main(int argc, char *argv[]) {
   checkAXP();
-  pthread_create(&adc_pt, NULL, &runAXP, NULL);
-  // Set Initial Volume / Brightness
   InitSettings();
+  pthread_create(&adc_pt, NULL, &runAXP, NULL);
 
   input_fd = open("/dev/input/event0", O_RDONLY);
-  // Main Loop
-  register uint32_t val;
-  register uint32_t button_flag = 0;
-  register uint32_t menu_pressed = 0;
-  register uint32_t power_pressed = 0;
+
+  uint32_t val;
+  uint32_t button_flag = 0;
+  uint32_t menu_pressed = 0;
+  uint32_t power_pressed = 0;
+  uint32_t l2_pressed = 0;
+  uint32_t r2_pressed = 0;
   uint32_t repeat_vol = 0;
 
   while (read(input_fd, &ev, sizeof(ev)) == sizeof(ev)) {
@@ -105,7 +99,7 @@ int main(int argc, char *argv[]) {
       if (val != REPEAT)
         menu_pressed = val;
       if (val == PRESSED)
-      break;
+        break;
     case BUTTON_POWER:
       if (val != REPEAT)
         power_pressed = val;
@@ -134,17 +128,6 @@ int main(int argc, char *argv[]) {
           SetVolume(++val);
         if (val > 0)
           SetMute(0);
-        // if (menu_pressed > 0) {
-        //   val = GetBrightness();
-        //   if (val < MAX_BRIGHTNESS)
-        //     SetBrightness(++val);
-        // } else {
-        //   val = GetVolume();
-        //   if (val < MAX_VOLUME)
-        //     SetVolume(++val);
-        //   if (val > 0)
-        //     SetMute(0);
-        // }
       }
       break;
     case BUTTON_VOLDOWN:
@@ -161,42 +144,20 @@ int main(int argc, char *argv[]) {
           SetVolume(--val);
         if (val == 0)
           SetMute(1);
-        // if (menu_pressed > 0) {
-        //   val = GetBrightness();
-        //   if (val > 0)
-        //     SetBrightness(--val);
-        // } else {
-        //   val = GetVolume();
-        //   if (val > 0)
-        //     SetVolume(--val);
-        //   if (val == 0)
-        //     SetMute(1);
-        // }
       }
       break;
-    case BUTTON_UP:
-      if (val == PRESSED)
-      break;
-    case BUTTON_DOWN:
-      if (val == PRESSED)
-      break;
-    case BUTTON_LEFT:
-      if (val == PRESSED)
-      break;
-    case BUTTON_RIGHT:
-      if (val == PRESSED)
-      break;
-    case BUTTON_A:
-      if (val == PRESSED)
-      break;
-    case BUTTON_B:
-      if (val == PRESSED)
-      break;
-    case BUTTON_X:
-      if (val == PRESSED)
-      break;
-    case BUTTON_Y:
-      if (val == PRESSED)
+    case BUTTON_L2:
+    case BUTTON_R2:
+      if ( ev.code == BUTTON_L2 ) {
+				l2_pressed = val;
+			} else if ( ev.code == BUTTON_R2 ) {
+				r2_pressed = val;
+			}
+			if (l2_pressed & r2_pressed) {
+				screenshot();
+				usleep(100000);	//0.1s
+				l2_pressed = r2_pressed = 0;
+			}
       break;
     default:
       break;
@@ -209,5 +170,6 @@ int main(int argc, char *argv[]) {
         pause();
     }
   }
+
   ERROR("Failed to read input event");
 }

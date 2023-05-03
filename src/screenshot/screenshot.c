@@ -1,209 +1,223 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <fcntl.h>
-#include <stdint.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <linux/fb.h>
-#include <linux/input.h>
-#include <png.h>
 
-//
-//	Rumble ON(1) / OFF(0)
-//
-void rumble(uint32_t val) {
-	int fd;
-	const char str_export[] = "48";
-	const char str_direction[] = "out";
-	char value[1];
-	value[0] = ((val&1)^1) + 0x30;
+#include <SDL/SDL.h>
+#include <SDL/SDL_image.h>
+#include <SDL/SDL_mixer.h>
+#include <SDL/SDL_ttf.h>
+#include <msettings.h>
 
-	fd = open("/sys/class/gpio/export", O_WRONLY);
-		if (fd > 0) {
-			write(fd, str_export, 2);
-			close(fd);
-		}
-	fd = open("/sys/class/gpio/gpio48/direction", O_WRONLY);
-		if (fd > 0) {
-			write(fd, str_direction, 3);
-			close(fd);
-		}
-	fd = open("/sys/class/gpio/gpio48/value", O_WRONLY);
-		if (fd > 0) {
-			write(fd, value, 1);
-			close(fd);
-		}
+#include "../common/defines.h"
+#include "../common/keycontext.h"
+
+#include "../common/controls.h"
+#include "../common/gallery.h"
+#include "../common/interface.h"
+#include "../common/rumble.h"
+#include "../common/utils.h"
+
+#include "screenshot.h"
+
+///////////////////////////////////
+
+int main(int argc, char *argv[]) {
+  rumble(OFF);
+  SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+  SDL_ShowCursor(0);
+  SDL_EnableKeyRepeat(500, 50);
+  gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
+                                SDL_HWSURFACE | SDL_DOUBLEBUF);
+  if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
+  GFX_init();
+  GFX_ready();
+  Input_reset();
+
+  int dirty = 1;
+  int quit = 0;
+  int selected = 0;
+  int imageCount = 0;
+  char images_dir_path[STR_MAX];
+  
+  if (exists(SCREENSHOT_PATH)) {
+    imageCount = getImagesCount(SCREENSHOT_PATH);
+  }
+
+  while (!quit) {
+    unsigned long frameStart = SDL_GetTicks();
+    int total = imageCount;
+    Input_poll();
+
+    if (Input_justPressed(BTN_UP)) {
+      // playArrowSound();
+      selected -= 1;
+      if (selected < 0) {
+        selected += imageCount;
+      }
+      dirty = 1;
+    } else if (Input_justPressed(BTN_DOWN)) {
+      // playArrowSound();
+      selected += 1;
+      if (selected >= imageCount) {
+        selected -= imageCount;
+      }
+      dirty = 1;
+    } else if (Input_justPressed(BTN_B)) {
+      // playClickSound();
+      SDL_Delay(200);
+      quit = 1;
+    }
+
+    if (dirty) {
+      SDL_FillRect(gfx.screen, NULL, 0);
+      if (total > 0) {
+        char tmp[256];
+        sprintf(tmp, "%i / %i", selected, imageCount);
+        paragraph(BODY, 1, tmp, (SDL_Color){WHITE}, gfx.screen, NULL);
+      }
+
+      primaryBTN(gfx.screen, "A", "Okay", 1, SCREEN_WIDTH - SPACING_LG,
+                 SCREEN_HEIGHT - SPACING_LG);
+      secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 113,
+                   SCREEN_HEIGHT - SPACING_LG);
+
+      SDL_Flip(gfx.screen);
+      dirty = 0;
+    }
+    // slow down to 60fps
+    GFX_sync(frameStart);
+  }
+
+  GFX_quit();
+  SDL_Quit();
+  freeSound();
+  return 0;
 }
 
-//
-//	Search pid of running executable
-//
-pid_t searchpid(const char *commname) {
-	DIR *procdp;
-	struct dirent *dir;
-	char fname[32];
-	char comm[128];
-	pid_t pid;
-	pid_t ret = 0;
 
-	procdp = opendir("/proc");
-	while ((dir = readdir(procdp))) {
-		if (dir->d_type == DT_DIR) {
-			pid = atoi(dir->d_name);
-			if ( pid > 2 ) {
-				sprintf(fname, "/proc/%d/comm", pid);
-				FILE *fp = fopen(fname, "r");
-				if (fp) {
-					fscanf(fp, "%127s", comm);
-					fclose(fp);
-					if (!strcmp(comm, commname)) { ret = pid; break; }
-				}
-			}
-		}
-	}
-	closedir(procdp);
-	return ret;
-}
+// static char **g_images_paths;
+// static char **g_images_titles;
+// static int g_images_paths_count = 0;
+// static int g_image_index = -1;
 
-//
-//	Get Most recent file name from Roms/recentlist.json
-//
-char* getrecent(char *filename) {
-	FILE		*fp;
-	char		*fnptr;
-	uint32_t	i;
+// static void drawImage(const char *image_path, SDL_Surface *screen) {
+//   SDL_Surface *image = IMG_Load(image_path);
+//   if (image) {
+//     SDL_Rect image_rect = {320 - image->w / 2, 240 - image->h / 2};
+//     SDL_BlitSurface(image, NULL, screen, &image_rect);
+//     SDL_FreeSurface(image);
+//   }
+// }
 
-	strcpy(filename, "/mnt/SDCARD/Screenshots/");
-	if (access(filename, F_OK)) mkdir(filename, 777);
+// int main(int argc, char *argv[]) {
+//   rumble(OFF);
+//   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+//   SDL_ShowCursor(0);
+//   SDL_EnableKeyRepeat(500, 50);
+//   gfx.screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, 16,
+//                                 SDL_HWSURFACE | SDL_DOUBLEBUF);
+//   if (Mix_OpenAudio(48000, 32784, 2, 4096) < 0) return 0;
+//   GFX_init();
+//   GFX_ready();
+//   Input_reset();
 
-	fnptr = filename + strlen(filename);
+//   int dirty = 1;
+//   int quit = 0;
+//   int selected = 0;
+//   // int cache_used = 0;
+//   // char image_path[STR_MAX] = "";
+//   // char images_dir_path[STR_MAX] = "";
 
-	if (!access("/tmp/cmd_to_run.sh", F_OK)) {
-		// for stock
-		if ((fp = fopen("/mnt/SDCARD/Roms/recentlist.json", "r"))) {
-			fscanf(fp, "%*255[^:]%*[:]%*[\"]%255[^\"]", fnptr);
-			fclose(fp);
-		}
-	} else if ((fp = fopen("/tmp/next", "r"))) {
-		// for RetroPlay OS
-		char ename[256];
-		char fname[256];
-		char *strptr;
-		ename[0] = 0; fname[0] = 0;
-		fscanf(fp, "%*[\"]%255[^\"]%*[\" ]%255[^\"]", ename, fname);
-		fclose(fp);
-		if (fname[0]) {
-			if ((strptr = strrchr(fname, '.'))) *strptr = 0;
-			if ((strptr = strrchr(fname, '/'))) strptr++; else strptr = fname;
-			strcpy(fnptr, strptr);
-		} else if (ename[0]) {
-			if ((strptr = strrchr(ename, '/'))) *strptr = 0;
-			if ((strptr = strrchr(ename, '.'))) *strptr = 0;
-			if ((strptr = strrchr(ename, '/'))) strptr++; else strptr = ename;
-			strcpy(fnptr, strptr);
-		}
-	}
+//   // for (int i = 1; i < argc; i++) {
+//   //   if (argv[i][0] == '-') {
+//   //     if (strcmp(argv[i], "-i") == 0 || strcmp(argv[i], "--image") == 0)
+//   //       strncpy(image_path, argv[++i], STR_MAX - 1);
+//   //     else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--directory") == 0)
+//   //       strncpy(images_dir_path, argv[++i], STR_MAX - 1);
+//   //   }
+//   // }
 
-	if (!(*fnptr)) {
-		if (searchpid("retroplay")) strcat(filename, "retroplay");
-		else strcat(filename, "MainUI");
-	}
+//   while (!quit) {
+//     unsigned long frameStart = SDL_GetTicks();
+//     int total = 7;
+//     Input_poll();
 
-	fnptr = filename + strlen(filename);
-	for (i=0; i<1000; i++) {
-		sprintf(fnptr, "_%03d.png", i);
-		if ( access(filename, F_OK) != 0 ) break;
-	} if (i > 999) return NULL;
-	return filename;
-}
+//     if (Input_justPressed(BTN_UP)) {
+//       playArrowSound();
+//       selected -= 1;
+//       if (selected < 0) {
+//         selected += 4;
+//       }
+//       dirty = 1;
+//     } else if (Input_justPressed(BTN_DOWN)) {
+//       playArrowSound();
+//       selected += 1;
+//       if (selected >= 4) {
+//         selected -= 4;
+//       }
+//       dirty = 1;
+//     }
+    
+//     // else if (Input_justPressed(BTN_A)) {
+//     //   playClickSound();
+//     //   SDL_Delay(200);
+//     //   superShortPulse();
+//     //   dirty = 1;
+//     // } else if (Input_justPressed(BTN_B)) {
+//     //   playClickSound();
+//     //   SDL_Delay(200);
+//     //   quit = 1;
+//     // }
 
-//
-//	Screenshot (640x480, rotate180, png)
-//
-void screenshot(void) {
-	char		screenshotname[512];
-	uint32_t	*buffer, *src;
-	uint32_t	linebuffer[640], x, y, pix;
-	FILE		*fp;
-	int		fd_fb;
-	struct		fb_var_screeninfo vinfo;
-	png_structp	png_ptr;
-	png_infop	info_ptr;
+//     if (dirty) {
 
-	if (getrecent(screenshotname) == NULL) return;
-	if ((buffer = (uint32_t*)malloc(640*480*4)) != NULL) {
-		fd_fb = open("/dev/fb0", O_RDWR);
-		ioctl(fd_fb, FBIOGET_VSCREENINFO, &vinfo);
-		lseek(fd_fb, 640*vinfo.yoffset*4, SEEK_SET);
-		read(fd_fb, buffer, 640*480*4);
-		close(fd_fb);
+//       // if (exists(image_path)) {
+//       //   g_images_paths_count = 1;
+//       //   g_image_index = 0;
+//       //   drawImage(image_path, gfx.screen);
+//       // } else if (exists(images_dir_path)) {
+//       //   if (loadImagesPathsFromDir(images_dir_path, &g_images_paths, &g_images_paths_count) && g_images_paths_count > 0) {
+//       //     g_image_index = 0;
+//       //     drawImageByIndex(0, g_image_index, g_images_paths, g_images_paths_count, gfx.screen, NULL, &cache_used);
+//       //     putInt(DEBUG_PATH, g_images_paths_count);
+//       //   } else {
+//       //     SDL_FreeSurface(gfx.screen);
+//       //     SDL_Quit();
+//       //     return EXIT_FAILURE;
+//       //   }
+//       // }
+//       if (total > 0) {
+//         char tmp[256];
+//         sprintf(tmp, "%i", selected);
+//         paragraph(BODY, 1, tmp, (SDL_Color){WHITE}, gfx.screen, NULL);
+//       }
+//       primaryBTN(gfx.screen, "A", "Okay", 1, SCREEN_WIDTH - SPACING_LG,
+//                  SCREEN_HEIGHT - SPACING_LG);
+//       secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 113,
+//                    SCREEN_HEIGHT - SPACING_LG);
 
-		fp = fopen(screenshotname, "wb");
-		if (fp != NULL) {
-			png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-			info_ptr = png_create_info_struct(png_ptr);
-			png_init_io(png_ptr, fp);
-			png_set_IHDR(png_ptr, info_ptr, 640, 480, 8, PNG_COLOR_TYPE_RGBA,
-				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-			png_write_info(png_ptr, info_ptr);
-			src = buffer + 640*480;
-			for (y=0; y<480; y++) {
-				for (x=0; x<640; x++){
-					pix = *--src;
-					linebuffer[x] = 0xFF000000 | (pix & 0x0000FF00) | (pix & 0x00FF0000)>>16 | (pix & 0x000000FF)<<16;
-				}
-				png_write_row(png_ptr, (png_bytep)linebuffer);
-			}
-			png_write_end(png_ptr, info_ptr);
-			png_destroy_write_struct(&png_ptr, &info_ptr);
-			fclose(fp);
-			sync();
-		}
-		free(buffer);
-	}
-}
+//       SDL_Flip(gfx.screen);
+//       dirty = 0;
+//     }
+//     // slow down to 60fps
+//     GFX_sync(frameStart);
+//   }
 
-//
-//	Screenshot Sample Main
-//
-#define	BUTTON_MENU	KEY_ESC
-#define	BUTTON_POWER	KEY_POWER
-#define	BUTTON_L2	KEY_TAB
-#define	BUTTON_R2	KEY_BACKSPACE
-int main() {
-	int			input_fd;
-	struct input_event	ev;
-	uint32_t		val;
-	uint32_t		l2_pressed = 0;
-	uint32_t		r2_pressed = 0;
+//   // if (g_images_paths != NULL) {
+//   //   for (int i = 0; i < g_images_paths_count; i++)
+//   //     free(g_images_paths[i]);
+//   //   free(g_images_paths);
+//   // }
+//   // if (g_images_titles != NULL) {
+//   //   for (int i = 0; i < g_images_paths_count; i++)
+//   //     free(g_images_titles[i]);
+//   //   free(g_images_titles);
+//   // }
 
-	// Prepare for Poll button input
-	input_fd = open("/dev/input/event0", O_RDONLY);
+//   // cleanImagesCache();
+//   GFX_quit();
+//   SDL_Quit();
+//   freeSound();
 
-	while( read(input_fd, &ev, sizeof(ev)) == sizeof(ev) ) {
-		val = ev.value;
-		if (( ev.type != EV_KEY ) || ( val > 1 )) continue;
-		if (( ev.code == BUTTON_L2 )||( ev.code == BUTTON_R2 )) {
-			if ( ev.code == BUTTON_L2 ) {
-				l2_pressed = val;
-			} else if ( ev.code == BUTTON_R2 ) {
-				r2_pressed = val;
-			}
-			if (l2_pressed & r2_pressed) {
-				rumble(1);
-				screenshot();
-				usleep(100000);	//0.1s
-				rumble(0);
-				l2_pressed = r2_pressed = 0;
-			}
-		}
-	}
-
-	// Quit
-	close(input_fd);
-
-	return 0;
-}
+//   return 0;
+// }
