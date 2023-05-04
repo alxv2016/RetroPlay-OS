@@ -9,6 +9,8 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
 
+#include "../common/defines.h"
+#include "../common/utils.h"
 #include "gallery.h"
 
 static SDL_Surface *g_image_cache_prev = NULL;
@@ -150,66 +152,113 @@ static void drawImage(SDL_Surface *image_to_draw, SDL_Surface *screen, const SDL
     SDL_BlitSurface(image_to_draw, NULL, screen, &image_rect);
 }
 
-char *drawImageByIndex(const int new_image_index, const int image_index, char **images_paths, const int images_paths_count, SDL_Surface *screen, SDL_Rect *frame, int *cache_used) {
-  if (new_image_index < 0 || new_image_index >= images_paths_count) {
-    // out of range, draw nothing
-    printf("out of range, draw nothing\n");
-    return NULL;
-  }
-  char *image_path_to_draw = images_paths[new_image_index];
-  if (new_image_index == image_index) {
+char *drawImageByIndex(int current, int selected, char **images_paths, int total, SDL_Surface *screen, SDL_Rect *frame, int *cache_used) {
+  
+  char *renderImage = images_paths[current];
+  if (current == selected) {
     if (g_image_cache_current == NULL) {
-      g_image_cache_prev = new_image_index == 0 ? NULL : IMG_Load(images_paths[new_image_index - 1]);
-      g_image_cache_current = IMG_Load(images_paths[new_image_index]);
-      g_image_cache_next = new_image_index == images_paths_count - 1 ? NULL : IMG_Load(images_paths[new_image_index + 1]);
+      g_image_cache_prev = current == 0? NULL : IMG_Load(images_paths[current -= 1]);
+      g_image_cache_current = IMG_Load(images_paths[current]);
+      g_image_cache_prev = current == total? NULL : IMG_Load(images_paths[current += 1]);
 
       drawImage(g_image_cache_current, screen, frame);
-
       *cache_used = 0;
-      return image_path_to_draw;
+      return renderImage;
     }
   }
-  if (abs(new_image_index - image_index) > 1) {
-    return NULL;
-  }
 
-  int move_direction = new_image_index - image_index;
+  int move_direction = current - selected;
 
   if (move_direction > 0) {
-    if (g_image_cache_prev)
-      SDL_FreeSurface(g_image_cache_prev);
+    if (g_image_cache_prev) SDL_FreeSurface(g_image_cache_prev);
     g_image_cache_prev = g_image_cache_current;
     g_image_cache_current = g_image_cache_next;
-    if (new_image_index == images_paths_count - 1) {
+    if (current == total) {
       g_image_cache_next = NULL;
     } else {
-      const int next_image_index = new_image_index + 1;
-      char *image_path_to_load = images_paths[next_image_index];
-      g_image_cache_next = IMG_Load(image_path_to_load);
+      int next = current += 1;
+      char *renderImage = images_paths[next];
+      g_image_cache_next = IMG_Load(renderImage);
     }
     *cache_used = 1;
   } else if (move_direction < 0) {
-    if (g_image_cache_next)
-      SDL_FreeSurface(g_image_cache_next);
+    if (g_image_cache_next) SDL_FreeSurface(g_image_cache_next);
     g_image_cache_next = g_image_cache_current;
     g_image_cache_current = g_image_cache_prev;
-    if (new_image_index == 0) {
+    if (current == 0) {
       g_image_cache_prev = NULL;
     } else {
-      const int prev_image_index = new_image_index - 1;
-      char *image_path_to_load = images_paths[prev_image_index];
-      g_image_cache_prev = IMG_Load(image_path_to_load);
+      int prev = current -= 1;
+      char *renderImage = images_paths[prev];
+      g_image_cache_prev = IMG_Load(renderImage);
     }
-
-    *cache_used = 1;
-  } else {
     *cache_used = 1;
   }
 
   drawImage(g_image_cache_current, screen, frame);
-
-  return image_path_to_draw;
+  return renderImage;
 }
+
+// char *drawImageByIndex(const int new_image_index, const int image_index, char **images_paths, const int images_paths_count, SDL_Surface *screen, SDL_Rect *frame, int *cache_used) {
+//   if (new_image_index < 0 || new_image_index >= images_paths_count) {
+//     // out of range, draw nothing
+//     printf("out of range, draw nothing\n");
+//     return NULL;
+//   }
+//   char *image_path_to_draw = images_paths[new_image_index];
+//   if (new_image_index == image_index) {
+//     if (g_image_cache_current == NULL) {
+//       g_image_cache_prev = new_image_index == 0 ? NULL : IMG_Load(images_paths[new_image_index - 1]);
+//       g_image_cache_current = IMG_Load(images_paths[new_image_index]);
+//       g_image_cache_next = new_image_index == images_paths_count - 1 ? NULL : IMG_Load(images_paths[new_image_index + 1]);
+
+//       drawImage(g_image_cache_current, screen, frame);
+
+//       *cache_used = 0;
+//       return image_path_to_draw;
+//     }
+//   }
+//   if (abs(new_image_index - image_index) > 1) {
+//     return NULL;
+//   }
+
+//   int move_direction = new_image_index - image_index;
+
+//   if (move_direction > 0) {
+//     if (g_image_cache_prev)
+//       SDL_FreeSurface(g_image_cache_prev);
+//     g_image_cache_prev = g_image_cache_current;
+//     g_image_cache_current = g_image_cache_next;
+//     if (new_image_index == images_paths_count - 1) {
+//       g_image_cache_next = NULL;
+//     } else {
+//       const int next_image_index = new_image_index + 1;
+//       char *image_path_to_load = images_paths[next_image_index];
+//       g_image_cache_next = IMG_Load(image_path_to_load);
+//     }
+//     *cache_used = 1;
+//   } else if (move_direction < 0) {
+//     if (g_image_cache_next)
+//       SDL_FreeSurface(g_image_cache_next);
+//     g_image_cache_next = g_image_cache_current;
+//     g_image_cache_current = g_image_cache_prev;
+//     if (new_image_index == 0) {
+//       g_image_cache_prev = NULL;
+//     } else {
+//       const int prev_image_index = new_image_index - 1;
+//       char *image_path_to_load = images_paths[prev_image_index];
+//       g_image_cache_prev = IMG_Load(image_path_to_load);
+//     }
+
+//     *cache_used = 1;
+//   } else {
+//     *cache_used = 1;
+//   }
+
+//   drawImage(g_image_cache_current, screen, frame);
+
+//   return image_path_to_draw;
+// }
 
 void cleanImagesCache() {
     if (g_image_cache_prev)
