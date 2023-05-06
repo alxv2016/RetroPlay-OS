@@ -36,6 +36,8 @@ void getFile(char *path, char *buffer, size_t buffer_size);
 int getInt(char *path);
 void putInt(char *path, int value);
 void trimSortingMeta(char **str);
+char *getFilenameExt(char *filename);
+char *toLower(char *s);
 
 /* ARRAYS */
 Array *Array_new(void);

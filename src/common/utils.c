@@ -10,6 +10,20 @@
 #include "utils.h"
 
 /* HELPERS */
+char *getFilenameExt(char *filename) {
+  char *dot = strrchr(filename, '.');
+  if (!dot || dot == filename)
+    return "";
+  return dot + 1;
+}
+
+char *toLower(char *s) {
+  for (char *p = s; *p; p++) {
+    *p = tolower(*p);
+  }
+  return s;
+}
+
 static int replaceString(char *line, const char *search, const char *replace) {
   char *sp; // start of pattern
   if ((sp = strstr(line, search)) == NULL) {
