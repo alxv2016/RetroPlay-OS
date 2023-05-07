@@ -9,6 +9,7 @@ typedef struct GFX_Context {
   SDL_Surface *button;
   SDL_Surface *button_outline;
   SDL_Surface *dpad;
+  SDL_Surface *dpad2;
   SDL_Surface *button_menu;
   SDL_Surface *corner_radius;
   SDL_Surface *settings_bar_full;

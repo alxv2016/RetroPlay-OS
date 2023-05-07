@@ -35,8 +35,9 @@ void GFX_init(void) {
 
   gfx.button = loadImage("btn.png");
   gfx.button_outline = loadImage("btn-outline.png");
-  gfx.dpad = loadImage("menu-btn.png");
-  gfx.button_menu = loadImage("d-pad.png");
+  gfx.button_menu = loadImage("menu-btn.png");
+  gfx.dpad = loadImage("d-pad.png");
+  gfx.dpad2 = loadImage("d-pad2.png");
   gfx.corner_radius = loadImage("radius-black.png");
   gfx.settings_bar_full = loadImage("progress-full.png");
   gfx.settings_bar_empty = loadImage("progress-empty.png");
@@ -102,6 +103,7 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.button_outline);
   SDL_FreeSurface(gfx.button_menu);
   SDL_FreeSurface(gfx.dpad);
+  SDL_FreeSurface(gfx.dpad2);
   SDL_FreeSurface(gfx.corner_radius);
   SDL_FreeSurface(gfx.settings_bar_full);
   SDL_FreeSurface(gfx.settings_bar_empty);
@@ -229,7 +231,7 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, ch
     listItem(surface,gfx.clock, NULL, 0, 1, display_name, row, selected_row, total);
   } else if (!strcmp(name, "Files")) {
     listItem(surface,gfx.files, NULL, 0, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(name, "Screenshot")) {
+  } else if (!strcmp(name, "Screenshots")) {
     listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, row, selected_row, total);
   } else {
     listItem(surface, NULL, NULL, 0, 0, display_name, row, selected_row, total);
@@ -334,7 +336,7 @@ void secondaryBTN(SDL_Surface *surface, char *bkey, char *blabel, int rightAlign
 }
 // Tertiary button
 void tertiaryBTN(SDL_Surface *surface, char *blabel, int altUI, int rightAlign, int x, int y) {
-  SDL_Surface *btn = altUI? gfx.button_menu : gfx.dpad;
+  SDL_Surface *btn = altUI == 0? gfx.button_menu : altUI == 1? gfx.dpad: gfx.dpad2;
   SDL_Surface *btnLabel = TTF_RenderUTF8_Blended(font.body, blabel, (SDL_Color){LIGHT_TEXT});
 
   int margin = SPACING_XS;

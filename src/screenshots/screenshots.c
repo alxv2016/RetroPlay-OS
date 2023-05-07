@@ -87,9 +87,11 @@ int main(int argc, char *argv[]) {
         int cy = (BUTTON_SIZE / 2) - (BODY / 2);
         SDL_BlitSurface(countInfo, NULL, gfx.screen, &(SDL_Rect){SPACING_XL, SCREEN_HEIGHT - SPACING_LG + cy - BUTTON_SIZE});
         SDL_FreeSurface(countInfo);
+        tertiaryBTN(gfx.screen, "View", 2, 1, SCREEN_WIDTH - SPACING_LG - 114, SCREEN_HEIGHT - SPACING_LG);
+      } else {
+        paragraph(BODY,1,"Hold L2 + R2 to take screenshots.", (SDL_Color){NEUTRAL_TEXT}, gfx.screen, NULL);
       }
-      primaryBTN(gfx.screen, "B", "Exit", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
-      tertiaryBTN(gfx.screen, "View", 1, 1, SCREEN_WIDTH - SPACING_LG - 113, SCREEN_HEIGHT - SPACING_LG);
+      primaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
 
       SDL_Flip(gfx.screen);
       dirty = 0;
