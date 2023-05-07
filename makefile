@@ -47,7 +47,7 @@ libs:
 	cd $(SRC_DIR)/confirm && make
 # Tools
 	cd $(SRC_DIR)/clock && make
-	cd $(SRC_DIR)/screenshot && make
+	cd $(SRC_DIR)/screenshots && make
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make -j
 
 dirs: clean
@@ -72,7 +72,7 @@ build: dirs
 	cp $(SRC_DIR)/sys-msg/sys-msg $(BUILD_DIR)/dist/miyoo354/app/
 
 	cp $(SRC_DIR)/clock/clock $(BUILD_DIR)/dist/Apps/Clock.pak/
-	cp $(SRC_DIR)/screenshot/screenshot $(BUILD_DIR)/dist/Apps/Screenshot.pak/
+	cp $(SRC_DIR)/screenshots/screenshots $(BUILD_DIR)/dist/Apps/Screenshots.pak/
 	cp $(THIRD_PARTY_DIR)/DinguxCommander/output/DinguxCommander $(BUILD_DIR)/dist/Apps/Files.pak/
 	cp -r $(THIRD_PARTY_DIR)/DinguxCommander/res $(BUILD_DIR)/dist/Apps/Files.pak/
 

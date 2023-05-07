@@ -17,8 +17,9 @@
 #include "../common/rumble.h"
 #include "../common/gallery.h"
 
-#include "screenshot.h"
+#include "screenshots.h"
 ///////////////////////////////////
+static SDL_Surface *overlay;
 
 int main(int argc, char *argv[]) {
   rumble(OFF);
@@ -74,13 +75,21 @@ int main(int argc, char *argv[]) {
             SDL_Quit();
             return 0;
         }
+        SDL_Surface *countInfo;
         char tmp[256];
-        sprintf(tmp, "current: %i/%i", selected, totalScreenshots);
-        paragraph(BODY, 1, tmp, (SDL_Color){WHITE}, gfx.screen, NULL);
-      }
+        sprintf(tmp, "%i of %i Screenshots", selected + 1, totalScreenshots);
+        countInfo = TTF_RenderUTF8_Blended(font.body, tmp, (SDL_Color){WHITE});
+        overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, BUTTON_SIZE + SPACING_XXL, 16, 0, 0, 0, 0);
+        SDL_SetAlpha(overlay, SDL_SRCALPHA, 0x98);
+        SDL_FillRect(overlay, NULL, 0);
+        SDL_BlitSurface(overlay, NULL, gfx.screen, &(SDL_Rect){0, SCREEN_HEIGHT - overlay->h});
 
-      primaryBTN(gfx.screen, "A", "Okay", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
-      secondaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG - 113, SCREEN_HEIGHT - SPACING_LG);
+        int cy = (BUTTON_SIZE / 2) - (BODY / 2);
+        SDL_BlitSurface(countInfo, NULL, gfx.screen, &(SDL_Rect){SPACING_XL, SCREEN_HEIGHT - SPACING_LG + cy - BUTTON_SIZE});
+        SDL_FreeSurface(countInfo);
+      }
+      primaryBTN(gfx.screen, "B", "Exit", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
+      tertiaryBTN(gfx.screen, "View", 1, 1, SCREEN_WIDTH - SPACING_LG - 113, SCREEN_HEIGHT - SPACING_LG);
 
       SDL_Flip(gfx.screen);
       dirty = 0;
@@ -99,6 +108,7 @@ int main(int argc, char *argv[]) {
   GFX_quit();
   SDL_Quit();
   freeSound();
+  SDL_FreeSurface(overlay);
   QuitSettings();
   return 0;
 }
