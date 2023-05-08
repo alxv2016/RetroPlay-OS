@@ -51,6 +51,7 @@ typedef struct GFX_Context {
   SDL_Surface *sys_sega;
   SDL_Surface *sys_snes;
   SDL_Surface *empty_state;
+  SDL_Surface *empty_screenshots;
   SDL_Surface *poweroff_state;
   SDL_Surface *sleep_state;
 } GFX;
@@ -96,7 +97,7 @@ int truncateText(TTF_Font *font, char *displayName,int max_width, int padding);
 SDL_Surface *loadImage(char *path);
 SDL_Surface *renderText(char *text);
 
-void emptyState(SDL_Surface *surface, int headingSize, int bodySize, char *headingCopy, char *bodyCopy);
+void emptyState(SDL_Surface *surface, SDL_Surface *icon, int headingSize, int bodySize, char *headingCopy, char *bodyCopy);
 void powerOffState(SDL_Surface *surface, char *headingCopy, char *bodyCopy);
 void sleepState(SDL_Surface *surface, char *headingCopy, char *bodyCopy);
 void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected, int total);

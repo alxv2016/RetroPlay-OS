@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
     unsigned long frameStart = SDL_GetTicks();
     Input_poll();
 
+  if (totalScreenshots > 0) {
     if (Input_justPressed(BTN_UP)) {
       clearScreenshot();
       playArrowSound();
@@ -59,11 +60,14 @@ int main(int argc, char *argv[]) {
         selected -= totalScreenshots;
       }
       dirty = 1;
-    } else if (Input_justPressed(BTN_B)) {
-      playClickSound();
-      SDL_Delay(200);
-      quit = 1;
     }
+  }
+
+  if (Input_justPressed(BTN_B)) {
+    playClickSound();
+    SDL_Delay(200);
+    quit = 1;
+  }
 
     if (dirty) {
       SDL_FillRect(gfx.screen, NULL, 0);
@@ -79,6 +83,7 @@ int main(int argc, char *argv[]) {
         char tmp[256];
         sprintf(tmp, "%i of %i Screenshots", selected + 1, totalScreenshots);
         countInfo = TTF_RenderUTF8_Blended(font.body, tmp, (SDL_Color){WHITE});
+
         overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, BUTTON_SIZE + SPACING_XXL, 16, 0, 0, 0, 0);
         SDL_SetAlpha(overlay, SDL_SRCALPHA, 0x98);
         SDL_FillRect(overlay, NULL, 0);
@@ -89,7 +94,7 @@ int main(int argc, char *argv[]) {
         SDL_FreeSurface(countInfo);
         tertiaryBTN(gfx.screen, "View", 2, 1, SCREEN_WIDTH - SPACING_LG - 114, SCREEN_HEIGHT - SPACING_LG);
       } else {
-        paragraph(BODY,1,"Hold L2 + R2 to take screenshots.", (SDL_Color){NEUTRAL_TEXT}, gfx.screen, NULL);
+        emptyState(gfx.screen, gfx.empty_screenshots, H2, CAPTION, "L2 + R2 to take screenshots", "There are no screenshots to view.");
       }
       primaryBTN(gfx.screen, "B", "Close", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
 
@@ -100,17 +105,19 @@ int main(int argc, char *argv[]) {
     GFX_sync(frameStart);
   }
 
-  if (screenshotPaths != NULL) {
-    for (int i = 0; i < totalScreenshots; i++)
+  if (totalScreenshots > 0 && screenshotPaths) {
+    for (int i = 0; i < totalScreenshots; i++) {
       free(screenshotPaths[i]);
+    }
     free(screenshotPaths);
+    clearScreenshot();
   }
 
-  clearScreenshot();
+  if (overlay) SDL_FreeSurface(overlay);
+
   GFX_quit();
   SDL_Quit();
   freeSound();
-  SDL_FreeSurface(overlay);
   QuitSettings();
   return 0;
 }

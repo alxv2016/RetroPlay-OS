@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
             listMenu(gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row, total);
           }
         } else {
-          emptyState(gfx.screen, H2, CAPTION, "Couldn't find any games.", "Load some games to start playing.");
+          emptyState(gfx.screen, gfx.empty_state, H2, CAPTION, "Couldn't find any games.", "Load some games to start playing.");
         }
       }
 
