@@ -38,6 +38,7 @@ libs:
 	@echo "\n::$(TARGET) -- Compiling Libs"
 # IMPORTANT: libmsettings needs to build first to compile miyoomin-toolchain dependencies 
 	cd $(SRC_DIR)/libmsettings && make
+	cd $(SRC_DIR)/libmmenu && make
 	cd $(SRC_DIR)/batmon && make
 	cd $(SRC_DIR)/keymon && make
 	cd $(SRC_DIR)/lumon && make
@@ -61,6 +62,7 @@ build: dirs
 
 	mv $(BUILD_DIR)/dist/miyoo354/app/keymon.sh $(BUILD_DIR)/dist/miyoo354/app/keymon
 	cp $(SRC_DIR)/libmsettings/libmsettings.so $(BUILD_DIR)/dist/.system/lib/
+	cp $(SRC_DIR)/libmmenu/libmmenu.so $(BUILD_DIR)/dist/.system/lib/
 	cp $(SRC_DIR)/batmon/batmon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/keymon/keymon $(BUILD_DIR)/dist/.system/bin/
 	cp $(SRC_DIR)/lumon/lumon $(BUILD_DIR)/dist/.system/bin/
@@ -134,6 +136,7 @@ clean-all: clean
 	rm -rf $(BUILD_DIR)
 	rm -rf $(RELEASE_DIR)
 	cd $(SRC_DIR)/libmsettings && make clean
+	cd $(SRC_DIR)/libmmenu && make clean
 	cd $(SRC_DIR)/batmon && make clean
 	cd $(SRC_DIR)/keymon && make clean
 	cd $(SRC_DIR)/lumon && make clean

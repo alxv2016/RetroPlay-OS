@@ -317,12 +317,9 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      // if (can_resume && !show_version) {
-      //   if (strlen("X") > 1)
-      //     button(gfx.screen, "X", "Resume", 0, 20, 419);
-      //   else
-      //     button(gfx.screen, "X", "Resume", 0, 557, 419);
-      // }
+      if (can_resume) {
+        primaryBTN(gfx.screen, "X", "Resume", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
+      }
 
       if (showSettingsMenu) {
         settingItemSelected == SETTINGS_SCREEN || settingItemSelected == SETTINGS_VOLUMN || settingItemSelected == SETTINGS_SLEEPTIME? tertiaryBTN(gfx.screen, "Adjust", 1, 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG) : primaryBTN(gfx.screen, "A", "Select", 1, SCREEN_WIDTH - SPACING_LG, SCREEN_HEIGHT - SPACING_LG);
