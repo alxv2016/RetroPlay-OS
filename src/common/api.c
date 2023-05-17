@@ -639,7 +639,6 @@ Directory *Directory_new(char *path, int selected, Array *recents) {
   self->path = strdup(path);
   self->name = strdup(display_name);
   self->emuTag = hasEmu(emu_tag)? strdup(emu_tag): "NA";
-
   if (exactMatch(path, SDCARD_PATH)) {
     self->entries = getRoot(recents);
   } else if (exactMatch(path, FAUX_RECENT_PATH)) {
@@ -654,7 +653,8 @@ Directory *Directory_new(char *path, int selected, Array *recents) {
   }
   self->alphas = IntArray_new();
   self->selected = selected;
-  self->consoleDir = isConsoleDir(path);
+  self->consoleDir = exactMatch(path, SDCARD_PATH);
+  self->recentDir = exactMatch(path, FAUX_RECENT_PATH);
   Directory_index(self);
   return self;
 }
@@ -1073,8 +1073,7 @@ void openDirectory(char *path, int auto_launch) {
   top->start = start;
   top->end = end ? end
                  : ((top->entries->count < ROW_COUNT) ? top->entries->count
-                                                      : ROW_COUNT);
-                                                      
+                                                      : ROW_COUNT);                                                 
   Array_push(stack, top);
 }
 

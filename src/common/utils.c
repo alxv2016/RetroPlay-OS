@@ -125,6 +125,12 @@ void consoleLog(char *path, char *contents) {
   }
 }
 
+void consoleLogBool(char *path, int value) {
+  char buffer[8];
+  sprintf(buffer, "%d", value);
+  consoleLog(path, buffer);
+}
+
 void getFile(char *path, char *buffer, size_t buffer_size) {
   FILE *file = fopen(path, "r");
   if (file) {

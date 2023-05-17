@@ -259,6 +259,8 @@ int main(int argc, char *argv[]) {
         // can_resume = 0;
         if (total > 0)
           readyResume(top->entries->items[top->selected]);
+      } else if (Input_justPressed(BTN_Y)) {
+         consoleLogBool(DEBUG_PATH, top->recentDir);
       }
     }
 
@@ -308,7 +310,7 @@ int main(int argc, char *argv[]) {
           int selected_row = top->selected - top->start;
           for (int i = top->start, j = 0; i < top->end; i++, j++) {
             Entry *entry = top->entries->items[i];
-            listMenu(gfx.screen, entry->path, top->consoleDir, entry->emuTag, entry->name, entry->unique, j, selected_row, total);
+            listMenu(gfx.screen, entry->path, top->consoleDir, top->recentDir, entry->emuTag, entry->name, entry->unique, j, selected_row, total);
           }
         } else {
           emptyState(gfx.screen, gfx.empty_state, H2, CAPTION, "Couldn't find any games.", "Load some games to start playing.");

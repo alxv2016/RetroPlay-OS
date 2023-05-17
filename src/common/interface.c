@@ -167,7 +167,7 @@ void GFX_quit(void) {
 
 /* COMPONENTS */
 
-static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIcon, int showSysIcon, int showIcon, char *displayName, int row, int selected_row, int total) {
+static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIcon, int showSysIcon, int showIcon, char *displayName, char *path, int row, int selected_row, int total) {
   #define MIN(min, max) (min) < (max) ? (min) : (max)
   if (sysIcon == NULL) sysIcon = gfx.sys_arcade;
   if (icon == NULL) icon = gfx.nes;
@@ -205,38 +205,38 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIc
 }
 
 // Menu list component
-void listMenu(SDL_Surface *surface, char *path, int consoleDir, char *emuTag, char *name, char *unique, int row, int selected_row, int total) {
+void listMenu(SDL_Surface *surface, char *path, int consoleDir, int recentDir, char *emuTag, char *name, char *unique, int row, int selected_row, int total) {
   char *display_name = unique ? unique : name;
   trimSortingMeta(&display_name);
   // Display console icons on root directory
-  if (!strcmp(emuTag, "FBA") && !consoleDir) {
-    listItem(surface, gfx.arcade, gfx.sys_arcade, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "FC") && !consoleDir) {
-    listItem(surface, gfx.nes, gfx.sys_nes, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "GB") && !consoleDir) {
-    listItem(surface, gfx.gameboy, gfx.sys_gb, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "GBA") && !consoleDir) {
-    listItem(surface, gfx.gba, gfx.sys_gba, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "GBC") && !consoleDir) {
-    listItem(surface,gfx.gbc, gfx.sys_gbc, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "MD") && !consoleDir) {
-    listItem(surface, gfx.sega, gfx.sys_sega, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "GG") && !consoleDir) {
-    listItem(surface, gfx.gamegear, gfx.sys_gg, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "PS") && !consoleDir) {
-    listItem(surface, gfx.playstation, gfx.sys_playstation, 1, 1, display_name, row, selected_row, total);
-  } else if (!strcmp(emuTag, "SFC") && !consoleDir) {
-    listItem(surface,gfx.snes, gfx.sys_snes, 1, 1, display_name, row, selected_row, total);
+  if (!strcmp(emuTag, "FBA") && consoleDir) {
+    listItem(surface, gfx.arcade, gfx.sys_arcade, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "FC") && consoleDir) {
+    listItem(surface, gfx.nes, gfx.sys_nes, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "GB") && consoleDir) {
+    listItem(surface, gfx.gameboy, gfx.sys_gb, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "GBA") && consoleDir) {
+    listItem(surface, gfx.gba, gfx.sys_gba, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "GBC") && consoleDir) {
+    listItem(surface,gfx.gbc, gfx.sys_gbc, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "MD") && consoleDir) {
+    listItem(surface, gfx.sega, gfx.sys_sega, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "GG") && consoleDir) {
+    listItem(surface, gfx.gamegear, gfx.sys_gg, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "PS") && consoleDir) {
+    listItem(surface, gfx.playstation, gfx.sys_playstation, 1, 1, display_name, path, row, selected_row, total);
+  } else if (!strcmp(emuTag, "SFC") && consoleDir) {
+    listItem(surface,gfx.snes, gfx.sys_snes, 1, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Recently Played")) {
-    listItem(surface,gfx.recents, NULL, 0, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.recents, NULL, 0, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Clock")) {
-    listItem(surface,gfx.clock, NULL, 0, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.clock, NULL, 0, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Files")) {
-    listItem(surface,gfx.files, NULL, 0, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.files, NULL, 0, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Screenshots")) {
-    listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, row, selected_row, total);
+    listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, path, row, selected_row, total);
   } else {
-    listItem(surface, NULL, NULL, 0, 0, display_name, row, selected_row, total);
+    listItem(surface, NULL, NULL, 0, 0, display_name, path, row, selected_row, total);
   }
 
 }

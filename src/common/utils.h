@@ -32,6 +32,7 @@ int exists(char *path);
 void touch(char *path);
 void putFile(char *path, char *contents);
 void consoleLog(char *path, char *contents);
+void consoleLogBool(char *path, int value);
 void getFile(char *path, char *buffer, size_t buffer_size);
 int getInt(char *path);
 void putInt(char *path, int value);

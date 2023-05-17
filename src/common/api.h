@@ -34,6 +34,7 @@ typedef struct Directory {
   int start;
   int end;
   int consoleDir;
+  int recentDir;
 } Directory;
 
 typedef struct Recent {
