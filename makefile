@@ -148,6 +148,11 @@ clean-all: clean
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
 
+clean-cores: clean
+	@echo "\n::$(TARGET) -- Cleaning cores"
+	cd $(SRC_DIR)/libmsettings && make clean
+	cd $(SRC_DIR)/libmmenu && make clean
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
 
 # Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
 third-party/SDL-1.2/.patched:
@@ -155,7 +160,7 @@ third-party/SDL-1.2/.patched:
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
 third-party/picoarch/.patched:
 	@echo "\n::$(TARGET) -- Patching Picoarch"
-	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
+# cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
 
 build-libs: third-party/SDL-1.2/.patched
 # NOTE: run commands to re-build dependency libs
@@ -172,7 +177,9 @@ build-cores: third-party/picoarch/.patched
 # NOTE: run commands to re-build cores
 # Fbalpha2012 cores provided else where
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini MINUI=1 -j
+	cd $(SRC_DIR)/libmsettings && make
+	cd $(SRC_DIR)/libmmenu && make
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
 	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(CORES_DIR)

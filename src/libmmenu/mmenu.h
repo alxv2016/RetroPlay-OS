@@ -1,23 +1,24 @@
-#ifndef _MMENU_H
-#define _MMENU_H
+#ifndef menu_h__
+#define menu_h__
 
+//NOTES: have to use this naming convention due to dependency from legacy picoarch code for mmenu integration
 typedef enum MenuReturnStatus {
-	STATUS_CONTINUE = 0,
-	STATUS_SAVE = 1,
-	STATUS_LOAD = 11,
-	STATUS_OPTIONS = 23,
-	STATUS_CHANGEDISC = 24,
-	STATUS_RESET = 25,
-	STATUS_EXIT = 30,
-	STATUS_POWER = 31,
+  kStatusContinue = 0,
+  kStatusSaveSlot = 1,
+  kStatusLoadSlot = 11,
+  kStatusOpenMenu = 23,
+  kStatusChangeDisc = 24,
+  kStatusResetGame = 25,
+  kStatusExitGame = 30,
+  kStatusPowerOff = 31,
 } MenuReturnStatus;
 
 typedef enum MenuRequestState {
-	REQ_MENU,
-	REQ_SLEEP,
-	REQ_POWER,
-	REQ_SAVE,
-	REQ_LOAD,
+  kRequestMenu,
+  kRequestSleep,
+  kRequestPowerOff,
+  kRequestSave,
+  kRequestLoad,
 } MenuRequestState;
 
 typedef void (*AutoSave_t)(void);
@@ -29,8 +30,8 @@ typedef int (*ChangeDisc_t)(char* disc_path);
 typedef MenuReturnStatus (*ShowMenu_t)(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave);
 MenuReturnStatus ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState request_state, AutoSave_t autosave);
 
-// void ShowWarning(void);
-// int ResumeSlot(void);
-// int ChangeDisc(char* disc_path);
+void ShowWarning(void);
+int ResumeSlot(void);
+int ChangeDisc(char* disc_path);
 
 #endif

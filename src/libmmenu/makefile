@@ -1,5 +1,13 @@
 .PHONY: all clean
 
+TARGET = mmenu
+
+ifeq (,$(PLATFORM))
+PLATFORM=$(UNION_PLATFORM)
+endif
+ifeq (,$(PLATFORM))
+$(error please specify PLATFORM, eg. make PLATFORM=trimui)
+endif
 ifeq (,$(CROSS_COMPILE))
 $(error missing CROSS_COMPILE for this toolchain)
 endif
@@ -7,13 +15,24 @@ ifeq (,$(PREFIX))
 $(error missing PREFIX for installation in toolchain)
 endif
 
-TARGET = mmenu
 
 CC = $(CROSS_COMPILE)gcc
+
 SYSROOT := $(shell $(CC) --print-sysroot)
+
 INCLUDEDIR = $(SYSROOT)/usr/include
-CFLAGS = -I$(INCLUDEDIR) -I. -I../common -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z) -std=gnu99 -ggdb3 -Og
+
+CFLAGS = -I$(INCLUDEDIR) -I. -I../common -DPLATFORM_$(shell echo $(PLATFORM) | tr a-z A-Z) -std=gnu99
 LDFLAGS = -s -lSDL -lSDL_image -lSDL_ttf -lSDL_mixer -lmsettings -lz -lm -Wl,--no-as-needed -ldl -lrt
+CFLAGS += -ggdb3 -Og
+
+ifeq (trimui,$(PLATFORM))
+LDFLAGS += -ltinyalsa
+endif
+ifeq (rs90,$(PLATFORM))
+LDFLAGS += -lasound
+endif
+
 OPTM=-Ofast
 
 OBJS = ../common/utils.c ../common/interface.c ../common/controls.c
