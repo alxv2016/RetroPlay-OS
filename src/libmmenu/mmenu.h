@@ -21,18 +21,16 @@ typedef enum MenuRequestState {
 } MenuRequestState;
 
 typedef void (*AutoSave_t)(void);
+typedef struct SDL_Surface SDL_Surface;
 typedef void (*ShowWarning_t)(void);
 typedef int (*ResumeSlot_t)(void);
 typedef int (*ChangeDisc_t)(char* disc_path);
 
 typedef MenuReturnStatus (*ShowMenu_t)(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave);
+MenuReturnStatus ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState request_state, AutoSave_t autosave);
 
-MenuReturnStatus ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, int requested_state, AutoSave_t autosave);
-
-int ResumeSlot(void);
-int ChangeDisc(char* disc_path);
-void ShowWarning(void);
-void SystemRequest(char* rom_path, int request, AutoSave_t autosave);
-
+// void ShowWarning(void);
+// int ResumeSlot(void);
+// int ChangeDisc(char* disc_path);
 
 #endif

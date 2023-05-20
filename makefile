@@ -172,7 +172,7 @@ build-cores: third-party/picoarch/.patched
 # NOTE: run commands to re-build cores
 # Fbalpha2012 cores provided else where
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini MINUI=1 -j
 	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(CORES_DIR)
