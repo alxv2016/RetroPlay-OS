@@ -20,6 +20,7 @@ BUNDLE_LIBS =
 #
 ECHO:= @echo "\n::$(TARGET) V$(VERSION) build complete, enjoy!"
 PATCH = git apply
+UNPATCH = git apply -R
 
 LIBC_LIB_DIR := /opt/miyoomini-toolchain/arm-none-linux-gnueabihf/libc/lib
 GCC_VER_GTE9_0 := $(shell echo `gcc -dumpversion | cut -f1-2 -d.` \>= 9.0 | bc )
@@ -150,6 +151,8 @@ clean-all: clean
 
 clean-cores: clean
 	@echo "\n::$(TARGET) -- Cleaning cores"
+	@echo "\n::$(TARGET) -- Un-patching Picoarch"
+	cd $(THIRD_PARTY_DIR)/picoarch && $(UNPATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && rm -f .patched
 	cd $(SRC_DIR)/libmsettings && make clean
 	cd $(SRC_DIR)/libmmenu && make clean
 	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
@@ -160,7 +163,7 @@ third-party/SDL-1.2/.patched:
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
 third-party/picoarch/.patched:
 	@echo "\n::$(TARGET) -- Patching Picoarch"
-# cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
+	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
 
 build-libs: third-party/SDL-1.2/.patched
 # NOTE: run commands to re-build dependency libs
@@ -176,10 +179,11 @@ build-libs: third-party/SDL-1.2/.patched
 build-cores: third-party/picoarch/.patched
 # NOTE: run commands to re-build cores
 # Fbalpha2012 cores provided else where
+# NOTE: Dependencies on libmsettings and libmmenu to build cores
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(SRC_DIR)/libmsettings && make
 	cd $(SRC_DIR)/libmmenu && make
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini -j
+	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini MMENU=1 -j
 	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(CORES_DIR)
 	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(CORES_DIR)
