@@ -1,88 +1,69 @@
 # Global definitions
-platform   ?= $(UNION_PLATFORM)
+platform ?= $(UNION_PLATFORM)
 
-CC        = $(CROSS_COMPILE)gcc
-SYSROOT   = $(shell $(CC) --print-sysroot)
+CC = $(CROSS_COMPILE)gcc
+SYSROOT = $(shell $(CC) --print-sysroot)
 
-PROCS     = -j4
+PROCS = -j4
 
-OBJS      = libpicofe/input.o libpicofe/in_sdl.o libpicofe/linux/in_evdev.o \
-            libpicofe/linux/plat.o libpicofe/fonts.o libpicofe/readpng.o \
+OBJS = libpicofe/input.o libpicofe/in_sdl.o libpicofe/linux/in_evdev.o \
+			libpicofe/linux/plat.o libpicofe/fonts.o libpicofe/readpng.o \
 			libpicofe/config_file.o source/cheat.o source/config.o \
 			source/content.o source/core.o source/menu.o source/main.o \
 			source/options.o source/overrides.o source/patch.o source/scale.o \
 			source/scaler_neon.o source/unzip.o source/util.o
 
-BIN       = picoarch
+BIN = picoarch
 
-CFLAGS     += -Wall
-CFLAGS     += -fdata-sections -ffunction-sections -DPICO_HOME_DIR='"/.picoarch/"' -flto
-CFLAGS     += -I./ -I./libretro-common/include/ -I./source $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
-
-LDFLAGS    = -lc -ldl -lgcc -lm -lSDL -lpng12 -lz -Wl,--gc-sections -flto
+CFLAGS += -Wall
+CFLAGS += -fdata-sections -ffunction-sections -DPICO_HOME_DIR='"/.picoarch/"' -flto
+CFLAGS += -I./ -I./libretro-common/include/ -I./source $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
+LDFLAGS = -lc -ldl -lgcc -lm -lSDL -lpng12 -lz -Wl,--gc-sections -flto
 
 PATCH = git apply
 
-# Unpolished or slow cores that build
-# EXTRA_CORES += mame2003_plus
-CORES = gambatte gpsp fceumm snes9x2005_plus pcsx_rearmed picodrive mgba smsplus-gx beetle-pce-fast genesis-plus-gx snes9x2005 nxengine mednafen_supafaust
-CORES+= beetle-vb fake-08
+CORES = gambatte gpsp mgba fceumm snes9x2005_plus snes9x2005 mednafen_supafaust picodrive smsplus-gx genesis-plus-gx pcsx_rearmed
 
-# *_BUILD_PATH seems to assume the makefile is present in the root of the repo
-
-fake-08_REPO = https://github.com/jtothebell/fake-08
-fake-08_BUILD_PATH = cores/fake-08/platform/libretro
-fake-08_CORE = fake08_libretro_miyoomini.so
-
-nxengine_REPO = https://github.com/libretro/nxengine-libretro
-
+#NINTENDO
+quicknes_REPO = https://github.com/libretro/QuickNES_Core
 mednafen_supafaust_REPO = https://github.com/libretro/supafaust
-
 snes9x2005_plus_REPO = https://github.com/libretro/snes9x2005
 snes9x2005_plus_FLAGS = USE_BLARGG_APU=1
-
-beetle-pce-fast_REPO = https://github.com/libretro/beetle-pce-fast-libretro
-beetle-pce-fast_CORE = mednafen_pce_fast_libretro.so
-
-beetle-vb_REPO = https://github.com/libretro/beetle-vb-libretro
-beetle-vb_CORE = mednafen_vb_libretro.so
-
-bluemsx_REPO = https://github.com/libretro/blueMSX-libretro
-
-fbalpha2012_BUILD_PATH = cores/fbalpha2012/svn-current/trunk
-fbalpha2012_MAKEFILE = makefile.libretro
-
+snes9x_REPO = https://github.com/libretro/snes9x
 fceumm_REPO = https://github.com/libretro/libretro-fceumm
 fceumm_MAKEFILE = Makefile.libretro
-
-fmsx_REPO = https://github.com/libretro/fmsx-libretro
-
 gambatte_REPO = https://github.com/libretro/gambatte-libretro
-
-snes9x_REPO = https://github.com/libretro/snes9x
-
-gme_REPO = https://github.com/libretro/libretro-gme
-
-mame2000_REPO = https://github.com/libretro/mame2000-libretro
-mame2003_plus_REPO = https://github.com/libretro/mame2003-plus-libretro
-
+#SEGA
+picodrive_REPO = https://github.com/irixxxx/picodrive
+picodrive_MAKEFILE = Makefile.libretro
+smsplus-gx_MAKEFILE = Makefile.libretro
+smsplus-gx_CORE = smsplus_libretro.so
+genesis-plus-gx_MAKEFILE = Makefile.libretro
+genesis-plus-gx_CORE = genesis_plus_gx_libretro.so
+#PLAYSTATION
 pcsx_rearmed_MAKEFILE = Makefile.libretro
 # the next commit breaks trimui patches
 pcsx_rearmed_REVISION = 131a1b41835bc0eba3e35998dce376163a0a1b14 
 
-picodrive_REPO = https://github.com/irixxxx/picodrive
-picodrive_MAKEFILE = Makefile.libretro
 
+# beetle-pce-fast_REPO = https://github.com/libretro/beetle-pce-fast-libretro
+# beetle-pce-fast_CORE = mednafen_pce_fast_libretro.so
+# beetle-vb_REPO = https://github.com/libretro/beetle-vb-libretro
+# beetle-vb_CORE = mednafen_vb_libretro.so
+# bluemsx_REPO = https://github.com/libretro/blueMSX-libretro
+# fbalpha2012_BUILD_PATH = cores/fbalpha2012/svn-current/trunk
+# fbalpha2012_MAKEFILE = makefile.libretro
+# fmsx_REPO = https://github.com/libretro/fmsx-libretro
+# gme_REPO = https://github.com/libretro/libretro-gme
+# mame2000_REPO = https://github.com/libretro/mame2000-libretro
+# mame2003_plus_REPO = https://github.com/libretro/mame2003-plus-libretro
+# fake-08_REPO = https://github.com/jtothebell/fake-08
+# fake-08_BUILD_PATH = cores/fake-08/platform/libretro
+# fake-08_CORE = fake08_libretro_miyoomini.so
+# nxengine_REPO = https://github.com/libretro/nxengine-libretro
 # pokemini_REPO = https://github.com/libretro/PokeMini
 # pokemini_MAKEFILE = Makefile.libretro
 
-quicknes_REPO = https://github.com/libretro/QuickNES_Core
-
-smsplus-gx_MAKEFILE = Makefile.libretro
-smsplus-gx_CORE = smsplus_libretro.so
-
-genesis-plus-gx_MAKEFILE = Makefile.libretro
-genesis-plus-gx_CORE = genesis_plus_gx_libretro.so
 
 ifeq ($(platform), trimui)
 	OBJS += source/plat_trimui.o
@@ -92,8 +73,6 @@ else ifeq ($(platform), miyoomini)
 	OBJS += source/plat_miyoomini.o
 	CFLAGS += -marm -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -march=armv7ve -fPIC -DCONTENT_DIR='"/mnt/SDCARD/Roms"'
 	LDFLAGS += -fPIC -lmi_sys -lmi_gfx
-# MMENU=1
-# PATCH=patch
 else ifeq ($(platform), unix)
 	OBJS += source/plat_linux.o
 	LDFLAGS += -fPIE
