@@ -1,0 +1,199 @@
+diff --git a/in_sdl.c b/in_sdl.c
+index a84c781..bab649a 100644
+--- a/in_sdl.c
++++ b/in_sdl.c
+@@ -19,11 +19,18 @@
+ typedef unsigned long keybits_t;
+ #define KEYBITS_WORD_BITS (sizeof(keybits_t) * 8)
+ 
++enum mod_state {
++	MOD_NO,
++	MOD_MAYBE,
++	MOD_YES
++};
++
+ struct in_sdl_state {
+ 	const in_drv_t *drv;
+ 	SDL_Joystick *joy;
+ 	int joy_id;
+ 	int axis_keydown[2];
++	enum mod_state mod_state;
+ 	keybits_t keystate[SDLK_LAST / KEYBITS_WORD_BITS + 1];
+ 	// emulator keys should always be processed immediately lest one is lost
+ 	keybits_t emu_keys[SDLK_LAST / KEYBITS_WORD_BITS + 1];
+@@ -259,6 +266,139 @@ static int get_keystate(keybits_t *keystate, int sym)
+ 	return !!(*ks_word & mask);
+ }
+ 
++static inline void switch_key(SDL_Event *event, keybits_t *keystate, short upkey, short downkey)
++{
++	event->type = SDL_KEYUP;
++	event->key.state = SDL_RELEASED;
++	event->key.keysym.sym = upkey;
++
++	update_keystate(keystate, upkey, 0);
++	SDL_PushEvent(event);
++
++	event->type = SDL_KEYDOWN;
++	event->key.state = SDL_PRESSED;
++	event->key.keysym.sym = downkey;
++
++	update_keystate(keystate, downkey, 1);
++	SDL_PushEvent(event);
++}
++
++static void translate_combo_event(struct in_sdl_state *state, SDL_Event *event, keybits_t *keystate)
++{
++	const struct in_pdata *pdata = state->drv->pdata;
++	const struct mod_keymap *map;
++	short key = (short)event->key.keysym.sym;
++	uint8_t type  = event->type;
++	short mod_key = pdata->mod_key;
++	int i;
++
++	if (event->type != SDL_KEYDOWN && event->type != SDL_KEYUP) {
++		SDL_PushEvent(event);
++		return;
++	}
++
++	if (state->mod_state == MOD_NO && key != mod_key) {
++		update_keystate(keystate, event->key.keysym.sym, event->type == SDL_KEYDOWN);
++		SDL_PushEvent(event);
++		return;
++	}
++
++	if (key == mod_key) {
++		switch (state->mod_state) {
++		case MOD_NO:
++			if (type == SDL_KEYDOWN) {
++				/* Pressed mod, maybe a combo? Ignore the keypress
++				 * until it's determined */
++				state->mod_state = MOD_MAYBE;
++
++				for (i = 0; i < pdata->modmap_size; i++) {
++					map = &pdata->mod_keymap[i];
++
++					if (get_keystate(keystate, map->inkey)) {
++						state->mod_state = MOD_YES;
++						switch_key(event, keystate, map->inkey, map->outkey);
++					}
++				}
++			} else {
++				SDL_PushEvent(event);
++			}
++			break;
++		case MOD_MAYBE:
++			if (type == SDL_KEYDOWN) {
++				SDL_PushEvent(event);
++			} else {
++				/* Released mod without combo, simulate down and up */
++				state->mod_state = MOD_NO;
++
++				event->type = SDL_KEYDOWN;
++				event->key.state = SDL_PRESSED;
++				SDL_PushEvent(event);
++
++				event->type = SDL_KEYUP;
++				event->key.state = SDL_RELEASED;
++				SDL_PushEvent(event);
++			}
++			break;
++		case MOD_YES:
++			if (type == SDL_KEYDOWN) {
++				SDL_PushEvent(event);
++			} else {
++				/* Released mod, switch all mod keys to unmod and ignore mod press */
++				state->mod_state = MOD_NO;
++
++				for (i = 0; i < pdata->modmap_size; i++) {
++					map = &pdata->mod_keymap[i];
++
++					if (get_keystate(keystate, map->outkey)) {
++						switch_key(event, keystate, map->outkey, map->inkey);
++					}
++				}
++			}
++			break;
++		default:
++			SDL_PushEvent(event);
++			break;
++		}
++	} else {
++		for (i = 0; i < pdata->modmap_size; i++) {
++			map = &pdata->mod_keymap[i];
++
++			if (map->inkey == key) {
++				state->mod_state = MOD_YES;
++
++				event->key.keysym.sym = map->outkey;
++				update_keystate(keystate, map->outkey, event->type == SDL_KEYDOWN);
++				SDL_PushEvent(event);
++			}
++		}
++	}
++}
++
++static void translate_combo_events(struct in_sdl_state *state, Uint32 mask)
++{
++	const struct in_pdata *pdata = state->drv->pdata;
++	SDL_Event events[10]; /* Must be bigger than events size in collect_events */
++	keybits_t keystate[SDLK_LAST / KEYBITS_WORD_BITS + 1];
++	int count;
++	int has_events;
++	int i;
++
++	if (!pdata->mod_key)
++		return;
++
++	has_events = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, mask);
++
++	if (!has_events)
++		return;
++
++	memcpy(keystate, state->keystate, sizeof(keystate));
++
++	count = SDL_PeepEvents(events, (sizeof(events) / sizeof(events[0])), SDL_GETEVENT, mask);
++	for (i = 0; i < count; i++) {
++		translate_combo_event(state, &events[i], keystate);
++	}
++}
++
+ static int handle_event(struct in_sdl_state *state, SDL_Event *event,
+ 	int *kc_out, int *down_out, int *emu_out)
+ {
+@@ -363,6 +503,9 @@ static int collect_events(struct in_sdl_state *state, int *one_kc, int *one_down
+ 
+ 	SDL_PumpEvents();
+ 
++	if (!state->joy)
++		translate_combo_events(state, mask);
++
+ 	num_events = SDL_PeepEvents(NULL, 0, SDL_PEEKEVENT, mask);
+ 
+ 	for (num_peeped_events = 0; num_peeped_events < num_events; num_peeped_events += count) {
+diff --git a/input.h b/input.h
+index 360b65b..895ad61 100644
+--- a/input.h
++++ b/input.h
+@@ -110,6 +110,11 @@ struct menu_keymap {
+ 	short pbtn;
+ };
+ 
++struct mod_keymap {
++	short inkey;
++	short outkey;
++};
++
+ struct in_pdata {
+ 	const struct in_default_bind *defbinds;
+ 	const struct menu_keymap *key_map;
+@@ -117,6 +122,9 @@ struct in_pdata {
+ 	const struct menu_keymap *joy_map;
+ 	size_t jmap_size;
+ 	const char * const *key_names;
++	short mod_key;
++	const struct mod_keymap *mod_keymap;
++	size_t modmap_size;
+ };
+ 
+ /* to be called by drivers */

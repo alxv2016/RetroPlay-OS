@@ -1,0 +1,28 @@
+diff --git a/Makefile.libretro b/Makefile.libretro
+index 5e52c6557cb732d7ffe0608609428945e714321a..ec03f15376fb21bdbb33e3fa7ddf07350e9f9f51 100644
+--- a/Makefile.libretro
++++ b/Makefile.libretro
+@@ -327,7 +327,22 @@ else ifeq ($(platform), miyoo)
+    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+    CFLAGS += -ffast-math -march=armv5te -mtune=arm926ej-s -fomit-frame-pointer
+    ENDIANNESS_DEFINES += -DLSB_FIRST -DBYTE_ORDER=LITTLE_ENDIAN -DALIGN_DWORD
+-   
++
++# TRIMUI
++else ifeq ($(platform), trimui)
++	TARGET := $(TARGET_NAME)_libretro.so
++	CC = $(CROSS_COMPILE)gcc
++	CXX = $(CROSS_COMPILE)g++
++	AR = $(CROSS_COMPILE)ar
++	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
++	CFLAGS += -fomit-frame-pointer -march=armv5te -mtune=arm926ej-s -ffast-math -fno-PIC -flto
++	CXXFLAGS += -fomit-frame-pointer -march=armv5te -mtune=arm926ej-s -ffast-math -fno-PIC -flto
++	LDFLAGS += -flto
++	ifeq (,$(DEBUG))
++		LDFLAGS += -s
++	endif
++	ENDIANNESS_DEFINES += -DLSB_FIRST -DBYTE_ORDER=LITTLE_ENDIAN -DALIGN_DWORD
++
+ # else ifneq (,$(findstring armv,$(platform)))
+ #    TARGET := $(TARGET_NAME)_libretro.so
+ #    fpic := -fPIC

@@ -1,11 +1,18 @@
 .DS_Store
 .vscode/
 *.o
+*.so
 /build/
 /release/
 temp/
 cache/
 /.build_cached
+
+picoarch/pkg
+picoarch/profile
+picoarch/system
+picoarch/cores
+picoarch/output
 
 src/**/batmon
 !batmon/
