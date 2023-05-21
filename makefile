@@ -11,6 +11,7 @@ RELEASE_NAME=$(TARGET)-v$(VERSION)
 ROOT_DIR := $(shell pwd)
 DOCKER_DIR := $(ROOT_DIR)/docker
 SRC_DIR := $(ROOT_DIR)/src
+PICOARCH_DIR := $(ROOT_DIR)/picoarch
 THIRD_PARTY_DIR := $(ROOT_DIR)/third-party
 BUILD_DIR := $(ROOT_DIR)/build
 RELEASE_DIR := $(ROOT_DIR)/release
@@ -146,24 +147,19 @@ clean-all: clean
 	cd $(SRC_DIR)/sys-msg && make clean
 	cd $(SRC_DIR)/confirm && make clean
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && make distclean
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
+	cd $(PICOARCH_DIR) && make platform=miyoomini clean
 	cd $(THIRD_PARTY_DIR)/DinguxCommander && make clean
 
 clean-cores: clean
 	@echo "\n::$(TARGET) -- Cleaning cores"
-	@echo "\n::$(TARGET) -- Un-patching Picoarch"
-	cd $(THIRD_PARTY_DIR)/picoarch && $(UNPATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && rm -f .patched
 	cd $(SRC_DIR)/libmsettings && make clean
 	cd $(SRC_DIR)/libmmenu && make clean
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini clean
+	cd $(PICOARCH_DIR) && make platform=miyoomini clean
 
 # Third party patches, NOTE Pokemini core and MMENU flag errors out build, patched to remove them.
 third-party/SDL-1.2/.patched:
 	@echo "\n::$(TARGET) -- Patching SDL-1.2"
 	cd $(THIRD_PARTY_DIR)/SDL-1.2 && $(PATCH) -p1 < $(ROOT_DIR)/patches/SDL-1.2/0001-vol-keys.patch && touch .patched
-third-party/picoarch/.patched:
-	@echo "\n::$(TARGET) -- Patching Picoarch"
-	cd $(THIRD_PARTY_DIR)/picoarch && $(PATCH) -p1 < $(ROOT_DIR)/patches/picoarch/0001-picoarch.patch && touch .patched
 
 build-libs: third-party/SDL-1.2/.patched
 # NOTE: run commands to re-build dependency libs
@@ -176,23 +172,23 @@ build-libs: third-party/SDL-1.2/.patched
 	cp $(THIRD_PARTY_DIR)/latency_reduction/audioserver.mod $(BUILD_DIR)/dist/.system/bin/
 	cp $(THIRD_PARTY_DIR)/SDL-1.2/build/.libs/libSDL-1.2.so.0.11.5 $(BUILD_DIR)/dist/.system/lib/libSDL-1.2.so.0
 
-build-cores: third-party/picoarch/.patched
+build-cores:
 # NOTE: run commands to re-build cores
 # Fbalpha2012 cores provided else where
 # NOTE: Dependencies on libmsettings and libmmenu to build cores
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(SRC_DIR)/libmsettings && make
 	cd $(SRC_DIR)/libmmenu && make
-	cd $(THIRD_PARTY_DIR)/picoarch && make platform=miyoomini MMENU=1 -j
-	cp $(THIRD_PARTY_DIR)/picoarch/output/picoarch $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/fceumm_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/gambatte_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/gpsp_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/pcsx_rearmed_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/picodrive_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/snes9x2005_plus_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/mednafen_supafaust_libretro.so $(CORES_DIR)
-	cp $(THIRD_PARTY_DIR)/picoarch/output/mgba_libretro.so $(CORES_DIR)
+	cd $(PICOARCH_DIR) && make platform=miyoomini MMENU=1 -j
+	cp $(PICOARCH_DIR)/output/picoarch $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/fceumm_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/gambatte_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/gpsp_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/pcsx_rearmed_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/picodrive_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/snes9x2005_plus_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/mednafen_supafaust_libretro.so $(CORES_DIR)
+	cp $(PICOARCH_DIR)/output/mgba_libretro.so $(CORES_DIR)
 
 # Init git submodules
 git-submodules:
