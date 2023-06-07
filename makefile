@@ -179,7 +179,7 @@ build-cores:
 	@echo "\n::$(TARGET) -- Pulling and compiling Picoarch cores for Miyoo Mini"
 	cd $(SRC_DIR)/libmsettings && make
 	cd $(SRC_DIR)/libmmenu && make
-	cd $(PICOARCH_DIR) && make platform=miyoomini MMENU=1 -j
+	cd $(PICOARCH_DIR) && make platform=miyoomini -j
 	cp $(PICOARCH_DIR)/output/picoarch $(CORES_DIR)
 	cp $(PICOARCH_DIR)/output/fceumm_libretro.so $(CORES_DIR)
 	cp $(PICOARCH_DIR)/output/gambatte_libretro.so $(CORES_DIR)

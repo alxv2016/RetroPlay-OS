@@ -1,6 +1,16 @@
 #ifndef _MMENU_H
 #define _MMENU_H
 
+#define TOTAL_SLOTS 6
+#define MENU_ITEMS 5
+
+typedef enum EmuMenu {
+	OPTS_CONTINUE,
+	OPTS_SAVE,
+	OPTS_LOAD,
+	OPTS_SETTINGS,
+	OPTS_QUIT
+} EmuMenu;
 // NOTE: Code base has dependencies linked to code written in picoarch main.c cannot rename functions or types
 // NOTE: have to use this naming convention due to dependency from legacy picoarch code for mmenu integration
 typedef enum MenuReturnStatus {

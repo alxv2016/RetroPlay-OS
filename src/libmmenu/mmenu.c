@@ -1,9 +1,9 @@
+#include <dlfcn.h>
+#include <msettings.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <dlfcn.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <msettings.h>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_image.h>
@@ -12,195 +12,172 @@
 #include "../common/defines.h"
 #include "../common/keycontext.h"
 
-#include "../common/utils.h"
 #include "../common/api.h"
 #include "../common/controls.h"
 #include "../common/interface.h"
+#include "../common/utils.h"
 
 #include "mmenu.h"
 
+char *menuItems[MENU_ITEMS];
 static int slot = 0;
+static int state_support = 1;
+static int disable_poweroff = 0;
+static SDL_Surface *ingameOverlay;
+static SDL_Surface *ingameScreen;
 
 __attribute__((constructor)) static void MMenu_init(void) {
-	void* librt = dlopen("librt.so.1", RTLD_LAZY | RTLD_GLOBAL);
-	void* libmsettings = dlopen("libmsettings.so", RTLD_LAZY | RTLD_GLOBAL);
-	InitSettings();
+  void *librt = dlopen("librt.so.1", RTLD_LAZY | RTLD_GLOBAL);
+  void *libmsettings = dlopen("libmsettings.so", RTLD_LAZY | RTLD_GLOBAL);
+  InitSettings();
 
-	gfx.overlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 16, 0, 0, 0, 0);
-	SDL_SetAlpha(gfx.overlay, SDL_SRCALPHA, 0x80);
-	SDL_FillRect(gfx.overlay, NULL, 0);
+  menuItems[OPTS_CONTINUE] = "Continue";
+  menuItems[OPTS_LOAD] = "Load game";
+  menuItems[OPTS_SAVE] = "Save game";
+  menuItems[OPTS_SETTINGS] = "Settings";
+  menuItems[OPTS_QUIT] = "Quit game";
+
+  ingameOverlay = SDL_CreateRGBSurface(SDL_SWSURFACE, SCREEN_WIDTH, SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+  SDL_SetAlpha(ingameOverlay, SDL_SRCALPHA, 0x80);
+  SDL_FillRect(ingameOverlay, NULL, 0);
 }
 __attribute__((destructor)) static void MMenu_quit(void) {
-	SDL_FreeSurface(gfx.overlay);
+  SDL_FreeSurface(ingameOverlay);
 }
 
-static MenuReturnStatus SaveLoad(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave) {
-	int status = kStatusContinue;
-	return status;
+/* INGAME MENU */
+static void settingActiveItem(SDL_Surface *surface, int y, int w) {
+  int background = SDL_MapRGB(surface->format, GREY500);
+  int accent = SDL_MapRGB(surface->format, PRIMARY);
+  SDL_FillRect(surface, &(SDL_Rect){0, y, w, ROW_HEIGHT}, background);
+  SDL_FillRect(surface, &(SDL_Rect){0, y, 6, ROW_HEIGHT}, accent);
 }
 
-MenuReturnStatus ShowMenu(char* rom_path, char* save_path_template, SDL_Surface* optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave) {
+static void settingItem(SDL_Surface *surface, SDL_Surface *label, int x, int y, int marginLeft, int w) {
+  int cy = (ROW_HEIGHT / 2) - (label->h / 2);
+  SDL_BlitSurface(label, &(SDL_Rect){0, 0, w, label->h}, surface, &(SDL_Rect){x, y + cy});
+  SDL_FreeSurface(label);
+}
 
-	// gfx.screen = SDL_GetVideoSurface();
-	// SDL_BlitSurface(gfx.overlay, NULL, gfx.screen, NULL);
-	SDL_EnableKeyRepeat(300,100);
-	Input_reset();
+void settingsMenu(SDL_Surface *surface, int selected, int i) {
+#define MIN(min, max) (min) < (max) ? (min) : (max)
+  int marginLeft = SPACING_XL;
+  char *item = menuItems[i];
+  SDL_Surface *label =
+      TTF_RenderUTF8_Blended(font.h3, item, (SDL_Color){LIGHT_TEXT});
+  int labelMarginLeft = marginLeft + SPACING_MD;
+  int labelWidth = labelMarginLeft + label->w + marginLeft;
+  int availableWidth = SCREEN_WIDTH / 2 - marginLeft;
+  int cy = (ROW_HEIGHT / 2) - (label->h / 2);
 
-		// path and string things
-	char* tmp;
-	char rom_file[256]; // with extension
-	char rom_name[256]; // without extension or cruft
-	char slot_path[256];
-	char emu_name[256];
-	char mmenu_dir[256];
+  int rowWidth = labelWidth;
+  int maxLabelWidth = MIN(rowWidth, labelWidth);
+  int screenCenter = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * MENU_ITEMS) / 2);
 
-	// filename
-	tmp = strrchr(rom_path,'/');
-	if (tmp==NULL) tmp = rom_path;
-	else tmp += 1;
-	strcpy(rom_file, tmp);
-	
-	getEmuName(rom_path, emu_name);
-	sprintf(mmenu_dir, "%s/.mmenu/%s", getenv("USERDATA_PATH"), emu_name);
-	mkdir(mmenu_dir, 0755);
+  if (i == selected) {
+    settingActiveItem(surface, screenCenter + i * ROW_HEIGHT, rowWidth);
+  }
+  settingItem(surface, label, labelMarginLeft, screenCenter + (i * ROW_HEIGHT),
+              marginLeft, maxLabelWidth);
+}
 
-	// does this game have an m3u?
-	int rom_disc = -1;
-	int disc = rom_disc;
-	int total_discs = 0;
-	char disc_name[16];
-	char* disc_paths[9]; // up to 9 paths, Arc the Lad Collection is 7 discs
+void initSettings(SDL_Surface *surface, int selected) {
+  for (int i = 0; i < MENU_ITEMS; i++) {
+    settingsMenu(surface, selected, i);
+  }
+}
+/*********/
 
-	// construct m3u path based on parent directory
-	// essentially hasM3u() from MiniUI but we use the building blocks as well
-	char m3u_path[256];
-	strcpy(m3u_path, rom_path);
-	tmp = strrchr(m3u_path, '/') + 1;
-	tmp[0] = '\0';
+static MenuReturnStatus SaveLoad(char *rom_path, char *save_path_template, SDL_Surface *optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave) {
+  int status = kStatusContinue;
+  return status;
+}
 
-	// path to parent directory
-	char base_path[256]; // used below too when status==kItemSave
-	strcpy(base_path, m3u_path);
+MenuReturnStatus ShowMenu(char *rom_path, char *save_path_template, SDL_Surface *optional_snapshot, MenuRequestState requested_state, AutoSave_t autosave) {
 
-	tmp = strrchr(m3u_path, '/');
-	tmp[0] = '\0';
+  ingameScreen = SDL_GetVideoSurface();
+  SDL_BlitSurface(ingameOverlay, NULL, ingameScreen, NULL);
+  SDL_EnableKeyRepeat(300, 100);
+  Input_reset();
 
-	// get parent directory name
-	char dir_name[256];
-	tmp = strrchr(m3u_path, '/');
-	strcpy(dir_name, tmp);
+  int status = kStatusContinue;
+  int optionSelected = 0;
+  int quit = 0;
+  int dirty = 1;
 
-	// dir_name is also our m3u file name
-	tmp = m3u_path + strlen(m3u_path); 
-	strcpy(tmp, dir_name);
+  while (!quit) {
+    unsigned long frameStart = SDL_GetTicks();
+    Input_poll();
 
-	// add extension
-	tmp = m3u_path + strlen(m3u_path);
-	strcpy(tmp, ".m3u");
-	
-	if (exists(m3u_path)) {
-		// share saves across multi-disc games
-		strcpy(rom_file, dir_name);
-		tmp = rom_file + strlen(rom_file);
-		strcpy(tmp, ".m3u");
-		
-		//read m3u file
-		FILE* file = fopen(m3u_path, "r");
-		if (file) {
-			char line[256];
-			while (fgets(line,256,file)!=NULL) {
-				int len = strlen(line);
-				if (len>0 && line[len-1]=='\n') {
-					line[len-1] = 0; // trim newline
-					len -= 1;
-					if (len>0 && line[len-1]=='\r') {
-						line[len-1] = 0; // trim Windows newline
-						len -= 1;
-					}
-				}
-				if (len==0) continue; // skip empty lines
-		
-				char disc_path[256];
-				strcpy(disc_path, base_path);
-				tmp = disc_path + strlen(disc_path);
-				strcpy(tmp, line);
-				
-				// found a valid disc path
-				if (exists(disc_path)) {
-					disc_paths[total_discs] = strdup(disc_path);
-					// matched our current disc
-					if (exactMatch(disc_path, rom_path)) {
-						rom_disc = total_discs;
-						disc = rom_disc;
-						sprintf(disc_name, "Disc %i", disc+1);
-					}
-					total_discs += 1;
-				}
-			}
-			fclose(file);
-		}
-	}
-	
-	// m3u path may change rom_file
-	sprintf(slot_path, "%s/%s.txt", mmenu_dir, rom_file);
-	getDisplayName(rom_file, rom_name);
+    if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU)) && !dirty) {
+      status = kStatusContinue;
+      quit = 1;
+    } else if (Input_justPressed(BTN_A)) {
+      switch (optionSelected) {
+      case OPTS_CONTINUE:
+        status = kStatusContinue;
+        quit = 1;
+        break;
+      case OPTS_SAVE:
+        break;
+      case OPTS_LOAD:
+        break;
+      case OPTS_SETTINGS:
+        status = kStatusOpenMenu;
+        quit = 1;
+        break;
+      case OPTS_QUIT:
+        status = kStatusExitGame;
+        quit = 1;
+        break;
+      }
+    }
 
-	char save_path[256];
-	char bmp_path[256];
-	char txt_path[256];
-	int save_exists = 0;
-	int preview_exists = 0;
+    if (Input_justPressed(BTN_UP)) {
+      optionSelected -= 1;
+      if (optionSelected < 0) {
+        optionSelected += MENU_ITEMS;
+      }
+      dirty = 1;
+    } else if (Input_justPressed(BTN_DOWN)) {
+      optionSelected += 1;
+      if (optionSelected >= MENU_ITEMS) {
+        optionSelected -= MENU_ITEMS;
+      }
+      dirty = 1;
+    }
 
-	if (exists(slot_path)) slot = getInt(slot_path);
-	if (slot==8) slot = 0;
+    if (dirty) {
+      SDL_FillRect(ingameScreen, NULL, 0);
+      initSettings(ingameScreen, optionSelected);
+      SDL_Flip(ingameScreen);
+      dirty = 0;
+    }
 
-	int status = kStatusContinue;
-	int quit = 0;
-	int dirty = 1;
+    // slow down to 60fps
+    GFX_sync(frameStart);
+  }
 
-	
-	while (!quit) {
-		unsigned long frameStart = SDL_GetTicks();
-		Input_poll();
+  if (status != kStatusPowerOff) {
+    SDL_FillRect(ingameScreen, NULL, 0);
+    SDL_Flip(ingameScreen);
+  }
 
-		if ((Input_justPressed(BTN_B) || Input_justReleased(BTN_MENU)) && !dirty) {
-			status = kStatusOpenMenu;
-			quit = 1;
-		}
-		else if (Input_justPressed(BTN_A)) {
-			status = kStatusExitGame;
-			quit = 1;
-			if (quit) break;
-		}
-		
-		if (dirty) {
-			dirty = 0;
-			// SDL_Flip(gfx.screen);
-		}
-		
-		// slow down to 60fps
-		GFX_sync(frameStart);
-	}
-	
-	// redraw original screen before returning
-	if (status!=kStatusPowerOff) {
-		// SDL_FillRect(gfx.screen, NULL, 0);
-		// SDL_Flip(gfx.screen);
-	}
-
-	SDL_EnableKeyRepeat(0,0);
-	return status;
+  QuitSettings();
+  return status;
 }
 
 int ResumeSlot(void) {
-	if (!exists(RESUME_SLOT_PATH)) return -1;
-	slot = getInt(RESUME_SLOT_PATH);
-	unlink(RESUME_SLOT_PATH);
-	return slot;
+  if (!exists(RESUME_SLOT_PATH))
+    return -1;
+  slot = getInt(RESUME_SLOT_PATH);
+  unlink(RESUME_SLOT_PATH);
+  return slot;
 }
 
-int ChangeDisc(char* disc_path) {
-	if (!exists(CHANGE_DISC_PATH)) return 0;
-	getFile(CHANGE_DISC_PATH, disc_path, 256);
-	return 1;
+int ChangeDisc(char *disc_path) {
+  if (!exists(CHANGE_DISC_PATH))
+    return 0;
+  getFile(CHANGE_DISC_PATH, disc_path, 256);
+  return 1;
 }

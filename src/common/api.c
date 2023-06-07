@@ -410,12 +410,13 @@ Array *getRoot(Array *recents) {
         strcpy(tmp, dp->d_name);
         int type = suffixMatch(".pak", full_path) ? ENTRY_PAK : ENTRY_DIR;
         Array_push(emus, Entry_new(full_path, type));
-      } else {
-        // Show Emulators regardless
-        strcpy(tmp, dp->d_name);
-        int type = suffixMatch(".pak", full_path) ? ENTRY_PAK : ENTRY_DIR;
-        Array_push(emus, Entry_new(full_path, type));
-      }
+      } 
+      // else {
+      //   // Show Emulators regardless
+      //   strcpy(tmp, dp->d_name);
+      //   int type = suffixMatch(".pak", full_path) ? ENTRY_PAK : ENTRY_DIR;
+      //   Array_push(emus, Entry_new(full_path, type));
+      // }
     }
     EntryArray_sort(emus);
     Entry *prev_entry = NULL;
