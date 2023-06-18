@@ -363,11 +363,14 @@ void handle_emu_action(emu_action action)
 	{
 	case EACTION_NONE:
 		break;
-	case EACTION_MENU:
 	case EACTION_SLEEP:
+		break;
 	case EACTION_POWER_OFF:
 		sram_write();
+		should_quit = 1;
+		break;
 		// intentional fallthrough
+	case EACTION_MENU:
 	case EACTION_SAVE_STATE:
 	case EACTION_LOAD_STATE:
 		toggle_fast_forward(1); /* Force FF off */

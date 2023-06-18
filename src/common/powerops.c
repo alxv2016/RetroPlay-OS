@@ -110,9 +110,9 @@ int preventAutosleep(void) { return isCharging(); }
 void powerOff(void) {
   if (can_poweroff) {
     menuSuperShortPulse();
-    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off your device." : "Powering off your device.";
+    char *msg = exists(AUTO_RESUME_PATH) ? "Quicksave created,\npowering off your device." : "Powering off device.";
     SDL_FillRect(gfx.screen, NULL, 0);
-    powerOffState(gfx.screen, "Goodbye!", msg);
+    powerOffState(gfx.screen, "Powering off", msg);
     SDL_Flip(gfx.screen);
     sleep(2);
     system("shutdown");

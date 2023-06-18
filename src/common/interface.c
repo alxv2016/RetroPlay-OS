@@ -58,27 +58,18 @@ void GFX_init(void) {
   gfx.screenshot = loadImage("photos.png");
   gfx.files = loadImage("files.png");
   gfx.sleep_timer = loadImage("sleep-timer.png");
-  gfx.arcade = loadImage("arcade.png");
+  gfx.arcade = loadImage("arc.png");
   gfx.nes = loadImage("nes.png");
-  gfx.gameboy = loadImage("gameboy.png");
+  gfx.gameboy = loadImage("gb.png");
   gfx.gba = loadImage("gba.png");
   gfx.gbc = loadImage("gbc.png");
-  gfx.sega = loadImage("sega.png");
-  gfx.gamegear = loadImage("gamegear.png");
-  gfx.playstation = loadImage("playstation.png");
+  gfx.sega = loadImage("gen.png");
+  gfx.gamegear = loadImage("gg.png");
+  gfx.playstation = loadImage("ps.png");
   gfx.snes = loadImage("snes.png");
-  gfx.sys_arcade = loadImage("sys-arcade.png");
-  gfx.sys_gb = loadImage("sys-gb.png");
-  gfx.sys_gba = loadImage("sys-gba.png");
-  gfx.sys_gbc = loadImage("sys-gbc.png");
-  gfx.sys_gg = loadImage("sys-gg.png");
-  gfx.sys_nes = loadImage("sys-nes.png");
-  gfx.sys_playstation = loadImage("sys-playstation.png");
-  gfx.sys_sega = loadImage("sys-sega.png");
-  gfx.sys_snes = loadImage("sys-snes.png");
   gfx.empty_state = loadImage("empty-folder.png");
   gfx.empty_screenshots = loadImage("empty-screenshots.png");
-  gfx.poweroff_state = loadImage("wave.png");
+  gfx.poweroff_state = loadImage("heart.png");
   gfx.sleep_state = loadImage("sleep-mode.png");
   gfx.digits = loadImage("digits.png");
 }
@@ -131,15 +122,6 @@ void GFX_quit(void) {
   SDL_FreeSurface(gfx.sega);
   SDL_FreeSurface(gfx.playstation);
   SDL_FreeSurface(gfx.snes);
-  SDL_FreeSurface(gfx.sys_arcade);
-  SDL_FreeSurface(gfx.sys_gb);
-  SDL_FreeSurface(gfx.sys_gba);
-  SDL_FreeSurface(gfx.sys_gbc);
-  SDL_FreeSurface(gfx.sys_gg);
-  SDL_FreeSurface(gfx.sys_nes);
-  SDL_FreeSurface(gfx.sys_playstation);
-  SDL_FreeSurface(gfx.sys_sega);
-  SDL_FreeSurface(gfx.sys_snes);
   SDL_FreeSurface(gfx.empty_state);
   SDL_FreeSurface(gfx.empty_screenshots);
   SDL_FreeSurface(gfx.poweroff_state);
@@ -167,9 +149,8 @@ void GFX_quit(void) {
 
 /* COMPONENTS */
 
-static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIcon, int showSysIcon, int showIcon, char *displayName, char *path, int row, int selected_row, int total) {
+static void listItem(SDL_Surface *surface, SDL_Surface *icon, int showIcon, char *displayName, char *path, int row, int selected_row, int total) {
   #define MIN(min, max) (min) < (max) ? (min) : (max)
-  if (sysIcon == NULL) sysIcon = gfx.sys_arcade;
   if (icon == NULL) icon = gfx.nes;
   int marginLeft = SPACING_XL;
   int titleMarginLeft = showIcon? marginLeft + CONSOLE_ICON_SIZE + SPACING_MD: marginLeft;
@@ -187,12 +168,7 @@ static void listItem(SDL_Surface *surface, SDL_Surface *icon, SDL_Surface *sysIc
   int rows = total < ROW_COUNT? total: ROW_COUNT;
   int screen_center = (SCREEN_HEIGHT / 2) - ((ROW_HEIGHT * rows) / 2);
 
-  int sw = sysIcon->w;
-  int sx = SCREEN_WIDTH - sw;
-  int scy = (SCREEN_HEIGHT / 2) - (sysIcon->h / 2);
-
   if (row == selected_row) {
-    if (showSysIcon && showIcon) SDL_BlitSurface(sysIcon, NULL, surface, &(SDL_Rect){sx, scy});
     SDL_FillRect(surface, &(SDL_Rect){0, screen_center + row * ROW_HEIGHT, rowWidth, ROW_HEIGHT}, background);
     SDL_FillRect(surface,&(SDL_Rect){0, screen_center + row * ROW_HEIGHT, 6, ROW_HEIGHT}, accent);
   }
@@ -210,33 +186,33 @@ void listMenu(SDL_Surface *surface, char *path, int consoleDir, int recentDir, c
   trimSortingMeta(&display_name);
   // Display console icons on root directory
   if (!strcmp(emuTag, "FBA") && consoleDir) {
-    listItem(surface, gfx.arcade, gfx.sys_arcade, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.arcade, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "FC") && consoleDir) {
-    listItem(surface, gfx.nes, gfx.sys_nes, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.nes, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "GB") && consoleDir) {
-    listItem(surface, gfx.gameboy, gfx.sys_gb, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.gameboy, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "GBA") && consoleDir) {
-    listItem(surface, gfx.gba, gfx.sys_gba, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.gba, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "GBC") && consoleDir) {
-    listItem(surface,gfx.gbc, gfx.sys_gbc, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.gbc, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "MD") && consoleDir) {
-    listItem(surface, gfx.sega, gfx.sys_sega, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.sega, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "GG") && consoleDir) {
-    listItem(surface, gfx.gamegear, gfx.sys_gg, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.gamegear, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "PS") && consoleDir) {
-    listItem(surface, gfx.playstation, gfx.sys_playstation, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface, gfx.playstation, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(emuTag, "SFC") && consoleDir) {
-    listItem(surface,gfx.snes, gfx.sys_snes, 1, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.snes, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Recently Played")) {
-    listItem(surface,gfx.recents, NULL, 0, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.recents, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Clock")) {
-    listItem(surface,gfx.clock, NULL, 0, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.clock, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Files")) {
-    listItem(surface,gfx.files, NULL, 0, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.files, 1, display_name, path, row, selected_row, total);
   } else if (!strcmp(name, "Screenshots")) {
-    listItem(surface,gfx.screenshot, NULL, 0, 1, display_name, path, row, selected_row, total);
+    listItem(surface,gfx.screenshot, 1, display_name, path, row, selected_row, total);
   } else {
-    listItem(surface, NULL, NULL, 0, 0, display_name, path, row, selected_row, total);
+    listItem(surface, NULL, 0, display_name, path, row, selected_row, total);
   }
 
 }
